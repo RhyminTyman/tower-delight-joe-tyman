@@ -9,20 +9,18 @@ const MAP_PLACEHOLDER =
 
 type DriverDashboardProps = DriverDashboardData & {
   towId?: string;
-  updateStatus?: (formData: FormData) => Promise<void>;
-  startCapture?: (formData: FormData) => Promise<void>;
 };
 
-export const DriverDashboard = ({ driver, route, nextAction, towId, updateStatus, startCapture }: DriverDashboardProps) => (
+export const DriverDashboard = ({ driver, route, nextAction, towId }: DriverDashboardProps) => (
   <>
     <main className="mx-auto flex min-h-screen max-w-md flex-col gap-5 px-4 pb-28 pt-6 sm:max-w-lg">
       <DriverHeader driver={driver} />
-      <RouteMapCard route={route} towId={towId} updateStatus={updateStatus} />
+      <RouteMapCard route={route} towId={towId} />
       <RouteDetailCard driver={driver} route={route} />
       <StatusTimeline statuses={route.statuses} />
       <FooterNotes />
     </main>
-    <BottomActionCTA nextAction={nextAction} towId={towId} startCapture={startCapture} />
+    <BottomActionCTA nextAction={nextAction} />
   </>
 );
 
@@ -49,12 +47,10 @@ const DriverHeader = ({
 
 const RouteMapCard = ({ 
   route, 
-  towId, 
-  updateStatus 
+  towId
 }: { 
   route: DriverDashboardProps["route"]; 
   towId?: string;
-  updateStatus?: (formData: FormData) => Promise<void>;
 }) => (
   <div className="overflow-hidden rounded-3xl border border-border/60 bg-secondary/40 shadow-card">
     <div className="relative h-56">
@@ -71,14 +67,6 @@ const RouteMapCard = ({
           >
             {route.status}
           </Badge>
-          {updateStatus && towId && (
-            <form action={updateStatus}>
-              <input type="hidden" name="towId" value={towId} />
-              <Button variant="secondary" className="bg-white/90 text-black hover:bg-white" size="sm">
-                {route.updateCta}
-              </Button>
-            </form>
-          )}
         </div>
         <div className="flex flex-col gap-3 rounded-2xl bg-black/45 p-4 backdrop-blur">
           <div className="flex items-start justify-between gap-6">
@@ -214,13 +202,9 @@ const StatusTimeline = ({
 };
 
 const BottomActionCTA = ({ 
-  nextAction, 
-  towId,
-  startCapture 
+  nextAction
 }: { 
   nextAction: DriverDashboardProps["nextAction"];
-  towId?: string;
-  startCapture?: (formData: FormData) => Promise<void>;
 }) => (
   <div className="fixed inset-x-0 bottom-0 z-20 border-t border-slate-800 bg-slate-950/95 px-4 pb-6 pt-4 backdrop-blur">
     <div className="mx-auto flex max-w-md items-center justify-between gap-3 sm:max-w-lg">
@@ -229,14 +213,6 @@ const BottomActionCTA = ({
         <p className="text-sm font-semibold text-foreground">{nextAction.label}</p>
         <p className="text-xs text-muted-foreground">{nextAction.detail}</p>
       </div>
-      {startCapture && towId && (
-        <form action={startCapture}>
-          <input type="hidden" name="towId" value={towId} />
-          <Button className="rounded-full px-6 py-3 text-sm font-semibold shadow-lg shadow-brand/50">
-            Start Capture
-          </Button>
-        </form>
-      )}
     </div>
   </div>
 );

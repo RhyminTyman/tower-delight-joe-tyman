@@ -296,7 +296,7 @@ export const TowDetail = async (requestInfo: RequestInfo) => {
           </div>
         </div>
       </header>
-      <DriverDashboard {...data} towId={towId} updateStatus={updateStatusAction} startCapture={startCaptureAction} />
+      <DriverDashboard {...data} towId={towId} />
     </div>
   );
 };

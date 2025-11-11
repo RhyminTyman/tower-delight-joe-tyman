@@ -62,4 +62,7 @@ export async function updateAddress(formData: FormData) {
     console.error("[updateAddress] ERROR:", error);
     throw error;
   }
+
+  // After successful update, redirect back
+  console.log("[updateAddress] Redirecting to /tow/" + towId);
 }

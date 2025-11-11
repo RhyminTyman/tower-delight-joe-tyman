@@ -174,6 +174,14 @@ export async function createTow(formData: FormData) {
 
   const mapUrl = generateMapUrl(pickupWithCoords, destinationWithCoords);
 
+  // Get current time for the timestamp
+  const now = new Date();
+  const currentTime = now.toLocaleTimeString('en-US', { 
+    hour: 'numeric', 
+    minute: '2-digit',
+    hour12: true 
+  });
+
   payload.route = {
     ...payload.route,
     status: "Waiting",
@@ -193,6 +201,7 @@ export async function createTow(formData: FormData) {
         return {
           ...status,
           status: "active",
+          time: currentTime,
         };
       }
       return {

@@ -9,18 +9,20 @@ const MAP_PLACEHOLDER =
 
 type DriverDashboardProps = DriverDashboardData & {
   towId?: string;
+  updateStatus?: (formData: FormData) => Promise<void>;
+  startCapture?: (formData: FormData) => Promise<void>;
 };
 
-export const DriverDashboard = ({ driver, route, nextAction, towId }: DriverDashboardProps) => (
+export const DriverDashboard = ({ driver, route, nextAction, towId, updateStatus, startCapture }: DriverDashboardProps) => (
   <>
     <main className="mx-auto flex min-h-screen max-w-md flex-col gap-5 px-4 pb-28 pt-6 sm:max-w-lg">
       <DriverHeader driver={driver} />
-      <RouteMapCard route={route} towId={towId} />
+      <RouteMapCard route={route} towId={towId} updateStatus={updateStatus} />
       <RouteDetailCard driver={driver} route={route} />
       <StatusTimeline statuses={route.statuses} />
       <FooterNotes />
     </main>
-    <BottomActionCTA nextAction={nextAction} />
+    <BottomActionCTA nextAction={nextAction} towId={towId} startCapture={startCapture} />
   </>
 );
 
@@ -45,7 +47,15 @@ const DriverHeader = ({
   </header>
 );
 
-const RouteMapCard = ({ route, towId }: { route: DriverDashboardProps["route"]; towId?: string }) => (
+const RouteMapCard = ({ 
+  route, 
+  towId, 
+  updateStatus 
+}: { 
+  route: DriverDashboardProps["route"]; 
+  towId?: string;
+  updateStatus?: (formData: FormData) => Promise<void>;
+}) => (
   <div className="overflow-hidden rounded-3xl border border-border/60 bg-secondary/40 shadow-card">
     <div className="relative h-56">
       <div
@@ -61,11 +71,14 @@ const RouteMapCard = ({ route, towId }: { route: DriverDashboardProps["route"]; 
           >
             {route.status}
           </Badge>
-          <form action={updateStatus}>
-            <Button variant="secondary" className="bg-white/90 text-black hover:bg-white" size="sm">
-              {route.updateCta}
-            </Button>
-          </form>
+          {updateStatus && towId && (
+            <form action={updateStatus}>
+              <input type="hidden" name="towId" value={towId} />
+              <Button variant="secondary" className="bg-white/90 text-black hover:bg-white" size="sm">
+                {route.updateCta}
+              </Button>
+            </form>
+          )}
         </div>
         <div className="flex flex-col gap-3 rounded-2xl bg-black/45 p-4 backdrop-blur">
           <div className="flex items-start justify-between gap-6">
@@ -200,7 +213,15 @@ const StatusTimeline = ({
   );
 };
 
-const BottomActionCTA = ({ nextAction }: { nextAction: DriverDashboardProps["nextAction"] }) => (
+const BottomActionCTA = ({ 
+  nextAction, 
+  towId,
+  startCapture 
+}: { 
+  nextAction: DriverDashboardProps["nextAction"];
+  towId?: string;
+  startCapture?: (formData: FormData) => Promise<void>;
+}) => (
   <div className="fixed inset-x-0 bottom-0 z-20 border-t border-slate-800 bg-slate-950/95 px-4 pb-6 pt-4 backdrop-blur">
     <div className="mx-auto flex max-w-md items-center justify-between gap-3 sm:max-w-lg">
       <div>
@@ -208,11 +229,14 @@ const BottomActionCTA = ({ nextAction }: { nextAction: DriverDashboardProps["nex
         <p className="text-sm font-semibold text-foreground">{nextAction.label}</p>
         <p className="text-xs text-muted-foreground">{nextAction.detail}</p>
       </div>
-      <form action={startCapture}>
-        <Button className="rounded-full px-6 py-3 text-sm font-semibold shadow-lg shadow-brand/50">
-          Start Capture
-        </Button>
-      </form>
+      {startCapture && towId && (
+        <form action={startCapture}>
+          <input type="hidden" name="towId" value={towId} />
+          <Button className="rounded-full px-6 py-3 text-sm font-semibold shadow-lg shadow-brand/50">
+            Start Capture
+          </Button>
+        </form>
+      )}
     </div>
   </div>
 );
@@ -223,94 +247,4 @@ const FooterNotes = () => (
     history keep the operator aligned with Tower Delight policy in a single glance.
   </footer>
 );
-
-// Server Actions
-async function updateStatus(formData: FormData) {
-  "use server";
-  
-  // Get current dashboard data
-  const currentData = await db
-    .selectFrom("driver_dashboard")
-    .select("payload")
-    .where("id", "=", "primary")
-    .executeTakeFirst();
-  
-  if (currentData) {
-    const data = typeof currentData.payload === 'string' ? JSON.parse(currentData.payload) : currentData.payload;
-    
-    // Advance the workflow to next status
-    const currentActiveIndex = data.route.statuses.findIndex((s: any) => s.status === "active");
-    if (currentActiveIndex >= 0 && currentActiveIndex < data.route.statuses.length - 1) {
-      // Mark current as completed
-      data.route.statuses[currentActiveIndex].status = "completed";
-      data.route.statuses[currentActiveIndex].time = new Date().toLocaleTimeString("en-US", {
-        hour: "numeric",
-        minute: "2-digit",
-      });
-      
-      // Mark next as active
-      data.route.statuses[currentActiveIndex + 1].status = "active";
-      data.route.statuses[currentActiveIndex + 1].time = new Date().toLocaleTimeString("en-US", {
-        hour: "numeric",
-        minute: "2-digit",
-      });
-      
-      // Update route status label
-      data.route.status = data.route.statuses[currentActiveIndex + 1].label;
-    }
-    
-    // Save back to database
-    await db
-      .updateTable("driver_dashboard")
-      .set({
-        payload: JSON.stringify(data),
-        updated_at: Math.floor(Date.now() / 1000),
-      })
-      .where("id", "=", "primary")
-      .execute();
-  }
-}
-
-async function startCapture(formData: FormData) {
-  "use server";
-  
-  // Get current dashboard data
-  const currentData = await db
-    .selectFrom("driver_dashboard")
-    .select("payload")
-    .where("id", "=", "primary")
-    .executeTakeFirst();
-  
-  if (currentData) {
-    const data = typeof currentData.payload === 'string' ? JSON.parse(currentData.payload) : currentData.payload;
-    
-    // Mark VIN scan checklist item as complete
-    const vinScanItem = data.checklist.find((item: any) => item.id === "vin-scan");
-    if (vinScanItem) {
-      vinScanItem.complete = true;
-    }
-    
-    // Mark photo proof checklist item as complete
-    const photoProofItem = data.checklist.find((item: any) => item.id === "photo-proof");
-    if (photoProofItem) {
-      photoProofItem.complete = true;
-    }
-    
-    // Update next action
-    data.nextAction = {
-      label: "Review captured evidence",
-      detail: "VIN and photos captured. Ready for impound intake.",
-    };
-    
-    // Save back to database
-    await db
-      .updateTable("driver_dashboard")
-      .set({
-        payload: JSON.stringify(data),
-        updated_at: Math.floor(Date.now() / 1000),
-      })
-      .where("id", "=", "primary")
-      .execute();
-  }
-}
 

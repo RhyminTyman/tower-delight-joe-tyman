@@ -96,6 +96,105 @@ async function addNote(formData: FormData) {
   }
 }
 
+async function updateStatus(formData: FormData) {
+  "use server";
+
+  const towId = formData.get("towId") as string;
+
+  try {
+    const row = await db
+      .selectFrom("driver_dashboard")
+      .select("payload")
+      .where("id", "=", towId)
+      .executeTakeFirst();
+
+    if (row) {
+      const data = typeof row.payload === 'string' ? JSON.parse(row.payload) : row.payload;
+
+      // Advance the workflow to next status
+      const currentActiveIndex = data.route.statuses.findIndex((s: any) => s.status === "active");
+      if (currentActiveIndex >= 0 && currentActiveIndex < data.route.statuses.length - 1) {
+        // Mark current as completed
+        data.route.statuses[currentActiveIndex].status = "completed";
+        data.route.statuses[currentActiveIndex].time = new Date().toLocaleTimeString("en-US", {
+          hour: "numeric",
+          minute: "2-digit",
+        });
+
+        // Mark next as active
+        data.route.statuses[currentActiveIndex + 1].status = "active";
+        data.route.statuses[currentActiveIndex + 1].time = new Date().toLocaleTimeString("en-US", {
+          hour: "numeric",
+          minute: "2-digit",
+        });
+
+        // Update route status label
+        data.route.status = data.route.statuses[currentActiveIndex + 1].label;
+      }
+
+      // Save back to database
+      await db
+        .updateTable("driver_dashboard")
+        .set({
+          payload: JSON.stringify(data),
+          updated_at: Math.floor(Date.now() / 1000),
+        })
+        .where("id", "=", towId)
+        .execute();
+    }
+  } catch (error) {
+    console.error("Failed to update status:", error);
+  }
+}
+
+async function startCapture(formData: FormData) {
+  "use server";
+
+  const towId = formData.get("towId") as string;
+
+  try {
+    const row = await db
+      .selectFrom("driver_dashboard")
+      .select("payload")
+      .where("id", "=", towId)
+      .executeTakeFirst();
+
+    if (row) {
+      const data = typeof row.payload === 'string' ? JSON.parse(row.payload) : row.payload;
+
+      // Mark VIN scan checklist item as complete
+      const vinScanItem = data.checklist?.find((item: any) => item.id === "vin-scan");
+      if (vinScanItem) {
+        vinScanItem.complete = true;
+      }
+
+      // Mark photo proof checklist item as complete
+      const photoProofItem = data.checklist?.find((item: any) => item.id === "photo-proof");
+      if (photoProofItem) {
+        photoProofItem.complete = true;
+      }
+
+      // Update next action
+      data.nextAction = {
+        label: "Review captured evidence",
+        detail: "VIN and photos captured. Ready for impound intake.",
+      };
+
+      // Save back to database
+      await db
+        .updateTable("driver_dashboard")
+        .set({
+          payload: JSON.stringify(data),
+          updated_at: Math.floor(Date.now() / 1000),
+        })
+        .where("id", "=", towId)
+        .execute();
+    }
+  } catch (error) {
+    console.error("Failed to start capture:", error);
+  }
+}
+
 export const TowDetail = async (requestInfo: RequestInfo) => {
   const towId = requestInfo.params.id;
   const data = await loadTowDetail(towId);
@@ -107,7 +206,7 @@ export const TowDetail = async (requestInfo: RequestInfo) => {
   return (
     <div className="relative min-h-screen bg-background">
       <TowDetailHeader towId={towId} capturePhoto={capturePhoto} addNote={addNote} />
-      <DriverDashboard {...data} towId={towId} />
+      <DriverDashboard {...data} towId={towId} updateStatus={updateStatus} startCapture={startCapture} />
     </div>
   );
 };

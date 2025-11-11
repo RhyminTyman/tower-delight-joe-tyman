@@ -51,7 +51,7 @@ export const TowDetail = async (requestInfo: RequestInfo) => {
               </svg>
             </a>
 
-            <form>
+            <form method="POST">
               <input type="hidden" name="towId" value={towId} />
               <button
                 type="submit"
@@ -100,7 +100,7 @@ export const TowDetail = async (requestInfo: RequestInfo) => {
             <div className="absolute inset-0 bg-gradient-to-br from-black/20 via-black/40 to-black/70" />
             <div className="relative flex h-full flex-col justify-between p-5 text-white">
               <div className="flex items-center justify-between">
-                <form>
+                <form method="POST">
                   <input type="hidden" name="towId" value={towId} />
                   <button
                     type="submit"

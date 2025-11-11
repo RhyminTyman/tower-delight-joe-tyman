@@ -7,20 +7,6 @@ interface AddNoteFormProps {
 }
 
 export function AddNoteForm({ towId }: AddNoteFormProps) {
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const formData = new FormData(e.currentTarget);
-    
-    try {
-      await addNote(formData);
-      // Navigate back to tow detail page after successful save
-      window.location.href = `/tow/${towId}`;
-    } catch (error) {
-      console.error("Failed to add note:", error);
-      alert("Failed to add note. Please try again.");
-    }
-  };
-
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <header className="border-b border-border bg-card px-4 py-3">
@@ -39,7 +25,7 @@ export function AddNoteForm({ towId }: AddNoteFormProps) {
       </header>
 
       <main className="mx-auto w-full max-w-md flex-1 px-4 py-6">
-        <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+        <form action={addNote} className="flex flex-col gap-6">
           <input type="hidden" name="towId" value={towId} />
 
           <div className="flex flex-col gap-2">

@@ -30,20 +30,6 @@ interface EditTowFormProps {
 }
 
 export function EditTowForm({ towId, data }: EditTowFormProps) {
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const formData = new FormData(e.currentTarget);
-    
-    try {
-      await updateTow(formData);
-      // Navigate back to tow detail page after successful update
-      window.location.href = `/tow/${towId}`;
-    } catch (error) {
-      console.error("Failed to update tow:", error);
-      alert("Failed to update tow. Please try again.");
-    }
-  };
-
   return (
     <div className="relative min-h-screen bg-background">
       <header className="sticky top-0 z-30 border-b border-border/60 bg-slate-950/95 px-4 py-3 backdrop-blur">
@@ -63,7 +49,7 @@ export function EditTowForm({ towId, data }: EditTowFormProps) {
       <main className="mx-auto max-w-md px-4 py-6">
         <h1 className="mb-6 text-xl font-semibold text-foreground">Edit Tow</h1>
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+        <form action={updateTow} className="flex flex-col gap-6">
           <input type="hidden" name="towId" value={towId} />
 
           <Card className="glass-card p-5">

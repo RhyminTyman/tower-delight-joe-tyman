@@ -60,6 +60,9 @@ export async function updateTow(formData: FormData) {
     }
   } catch (error) {
     console.error("[updateTow] Failed to update tow:", error);
-    throw error;
+    return;
   }
+
+  // Return a redirect response
+  return Response.redirect(`/tow/${towId}`, 303);
 }

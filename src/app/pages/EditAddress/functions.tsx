@@ -52,6 +52,9 @@ export async function updateAddress(formData: FormData) {
     }
   } catch (error) {
     console.error("[updateAddress] Failed to update address:", error);
-    throw error;
+    return;
   }
+
+  // Return a redirect response
+  return Response.redirect(`/tow/${towId}`, 303);
 }

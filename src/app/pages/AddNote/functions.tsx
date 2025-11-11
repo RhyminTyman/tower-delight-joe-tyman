@@ -46,6 +46,9 @@ export async function addNote(formData: FormData) {
     }
   } catch (error) {
     console.error("[addNote] Failed to add note:", error);
-    throw error;
+    return;
   }
+
+  // Return a redirect response
+  return Response.redirect(`/tow/${towId}`, 303);
 }

@@ -288,7 +288,7 @@ async function updateTow(formData: FormData) {
       .executeTakeFirst();
 
     if (row) {
-      const data = JSON.parse(row.payload);
+      const data = typeof row.payload === 'string' ? JSON.parse(row.payload) : row.payload;
 
       // Update tow information
       data.dispatch.ticketId = ticketId;
@@ -337,7 +337,7 @@ async function loadTowData(towId: string): Promise<TowEditData | null> {
       .executeTakeFirst();
 
     if (row) {
-      const data = JSON.parse(row.payload);
+      const data = typeof row.payload === 'string' ? JSON.parse(row.payload) : row.payload;
       return {
         ticketId: data.dispatch.ticketId,
         vehicle: data.dispatch.vehicle,

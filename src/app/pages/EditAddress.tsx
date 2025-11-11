@@ -122,7 +122,7 @@ async function updateAddress(formData: FormData) {
       .executeTakeFirst();
 
     if (row) {
-      const data = JSON.parse(row.payload);
+      const data = typeof row.payload === 'string' ? JSON.parse(row.payload) : row.payload;
 
       // Update the specific address
       if (addressType === "pickup") {
@@ -163,7 +163,7 @@ async function loadAddressData(towId: string, addressType: "pickup" | "destinati
       .executeTakeFirst();
 
     if (row) {
-      const data = JSON.parse(row.payload);
+      const data = typeof row.payload === 'string' ? JSON.parse(row.payload) : row.payload;
       const addressData = addressType === "pickup" ? data.route.pickup : data.route.destination;
       
       return {

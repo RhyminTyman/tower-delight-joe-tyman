@@ -403,7 +403,8 @@ export async function loadDashboardFromDatabase(): Promise<DriverDashboardData |
 
 export function parseDashboardRow(row: Pick<DriverDashboardRow, "payload">): DriverDashboardData | null {
   try {
-    return JSON.parse(row.payload) as DriverDashboardData;
+    const data = typeof row.payload === 'string' ? JSON.parse(row.payload) : row.payload;
+    return data as DriverDashboardData;
   } catch (error) {
     console.warn("[driver-dashboard] Failed to parse database payload:", error);
     return null;

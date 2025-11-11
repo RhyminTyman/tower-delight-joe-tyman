@@ -112,7 +112,7 @@ async function capturePhoto(formData: FormData) {
       .executeTakeFirst();
 
     if (row) {
-      const data = JSON.parse(row.payload);
+      const data = typeof row.payload === 'string' ? JSON.parse(row.payload) : row.payload;
 
       // Mark photo proof checklist item as complete
       const photoProofItem = data.checklist?.find((item: any) => item.id === "photo-proof");
@@ -154,7 +154,7 @@ async function addNote(formData: FormData) {
       .executeTakeFirst();
 
     if (row) {
-      const data = JSON.parse(row.payload);
+      const data = typeof row.payload === 'string' ? JSON.parse(row.payload) : row.payload;
 
       // Add a note to the route
       if (!data.route.notes) {

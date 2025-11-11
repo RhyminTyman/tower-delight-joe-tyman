@@ -236,7 +236,7 @@ async function updateStatus(formData: FormData) {
     .executeTakeFirst();
   
   if (currentData) {
-    const data = JSON.parse(currentData.payload);
+    const data = typeof currentData.payload === 'string' ? JSON.parse(currentData.payload) : currentData.payload;
     
     // Advance the workflow to next status
     const currentActiveIndex = data.route.statuses.findIndex((s: any) => s.status === "active");
@@ -282,7 +282,7 @@ async function startCapture(formData: FormData) {
     .executeTakeFirst();
   
   if (currentData) {
-    const data = JSON.parse(currentData.payload);
+    const data = typeof currentData.payload === 'string' ? JSON.parse(currentData.payload) : currentData.payload;
     
     // Mark VIN scan checklist item as complete
     const vinScanItem = data.checklist.find((item: any) => item.id === "vin-scan");

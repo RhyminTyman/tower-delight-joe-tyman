@@ -1,7 +1,6 @@
 "use client";
 
 import { Card } from "@/components/ui/card";
-import { updateAddress } from "./functions";
 
 interface EditAddressFormProps {
   towId: string;
@@ -37,9 +36,7 @@ export function EditAddressForm({ towId, addressType, ticketId, title, address, 
           Update the {addressType} location details
         </p>
 
-        <form action={updateAddress} className="flex flex-col gap-6">
-          <input type="hidden" name="towId" value={towId} />
-          <input type="hidden" name="addressType" value={addressType} />
+        <form method="POST" className="flex flex-col gap-6">
 
           <Card className="glass-card p-5">
             <div className="flex flex-col gap-4">

@@ -63,6 +63,12 @@ export interface RouteOverview {
   driverCallsign: string;
   truck: string;
   statuses: RouteTimelineEntry[];
+  lastPhoto?: {
+    dataUrl: string;
+    fileName?: string;
+    mimeType?: string;
+    timestamp: string;
+  };
 }
 
 export interface ChecklistItem {

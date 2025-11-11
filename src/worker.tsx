@@ -88,7 +88,6 @@ const app = defineApp([
         const data = typeof row.payload === "string" ? JSON.parse(row.payload) : row.payload;
 
         if (data.route) {
-          delete data.route.mapImage;
           if (data.route.lastPhoto) {
             delete data.route.lastPhoto;
           }
@@ -154,16 +153,20 @@ const app = defineApp([
 
         if (photoData) {
           const isDataUrl = photoData.startsWith("data:image");
+          let photoDataUrl: string;
+          
           if (!isDataUrl && mimeType) {
-            data.route.mapImage = `data:${mimeType};base64,${photoData}`;
+            photoDataUrl = `data:${mimeType};base64,${photoData}`;
           } else {
-            data.route.mapImage = photoData;
+            photoDataUrl = photoData;
           }
 
+          // Store the photo in lastPhoto, not mapImage (which is for the route map)
           data.route.lastPhoto = {
+            dataUrl: photoDataUrl,
             fileName: fileName ?? `tow-${towId}-photo`,
             mimeType: mimeType ?? "image/jpeg",
-            capturedAt: new Date().toISOString(),
+            timestamp: new Date().toISOString(),
           };
         }
 

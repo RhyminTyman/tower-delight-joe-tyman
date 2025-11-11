@@ -49,13 +49,16 @@ const app = defineApp([
       return Response.json({
         count: rows.length,
         ids: rows.map(r => r.id),
-        rows: rows.map(r => ({
-          id: r.id,
-          updated_at: r.updated_at,
-          updated_date: new Date(r.updated_at * 1000).toISOString(),
-          pickup: JSON.parse(r.payload).route.pickup,
-          destination: JSON.parse(r.payload).route.destination
-        }))
+        rows: rows.map(r => {
+          const data = typeof r.payload === 'string' ? JSON.parse(r.payload) : r.payload;
+          return {
+            id: r.id,
+            updated_at: r.updated_at,
+            updated_date: new Date(r.updated_at * 1000).toISOString(),
+            pickup: data.route.pickup,
+            destination: data.route.destination
+          };
+        })
       });
     } catch (error) {
       return Response.json({

@@ -32,7 +32,7 @@ const hydrateAppContext = (requestInfo: RequestInfo<any, AppContext>) => {
 const app = defineApp([
   setCommonHeaders(),
   hydrateAppContext,
-  // Handle POST for address updates
+  // Handle POST for address updates BEFORE render
   route("/tow/:id/address/:type", async (req: Request, params: { id: string; type: string }) => {
     if (req.method === "POST") {
       const towId = params.id;
@@ -78,14 +78,13 @@ const app = defineApp([
       }
       return Response.redirect(`/tow/${towId}`, 303);
     }
-    
-    // GET request - render the form
-    return EditAddress;
+    // For GET requests, fall through to render
   }),
   render(Document, [
     route("/", TowList),
     route("/tow/:id", TowDetail),
     route("/tow/:id/edit", EditTow),
+    route("/tow/:id/address/:type", EditAddress),
     route("/tow/:id/note", AddNote),
   ]),
   route("/api/driver-dashboard", async () => {

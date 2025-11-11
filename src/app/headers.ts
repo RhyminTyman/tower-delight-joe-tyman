@@ -24,10 +24,9 @@ export const setCommonHeaders =
     );
 
     // Defines trusted sources for content loading and script execution:
-    // Note: 'unsafe-inline' required for React hydration scripts
-    // Hash for inline module import script in Document.tsx
+    // Note: 'unsafe-inline' required for React hydration scripts and dynamic client import
     response.headers.set(
       "Content-Security-Policy",
-      `default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' 'nonce-${nonce}' 'sha256-YWEiYYi+TY8SpT2NBRB52YDKnt+8gPM2z8PynQqQECI=' https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; frame-ancestors 'self'; frame-src 'self' https://challenges.cloudflare.com; object-src 'none';`,
+      `default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' 'nonce-${nonce}' https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; frame-ancestors 'self'; frame-src 'self' https://challenges.cloudflare.com; object-src 'none';`,
     );
   };

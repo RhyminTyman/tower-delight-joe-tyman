@@ -4,7 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { db } from "@/db";
 import { parseDashboardRow } from "@/app/data/driver-dashboard";
-import { TowActions, StatusButton } from "./TowDetail/TowActions";
+import { TowActions } from "./TowDetail/TowActions";
+import { StatusBanner } from "./TowDetail/StatusBanner";
 
 const MAP_PLACEHOLDER =
   "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?q=80&w=1600&auto=format&fit=crop";
@@ -70,6 +71,8 @@ export const TowDetail = async (requestInfo: RequestInfo) => {
           </div>
         </div>
       </header>
+
+      <StatusBanner towId={towId} currentStatus={data.route.status} />
       
       <main className="mx-auto flex min-h-screen max-w-md flex-col gap-5 px-4 pb-28 pt-6 sm:max-w-lg">
         {/* Route Map Card */}
@@ -80,10 +83,7 @@ export const TowDetail = async (requestInfo: RequestInfo) => {
               style={{ backgroundImage: `url(${data.route.mapImage || MAP_PLACEHOLDER})` }}
             />
             <div className="absolute inset-0 bg-gradient-to-br from-black/20 via-black/40 to-black/70" />
-            <div className="relative flex h-full flex-col justify-between p-5 text-white">
-              <div className="flex items-center justify-between">
-                <StatusButton towId={towId} currentStatus={data.route.status} />
-              </div>
+            <div className="relative flex h-full flex-col justify-end p-5 text-white">
               <div className="flex flex-col gap-3 rounded-2xl bg-black/45 p-4 backdrop-blur">
                 {/* Pickup Row */}
                 <div className="flex items-start justify-between gap-3">
@@ -201,23 +201,7 @@ export const TowDetail = async (requestInfo: RequestInfo) => {
           </div>
         </Card>
 
-        {/* Footer Notes */}
-        <footer className="pb-4 pt-2 text-center text-xs text-muted-foreground">
-          Designed around the field route view: live map context, dispatcher details, and status
-          history keep the operator aligned with Tower Delight policy in a single glance.
-        </footer>
       </main>
-
-      {/* Bottom Action CTA */}
-      <div className="fixed inset-x-0 bottom-0 z-20 border-t border-slate-800 bg-slate-950/95 px-4 pb-6 pt-4 backdrop-blur">
-        <div className="mx-auto flex max-w-md items-center justify-between gap-3 sm:max-w-lg">
-          <div>
-            <p className="text-xs uppercase tracking-wide text-muted-foreground">Next best action</p>
-            <p className="text-sm font-semibold text-foreground">{data.nextAction.label}</p>
-            <p className="text-xs text-muted-foreground">{data.nextAction.detail}</p>
-          </div>
-        </div>
-      </div>
     </div>
   );
 };

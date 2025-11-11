@@ -70,6 +70,28 @@ const app = defineApp([
   route("/api/tow/:id/photo", async (requestInfo: RequestInfo) => {
     const towId = requestInfo.params.id;
     console.log("[API capturePhoto] Starting for towId:", towId);
+    const request = requestInfo.request;
+
+    let photoData: string | null = null;
+    let fileName: string | null = null;
+    let mimeType: string | null = null;
+
+    try {
+      const contentType = request.headers.get("content-type") ?? "";
+      if (contentType.includes("multipart/form-data")) {
+        const formData = await request.formData();
+        photoData = (formData.get("photoData") as string) ?? null;
+        fileName = (formData.get("fileName") as string) ?? null;
+        mimeType = (formData.get("mimeType") as string) ?? null;
+      } else if (contentType.includes("application/json")) {
+        const body = await request.json();
+        photoData = typeof body.photoData === "string" ? body.photoData : null;
+        fileName = typeof body.fileName === "string" ? body.fileName : null;
+        mimeType = typeof body.mimeType === "string" ? body.mimeType : null;
+      }
+    } catch (parseError) {
+      console.warn("[API capturePhoto] Failed to parse request body:", parseError);
+    }
 
     try {
       const row = await db
@@ -81,15 +103,35 @@ const app = defineApp([
       if (row) {
         const data = typeof row.payload === 'string' ? JSON.parse(row.payload) : row.payload;
 
+        if (photoData) {
+          const isDataUrl = photoData.startsWith("data:image");
+          if (!isDataUrl && mimeType) {
+            data.route.mapImage = `data:${mimeType};base64,${photoData}`;
+          } else {
+            data.route.mapImage = photoData;
+          }
+
+          data.route.lastPhoto = {
+            fileName: fileName ?? `tow-${towId}-photo`,
+            mimeType: mimeType ?? "image/jpeg",
+            capturedAt: new Date().toISOString(),
+          };
+        }
+
         const photoProofItem = data.checklist?.find((item: any) => item.id === "photo-proof");
         if (photoProofItem) {
           photoProofItem.complete = true;
         }
 
-        data.nextAction = {
-          label: "Photo captured successfully",
-          detail: "4-angle documentation complete. Ready for next step.",
-        };
+        data.nextAction = photoData
+          ? {
+              label: "Photo captured successfully",
+              detail: "4-angle documentation complete. Ready for next step.",
+            }
+          : {
+              label: "Awaiting photo confirmation",
+              detail: "No photo data received. Please try uploading again.",
+            };
 
         await db
           .updateTable("driver_dashboard")
@@ -101,7 +143,10 @@ const app = defineApp([
           .execute();
 
         console.log("[API capturePhoto] Success");
-        return Response.json({ success: true });
+        return Response.json({
+          success: true,
+          mapImageUpdated: Boolean(photoData),
+        });
       }
 
       return Response.json({ error: "Tow not found" }, { status: 404 });

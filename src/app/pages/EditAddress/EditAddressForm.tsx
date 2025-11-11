@@ -13,6 +13,10 @@ interface EditAddressFormProps {
 }
 
 export function EditAddressForm({ towId, addressType, ticketId, title, address, distance }: EditAddressFormProps) {
+  async function handleSubmit(formData: FormData) {
+    await updateAddress(formData);
+    window.location.href = `/tow/${towId}`;
+  }
 
   return (
     <>
@@ -38,7 +42,7 @@ export function EditAddressForm({ towId, addressType, ticketId, title, address, 
           Update the {addressType} location details
         </p>
 
-        <form action={updateAddress} className="flex flex-col gap-6">
+        <form action={handleSubmit} className="flex flex-col gap-6">
           <input type="hidden" name="towId" value={towId} />
           <input type="hidden" name="addressType" value={addressType} />
 

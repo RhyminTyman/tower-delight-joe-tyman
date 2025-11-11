@@ -30,6 +30,11 @@ interface EditTowFormProps {
 }
 
 export function EditTowForm({ towId, data }: EditTowFormProps) {
+  async function handleSubmit(formData: FormData) {
+    await updateTow(formData);
+    window.location.href = `/tow/${towId}`;
+  }
+
   return (
     <div className="relative min-h-screen bg-background">
       <header className="sticky top-0 z-30 border-b border-border/60 bg-slate-950/95 px-4 py-3 backdrop-blur">
@@ -49,7 +54,7 @@ export function EditTowForm({ towId, data }: EditTowFormProps) {
       <main className="mx-auto max-w-md px-4 py-6">
         <h1 className="mb-6 text-xl font-semibold text-foreground">Edit Tow</h1>
 
-        <form action={updateTow} className="flex flex-col gap-6">
+        <form action={handleSubmit} className="flex flex-col gap-6">
           <input type="hidden" name="towId" value={towId} />
 
           <Card className="glass-card p-5">

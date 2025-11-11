@@ -35,10 +35,4 @@ export async function updateAddress(formData: FormData) {
     })
     .where("id", "=", towId)
     .execute();
-
-  // Use relative path to work in both dev and production
-  return new Response(null, {
-    status: 303,
-    headers: { Location: `/tow/${towId}` }
-  });
 }

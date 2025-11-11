@@ -1,12 +1,20 @@
 "use client";
 
 import { addNote } from "./functions";
+import { useState } from "react";
 
 interface AddNoteFormProps {
   towId: string;
 }
 
 export function AddNoteForm({ towId }: AddNoteFormProps) {
+  const [noteText, setNoteText] = useState("");
+
+  async function handleSubmit(formData: FormData) {
+    await addNote(formData);
+    setNoteText(""); // Clear the form after save
+  }
+
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <header className="border-b border-border bg-card px-4 py-3">
@@ -25,7 +33,7 @@ export function AddNoteForm({ towId }: AddNoteFormProps) {
       </header>
 
       <main className="mx-auto w-full max-w-md flex-1 px-4 py-6">
-        <form action={addNote} className="flex flex-col gap-6">
+        <form action={handleSubmit} className="flex flex-col gap-6">
           <input type="hidden" name="towId" value={towId} />
 
           <div className="flex flex-col gap-2">
@@ -35,6 +43,8 @@ export function AddNoteForm({ towId }: AddNoteFormProps) {
             <textarea
               id="note"
               name="note"
+              value={noteText}
+              onChange={(e) => setNoteText(e.target.value)}
               required
               rows={6}
               className="rounded-lg border border-border bg-card px-4 py-3 text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
@@ -51,7 +61,8 @@ export function AddNoteForm({ towId }: AddNoteFormProps) {
             </a>
             <button
               type="submit"
-              className="flex-1 rounded-lg bg-primary px-4 py-3 font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+              disabled={noteText.trim().length === 0}
+              className="flex-1 rounded-lg bg-primary px-4 py-3 font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Save Note
             </button>

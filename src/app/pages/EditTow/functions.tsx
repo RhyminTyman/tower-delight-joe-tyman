@@ -47,7 +47,7 @@ export async function updateTow(formData: FormData) {
       data.route.driverCallsign = driverCallsign;
       data.route.truck = truck;
 
-      const result = await db
+      await db
         .updateTable("driver_dashboard")
         .set({
           payload: JSON.stringify(data),
@@ -56,11 +56,11 @@ export async function updateTow(formData: FormData) {
         .where("id", "=", towId)
         .execute();
       
-      console.log("[updateTow] Database update result:", result);
+      console.log("[updateTow] Database update complete");
     }
   } catch (error) {
     console.error("[updateTow] Failed to update tow:", error);
-    return;
+    throw error;
   }
 
   console.log("[updateTow] Complete");

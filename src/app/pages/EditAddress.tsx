@@ -2,6 +2,7 @@ import type { RequestInfo } from "rwsdk/worker";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { db } from "@/db";
+import { updateAddress } from "./EditAddress/functions";
 
 interface AddressEditData {
   ticketId: string;
@@ -104,55 +105,6 @@ const EditAddressScreen = ({ towId, data }: { towId: string; data: AddressEditDa
     </main>
   </div>
 );
-
-async function updateAddress(formData: FormData) {
-  "use server";
-  
-  const towId = formData.get("towId") as string;
-  const addressType = formData.get("addressType") as "pickup" | "destination";
-  const title = formData.get("title") as string;
-  const address = formData.get("address") as string;
-  const distance = formData.get("distance") as string;
-
-  try {
-    const row = await db
-      .selectFrom("driver_dashboard")
-      .select("payload")
-      .where("id", "=", towId)
-      .executeTakeFirst();
-
-    if (row) {
-      const data = typeof row.payload === 'string' ? JSON.parse(row.payload) : row.payload;
-
-      // Update the specific address
-      if (addressType === "pickup") {
-        data.route.pickup = {
-          title,
-          address,
-          distance,
-        };
-      } else {
-        data.route.destination = {
-          title,
-          address,
-          distance,
-        };
-      }
-
-      // Save back to database
-      await db
-        .updateTable("driver_dashboard")
-        .set({
-          payload: JSON.stringify(data),
-          updated_at: Math.floor(Date.now() / 1000),
-        })
-        .where("id", "=", towId)
-        .execute();
-    }
-  } catch (error) {
-    console.error("Failed to update address:", error);
-  }
-}
 
 async function loadAddressData(towId: string, addressType: "pickup" | "destination"): Promise<AddressEditData | null> {
   try {

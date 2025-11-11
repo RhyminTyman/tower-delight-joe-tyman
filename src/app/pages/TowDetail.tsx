@@ -145,7 +145,7 @@ export const TowDetail = async (requestInfo: RequestInfo) => {
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   strokeWidth={2}
-                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                  d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
                 />
               </svg>
             </a>
@@ -181,7 +181,7 @@ export const TowDetail = async (requestInfo: RequestInfo) => {
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     strokeWidth={2}
-                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
                   />
                 </svg>
               </button>
@@ -225,9 +225,10 @@ export const TowDetail = async (requestInfo: RequestInfo) => {
                 </Badge>
               </div>
               <div className="flex flex-col gap-3 rounded-2xl bg-black/45 p-4 backdrop-blur">
-                <div className="flex items-start justify-between gap-6">
+                {/* Pickup Row */}
+                <div className="flex items-start justify-between gap-3">
                   <div className="flex-1">
-                    <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2 mb-1">
                       <p className="text-xs uppercase tracking-wide text-white/70">Pickup</p>
                       <a
                         href={`/tow/${towId}/address/pickup`}
@@ -235,7 +236,7 @@ export const TowDetail = async (requestInfo: RequestInfo) => {
                         title="Edit pickup"
                       >
                         <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                         </svg>
                       </a>
                     </div>
@@ -245,8 +246,15 @@ export const TowDetail = async (requestInfo: RequestInfo) => {
                       <p className="mt-1 text-xs text-white/60">{data.route.pickup.distance}</p>
                     )}
                   </div>
-                  <div className="flex-1 text-right">
-                    <div className="flex items-center justify-end gap-2">
+                </div>
+
+                {/* Divider */}
+                <div className="h-px bg-white/10" />
+
+                {/* Destination Row */}
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1">
                       <p className="text-xs uppercase tracking-wide text-white/70">Destination</p>
                       <a
                         href={`/tow/${towId}/address/destination`}
@@ -254,7 +262,7 @@ export const TowDetail = async (requestInfo: RequestInfo) => {
                         title="Edit destination"
                       >
                         <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                         </svg>
                       </a>
                     </div>

@@ -2,6 +2,7 @@ import type { RequestInfo } from "rwsdk/worker";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { db } from "@/db";
+import { updateTow } from "./EditTow/functions";
 
 interface TowEditData {
   ticketId: string;
@@ -262,71 +263,6 @@ const EditTowScreen = ({ towId, data }: { towId: string; data: TowEditData }) =>
     </main>
   </div>
 );
-
-async function updateTow(formData: FormData) {
-  "use server";
-  
-  const towId = formData.get("towId") as string;
-  const ticketId = formData.get("ticketId") as string;
-  const vehicle = formData.get("vehicle") as string;
-  const poNumber = formData.get("poNumber") as string;
-  const type = formData.get("type") as string;
-  const dispatcher = formData.get("dispatcher") as string;
-  const hasKeys = formData.get("hasKeys") === "yes";
-  const pickupTitle = formData.get("pickupTitle") as string;
-  const pickupAddress = formData.get("pickupAddress") as string;
-  const pickupDistance = formData.get("pickupDistance") as string;
-  const destinationTitle = formData.get("destinationTitle") as string;
-  const destinationAddress = formData.get("destinationAddress") as string;
-  const destinationDistance = formData.get("destinationDistance") as string;
-
-  try {
-    const row = await db
-      .selectFrom("driver_dashboard")
-      .select("payload")
-      .where("id", "=", towId)
-      .executeTakeFirst();
-
-    if (row) {
-      const data = typeof row.payload === 'string' ? JSON.parse(row.payload) : row.payload;
-
-      // Update tow information
-      data.dispatch.ticketId = ticketId;
-      data.dispatch.vehicle = vehicle;
-      
-      // Update route details
-      data.route.poNumber = poNumber;
-      data.route.type = type;
-      data.route.dispatcher = dispatcher;
-      data.route.hasKeys = hasKeys;
-      
-      // Update addresses
-      data.route.pickup = {
-        title: pickupTitle,
-        address: pickupAddress,
-        distance: pickupDistance,
-      };
-
-      data.route.destination = {
-        title: destinationTitle,
-        address: destinationAddress,
-        distance: destinationDistance,
-      };
-
-      // Save back to database
-      await db
-        .updateTable("driver_dashboard")
-        .set({
-          payload: JSON.stringify(data),
-          updated_at: Math.floor(Date.now() / 1000),
-        })
-        .where("id", "=", towId)
-        .execute();
-    }
-  } catch (error) {
-    console.error("Failed to update tow:", error);
-  }
-}
 
 async function loadTowData(towId: string): Promise<TowEditData | null> {
   try {

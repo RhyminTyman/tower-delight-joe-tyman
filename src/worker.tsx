@@ -81,7 +81,8 @@ const app = defineApp([
       }
       return Response.redirect(url.origin + `/tow/${towId}`, 303);
     }
-    // For all other requests, continue to next middleware
+    // For all other requests, return undefined to continue to next middleware
+    return undefined;
   },
   render(Document, [
     route("/", TowList),

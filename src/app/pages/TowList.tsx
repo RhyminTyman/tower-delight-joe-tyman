@@ -21,6 +21,11 @@ interface TowItem {
 
 export const TowList = async (requestInfo: RequestInfo) => {
   const tows = await loadTowList();
+  
+  // Prevent caching of this page
+  requestInfo.response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
+  requestInfo.response.headers.set('Pragma', 'no-cache');
+  
   return <TowListScreen tows={tows} />;
 };
 

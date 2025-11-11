@@ -188,7 +188,7 @@ const app = defineApp([
       const verifyRows = await db.selectFrom("driver_dashboard").select(["id"]).execute();
       console.log(`[Seed] Verification: ${verifyRows.length} rows in database`);
 
-      return Response.json({ 
+      const response = Response.json({ 
         success: true, 
         message: `Database seeded successfully with ${SEED_TOWS.length} tows`,
         verification: {
@@ -197,6 +197,12 @@ const app = defineApp([
           ids: verifyRows.map(r => r.id)
         }
       });
+      
+      // Add cache control headers to prevent caching
+      response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate');
+      response.headers.set('Pragma', 'no-cache');
+      
+      return response;
     } catch (error) {
       console.error("Seed failed:", error);
       return Response.json(

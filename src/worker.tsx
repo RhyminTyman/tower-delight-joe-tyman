@@ -43,7 +43,6 @@ const app = defineApp([
   }),
   route("/api/debug/tows", async () => {
     try {
-      const { db } = await import("@/db");
       const rows = await db.selectFrom("driver_dashboard").select(["id", "payload"]).execute();
       return Response.json({
         count: rows.length,

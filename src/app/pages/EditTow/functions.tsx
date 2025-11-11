@@ -63,6 +63,5 @@ export async function updateTow(formData: FormData) {
     return;
   }
 
-  // Return a redirect response
-  return Response.redirect(`/tow/${towId}`, 303);
+  console.log("[updateTow] Complete");
 }

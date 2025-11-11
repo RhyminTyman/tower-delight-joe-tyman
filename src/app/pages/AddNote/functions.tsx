@@ -49,6 +49,5 @@ export async function addNote(formData: FormData) {
     return;
   }
 
-  // Return a redirect response
-  return Response.redirect(`/tow/${towId}`, 303);
+  console.log("[addNote] Complete");
 }

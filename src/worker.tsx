@@ -61,8 +61,8 @@ const app = defineApp([
       }, { status: 500 });
     }
   }),
-  route("/api/tow/:id/photo", async (req: Request, params: { id: string }) => {
-    const towId = params.id;
+  route("/api/tow/:id/photo", async (requestInfo: RequestInfo) => {
+    const towId = requestInfo.params.id;
     console.log("[API capturePhoto] Starting for towId:", towId);
 
     try {
@@ -104,8 +104,8 @@ const app = defineApp([
       return Response.json({ error: String(error) }, { status: 500 });
     }
   }),
-  route("/api/tow/:id/status", async (req: Request, params: { id: string }) => {
-    const towId = params.id;
+  route("/api/tow/:id/status", async (requestInfo: RequestInfo) => {
+    const towId = requestInfo.params.id;
     console.log("[API updateStatus] Starting for towId:", towId);
 
     try {

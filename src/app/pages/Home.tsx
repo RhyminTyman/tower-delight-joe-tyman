@@ -12,7 +12,7 @@ export const Home = async (requestInfo: RequestInfo) => {
   return <HomeScreen {...data} />;
 };
 
-const HomeScreen = ({
+export const HomeScreen = ({
   driver,
   dispatch,
   workflow,
@@ -21,8 +21,7 @@ const HomeScreen = ({
   impoundPreparation,
   nextAction,
 }: HomeProps) => (
-  <div className="relative min-h-screen bg-slate-950">
-    <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top,_rgba(18,44,73,0.95)_0%,_rgba(10,16,25,1)_55%,_rgba(6,10,18,1)_100%)]" />
+  <div className="relative min-h-screen">
     <main className="mx-auto flex min-h-screen max-w-md flex-col gap-5 px-4 pb-28 pt-6 sm:max-w-lg">
       <header className="flex items-center justify-between">
         <div className="flex flex-col gap-1">
@@ -34,7 +33,7 @@ const HomeScreen = ({
             {driver.role} · {driver.truck}
           </p>
         </div>
-        <Badge className="border border-emerald-500/40 bg-emerald-500/10 text-emerald-300">
+        <Badge variant="accent" className="px-4 py-2 text-xs font-semibold uppercase tracking-wide">
           {driver.status}
         </Badge>
       </header>
@@ -56,7 +55,7 @@ const HomeScreen = ({
 );
 
 const PersonaInsights = ({ shift }: { shift: string }) => (
-  <Card className="p-5">
+  <Card className="glass-card p-5">
     <div className="flex items-center justify-between">
       <span className="text-sm font-medium text-slate-200">Shift Snapshot</span>
       <span className="text-xs text-slate-400">Persona: High Tempo Operator</span>
@@ -67,13 +66,13 @@ const PersonaInsights = ({ shift }: { shift: string }) => (
       in-cab use.
     </p>
     <div className="mt-4 flex flex-wrap gap-2 text-xs text-slate-300">
-      <Badge variant="muted" className="border-slate-800/70 bg-slate-900/80 text-slate-200">
+      <Badge variant="muted" className="bg-secondary/80 text-muted-foreground">
         {shift}
       </Badge>
-      <Badge variant="muted" className="border-slate-800/70 bg-slate-900/80 text-slate-200">
+      <Badge variant="muted" className="bg-secondary/80 text-muted-foreground">
         Prefers large tap targets over nested menus
       </Badge>
-      <Badge variant="muted" className="border-slate-800/70 bg-slate-900/80 text-slate-200">
+      <Badge variant="muted" className="bg-secondary/80 text-muted-foreground">
         Needs offline capture fallback
       </Badge>
     </div>
@@ -87,7 +86,7 @@ const DispatchCard = ({
   dispatch: HomeProps["dispatch"];
   workflowStages: HomeProps["workflow"];
 }) => (
-  <Card className="bg-slate-900/[0.85] p-5">
+  <Card className="glass-card p-6">
     <div className="flex items-center justify-between">
       <div>
         <p className="text-xs uppercase tracking-wide text-slate-400">
@@ -97,7 +96,7 @@ const DispatchCard = ({
           #{dispatch.ticketId}
         </h2>
       </div>
-      <Badge className="border border-amber-500/40 bg-amber-400/10 text-amber-200">
+      <Badge variant="accent" className="text-xs px-4 py-1.5">
         ETA {dispatch.etaMinutes} min
       </Badge>
     </div>
@@ -133,7 +132,7 @@ const DispatchCard = ({
 );
 
 const DispatchRow = ({ label, value }: { label: string; value: string }) => (
-  <div className="flex items-start justify-between gap-4 rounded-2xl bg-slate-900/60 px-4 py-3">
+  <div className="flex items-start justify-between gap-4 rounded-[calc(var(--radius)-4px)] bg-secondary/70 px-4 py-3">
     <span className="text-xs uppercase tracking-wide text-slate-500">
       {label}
     </span>
@@ -172,7 +171,7 @@ const StageIcon = ({
 };
 
 const ActionBar = ({ actions }: { actions: HomeProps["actions"] }) => (
-  <Card className="p-4">
+  <Card className="glass-card p-4">
     <header className="flex items-center justify-between">
       <p className="text-sm font-semibold text-slate-100">Priority Actions</p>
       <span className="text-xs text-slate-500">Last updated just now</span>
@@ -182,7 +181,7 @@ const ActionBar = ({ actions }: { actions: HomeProps["actions"] }) => (
         <Button
           key={action.label}
           variant={action.variant}
-          className="h-auto w-full rounded-2xl px-6 py-4 text-sm font-semibold shadow-md shadow-slate-950/20"
+          className="h-auto w-full rounded-[calc(var(--radius)-4px)] px-6 py-4 text-sm font-semibold shadow-brand"
         >
           {action.label}
         </Button>
@@ -196,7 +195,7 @@ const ActionBar = ({ actions }: { actions: HomeProps["actions"] }) => (
 );
 
 const SafetyChecklist = ({ checklist }: { checklist: HomeProps["checklist"] }) => (
-  <Card className="p-5">
+  <Card className="glass-card p-5">
     <header className="flex items-center justify-between">
       <div>
         <p className="text-sm font-semibold text-slate-100">On Scene Checklist</p>
@@ -204,7 +203,7 @@ const SafetyChecklist = ({ checklist }: { checklist: HomeProps["checklist"] }) =
           Prioritized for officer hand-off and policy compliance
         </p>
       </div>
-      <Badge variant="muted" className="border-slate-800 bg-slate-900 text-slate-400">
+      <Badge variant="muted">
         2 remaining
       </Badge>
     </header>
@@ -212,7 +211,7 @@ const SafetyChecklist = ({ checklist }: { checklist: HomeProps["checklist"] }) =
       {checklist.map((item) => (
         <label
           key={item.id}
-          className="flex items-center gap-3 rounded-2xl border border-slate-800 bg-slate-900/60 px-4 py-3 text-sm text-slate-200"
+          className="flex items-center gap-3 rounded-[calc(var(--radius)-4px)] border border-border/80 bg-secondary/70 px-4 py-3 text-sm text-slate-200"
         >
           <input
             type="checkbox"
@@ -232,7 +231,7 @@ const SafetyChecklist = ({ checklist }: { checklist: HomeProps["checklist"] }) =
 );
 
 const ImpoundPrep = ({ items }: { items: HomeProps["impoundPreparation"] }) => (
-  <Card className="p-5">
+  <Card className="glass-card p-5">
     <header className="mb-4 flex items-center justify-between">
       <div>
         <p className="text-sm font-semibold text-slate-100">Impound Intake Prep</p>
@@ -244,7 +243,7 @@ const ImpoundPrep = ({ items }: { items: HomeProps["impoundPreparation"] }) => (
       {items.map((item) => (
         <div
           key={item.id}
-          className="flex items-start justify-between gap-3 rounded-2xl bg-slate-900/50 px-4 py-3"
+          className="flex items-start justify-between gap-3 rounded-[calc(var(--radius)-4px)] bg-secondary/70 px-4 py-3"
         >
           <dt className="text-xs uppercase tracking-wide text-slate-500">
             {item.title}
@@ -259,7 +258,7 @@ const ImpoundPrep = ({ items }: { items: HomeProps["impoundPreparation"] }) => (
 );
 
 const BottomActionCTA = ({ nextAction }: { nextAction: HomeProps["nextAction"] }) => (
-  <div className="fixed inset-x-0 bottom-0 z-20 border-t border-slate-800 bg-slate-950/95 px-4 pb-6 pt-4 backdrop-blur">
+  <div className="fixed inset-x-0 bottom-0 z-20 border-t border-border bg-background/95 px-4 pb-6 pt-4 backdrop-blur">
     <div className="mx-auto flex max-w-md items-center justify-between gap-3 sm:max-w-lg">
       <div>
         <p className="text-xs uppercase tracking-wide text-slate-500">
@@ -270,7 +269,7 @@ const BottomActionCTA = ({ nextAction }: { nextAction: HomeProps["nextAction"] }
         </p>
         <p className="text-xs text-slate-400">{nextAction.detail}</p>
       </div>
-      <Button className="rounded-full px-6 py-3 text-sm font-semibold shadow-lg shadow-brand/50">
+      <Button size="lg" className="px-6 shadow-brand">
         Start Capture
       </Button>
     </div>

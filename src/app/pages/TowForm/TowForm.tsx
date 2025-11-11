@@ -30,30 +30,49 @@ function loadGoogleMapsScript(): Promise<void> {
   });
 }
 
-// Calculate distance using Google Maps Distance Matrix API
+// Calculate distance using Google Maps JavaScript Distance Service
 async function calculateDistance(
   origin: { lat: number; lng: number },
   destination: { lat: number; lng: number }
 ): Promise<{ distance: string; duration: string } | null> {
-  try {
-    const response = await fetch(
-      `https://maps.googleapis.com/maps/api/distancematrix/json?origins=${origin.lat},${origin.lng}&destinations=${destination.lat},${destination.lng}&key=${GOOGLE_MAPS_API_KEY}&units=imperial`
-    );
-    const data = await response.json();
-    
-    if (data.status === 'OK' && data.rows[0]?.elements[0]?.status === 'OK') {
-      const element = data.rows[0].elements[0];
-      return {
-        distance: element.distance.text,
-        duration: element.duration.text,
-      };
+  return new Promise((resolve) => {
+    try {
+      const google = (window as any).google;
+      if (!google?.maps?.DistanceMatrixService) {
+        console.warn('[Distance] Google Maps not loaded');
+        resolve(null);
+        return;
+      }
+
+      const service = new google.maps.DistanceMatrixService();
+      const originLatLng = new google.maps.LatLng(origin.lat, origin.lng);
+      const destLatLng = new google.maps.LatLng(destination.lat, destination.lng);
+
+      service.getDistanceMatrix(
+        {
+          origins: [originLatLng],
+          destinations: [destLatLng],
+          travelMode: google.maps.TravelMode.DRIVING,
+          unitSystem: google.maps.UnitSystem.IMPERIAL,
+        },
+        (response: any, status: any) => {
+          if (status === 'OK' && response?.rows[0]?.elements[0]?.status === 'OK') {
+            const element = response.rows[0].elements[0];
+            resolve({
+              distance: element.distance.text,
+              duration: element.duration.text,
+            });
+          } else {
+            console.warn('[Distance] Calculation failed:', status);
+            resolve(null);
+          }
+        }
+      );
+    } catch (error) {
+      console.error('[Distance] Calculation error:', error);
+      resolve(null);
     }
-    
-    return null;
-  } catch (error) {
-    console.error('[Distance] Calculation failed:', error);
-    return null;
-  }
+  });
 }
 
 // Get user's current location
@@ -248,16 +267,22 @@ export function TowForm({
       const destLat = parseFloat(formValues.destinationLat);
       const destLng = parseFloat(formValues.destinationLng);
 
-      // Need all coordinates
-      if (!pickupLat || !pickupLng || !destLat || !destLng) {
+      // Need all coordinates and Google Maps to be loaded
+      if (!pickupLat || !pickupLng || !destLat || !destLng || isLoadingMaps) {
         return;
       }
 
+      // Wait a bit to ensure Google Maps API is fully initialized
+      await new Promise(resolve => setTimeout(resolve, 500));
+
       setIsCalculatingDistances(true);
+      console.log('[Distance] Starting calculations...');
 
       // Calculate distance from user to pickup
       if (userLocation) {
+        console.log('[Distance] Calculating user to pickup:', userLocation, { lat: pickupLat, lng: pickupLng });
         const userToPickup = await calculateDistance(userLocation, { lat: pickupLat, lng: pickupLng });
+        console.log('[Distance] User to pickup result:', userToPickup);
         if (userToPickup) {
           setFormValues((prev) => ({
             ...prev,
@@ -267,10 +292,12 @@ export function TowForm({
       }
 
       // Calculate distance from pickup to destination
+      console.log('[Distance] Calculating pickup to destination:', { lat: pickupLat, lng: pickupLng }, { lat: destLat, lng: destLng });
       const pickupToDest = await calculateDistance(
         { lat: pickupLat, lng: pickupLng },
         { lat: destLat, lng: destLng }
       );
+      console.log('[Distance] Pickup to destination result:', pickupToDest);
       if (pickupToDest) {
         setFormValues((prev) => ({
           ...prev,
@@ -282,7 +309,7 @@ export function TowForm({
     };
 
     calculateDistances();
-  }, [formValues.pickupLat, formValues.pickupLng, formValues.destinationLat, formValues.destinationLng, userLocation]);
+  }, [formValues.pickupLat, formValues.pickupLng, formValues.destinationLat, formValues.destinationLng, userLocation, isLoadingMaps]);
 
   // Initialize Google Maps Autocomplete
   useEffect(() => {

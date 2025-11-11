@@ -45,6 +45,34 @@ function generateMapUrl(pickup: any, destination: any) {
   return `https://maps.googleapis.com/maps/api/staticmap?size=600x400&scale=2&maptype=roadmap&markers=${markers}&path=${path}&key=${GOOGLE_MAPS_API_KEY}`;
 }
 
+async function getDispatcher() {
+  try {
+    const dispatcher = await db
+      .selectFrom("driver_dashboard")
+      .select("payload")
+      .where("id", "=", "dispatcher-001")
+      .executeTakeFirst();
+
+    if (dispatcher?.payload) {
+      const data = typeof dispatcher.payload === "string" 
+        ? JSON.parse(dispatcher.payload) 
+        : dispatcher.payload;
+      return {
+        name: data.name || "Dispatch",
+        contactNumber: data.contactNumber || "+1 (512) 555-9999",
+      };
+    }
+  } catch (error) {
+    console.warn("[createTow] Failed to fetch dispatcher", error);
+  }
+
+  // Fallback to default
+  return {
+    name: "Dispatch",
+    contactNumber: "+1 (512) 555-9999",
+  };
+}
+
 async function resolveDriverSnapshot(driverId: string | null) {
   if (!driverId) {
     return {
@@ -100,6 +128,7 @@ export async function createTow(formData: FormData) {
   const etaMinutes = etaMinutesRaw ? Number(etaMinutesRaw) : STATIC_DRIVER_DASHBOARD.dispatch.etaMinutes;
 
   const { driver, driverCallsign, truck } = await resolveDriverSnapshot(driverId);
+  const dispatcherInfo = await getDispatcher();
 
   // Use provided GPS coordinates or generate random ones
   const pickupLatStr = (formData.get("pickupLat") as string | null)?.trim();
@@ -152,7 +181,7 @@ export async function createTow(formData: FormData) {
     destination: destinationWithCoords,
     mapUrl: mapUrl,
     mapImage: mapUrl || payload.route.mapImage,
-    dispatcher: payload.route.dispatcher,
+    dispatcher: dispatcherInfo.name,
     hasKeys: false,
     type,
     poNumber: "",
@@ -171,6 +200,12 @@ export async function createTow(formData: FormData) {
         time: "--",
       };
     }),
+  };
+
+  // Update driver info with dispatcher contact
+  payload.driver = {
+    ...payload.driver,
+    contactNumber: dispatcherInfo.contactNumber,
   };
 
   const now = Math.floor(Date.now() / 1000);

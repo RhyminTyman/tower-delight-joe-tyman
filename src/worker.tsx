@@ -658,6 +658,116 @@ const app = defineApp([
       );
     }
   }),
+
+  route("/api/seed/dispatcher", async () => {
+    try {
+      console.log("[Seed Dispatcher] Starting seed operation...");
+
+      const DISPATCHER = {
+        id: "dispatcher-001",
+        name: "Alex Morgan",
+        role: "Lead Dispatcher",
+        shift: "24/7 Operations",
+        contactNumber: "+1 (512) 555-9999",
+        email: "dispatch@towerdelight.com",
+      };
+
+      // Check if dispatcher already exists
+      const existing = await db
+        .selectFrom("driver_dashboard")
+        .select("id")
+        .where("id", "=", DISPATCHER.id)
+        .executeTakeFirst();
+
+      if (existing) {
+        console.log(`[Seed Dispatcher] Dispatcher already exists, updating...`);
+        
+        // Update existing dispatcher
+        await db
+          .updateTable("driver_dashboard")
+          .set({
+            payload: JSON.stringify(DISPATCHER),
+            updated_at: Math.floor(Date.now() / 1000),
+          })
+          .where("id", "=", DISPATCHER.id)
+          .execute();
+
+        return Response.json({
+          success: true,
+          message: "Dispatcher updated",
+          dispatcher: DISPATCHER,
+        });
+      }
+
+      // Insert new dispatcher
+      await db
+        .insertInto("driver_dashboard")
+        .values({
+          id: DISPATCHER.id,
+          payload: JSON.stringify(DISPATCHER),
+          updated_at: Math.floor(Date.now() / 1000),
+        })
+        .execute();
+
+      console.log(`[Seed Dispatcher] Inserted dispatcher: ${DISPATCHER.id} (${DISPATCHER.name})`);
+
+      return Response.json({
+        success: true,
+        message: "Dispatcher seeded successfully",
+        dispatcher: DISPATCHER,
+      });
+    } catch (error) {
+      console.error("[Seed Dispatcher] Failed:", error);
+      return Response.json(
+        {
+          success: false,
+          message: error instanceof Error ? error.message : "Seed dispatcher failed",
+          error: error instanceof Error ? error.stack : String(error),
+        },
+        { status: 500 }
+      );
+    }
+  }),
+
+  route("/api/dispatcher", async () => {
+    try {
+      console.log("[Get Dispatcher] Fetching dispatcher info...");
+
+      const dispatcher = await db
+        .selectFrom("driver_dashboard")
+        .select(["id", "payload"])
+        .where("id", "=", "dispatcher-001")
+        .executeTakeFirst();
+
+      if (!dispatcher) {
+        return Response.json(
+          {
+            success: false,
+            message: "Dispatcher not found. Visit /api/seed/dispatcher to seed.",
+          },
+          { status: 404 }
+        );
+      }
+
+      const data = typeof dispatcher.payload === 'string' 
+        ? JSON.parse(dispatcher.payload) 
+        : dispatcher.payload;
+
+      return Response.json({
+        success: true,
+        dispatcher: data,
+      });
+    } catch (error) {
+      console.error("[Get Dispatcher] Failed:", error);
+      return Response.json(
+        {
+          success: false,
+          message: error instanceof Error ? error.message : "Failed to get dispatcher",
+        },
+        { status: 500 }
+      );
+    }
+  }),
 ]);
 
 export default {

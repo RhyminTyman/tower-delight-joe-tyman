@@ -6,12 +6,16 @@ export async function addNote(formData: FormData) {
   const towId = formData.get("towId") as string;
   const noteText = formData.get("note") as string;
 
+  console.log("[addNote] Starting for towId:", towId, "note:", noteText);
+
   try {
     const row = await db
       .selectFrom("driver_dashboard")
       .select("payload")
       .where("id", "=", towId)
       .executeTakeFirst();
+
+    console.log("[addNote] Row found:", !!row);
 
     if (row) {
       const data = typeof row.payload === 'string' ? JSON.parse(row.payload) : row.payload;
@@ -29,7 +33,7 @@ export async function addNote(formData: FormData) {
       });
 
       // Save back to database
-      await db
+      const result = await db
         .updateTable("driver_dashboard")
         .set({
           payload: JSON.stringify(data),
@@ -37,9 +41,11 @@ export async function addNote(formData: FormData) {
         })
         .where("id", "=", towId)
         .execute();
+      
+      console.log("[addNote] Database update result:", result);
     }
   } catch (error) {
-    console.error("Failed to add note:", error);
+    console.error("[addNote] Failed to add note:", error);
   }
-}
 
+}

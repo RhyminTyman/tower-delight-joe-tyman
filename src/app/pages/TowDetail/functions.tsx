@@ -58,6 +58,7 @@ export async function updateStatus(formData: FormData) {
   } catch (error) {
     console.error("[updateStatus] Failed to update status:", error);
   }
+
 }
 
 export async function capturePhoto(formData: FormData) {
@@ -106,4 +107,5 @@ export async function capturePhoto(formData: FormData) {
   } catch (error) {
     console.error("[capturePhoto] Failed to capture photo:", error);
   }
+
 }

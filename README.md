@@ -39,7 +39,7 @@ Mobile-first dispatch, pickup, and impound workflow for Tower Delight heavy-duty
 
 The worker stores dashboard content in an isolated SQLite Durable Object managed by `rwsdk/db`, which handles migrations automatically when the worker boots ([RedwoodSDK docs](https://docs.rwsdk.com/core/database-do/)). The `npm run seed` script drops and re-inserts the `driver_dashboard` row so local development always starts from a known workflow snapshot.
 
-`wrangler.jsonc` already binds the Durable Object as `DATABASE`; deployments will automatically initialize or migrate the database on first request.
+`wrangler.jsonc` already binds the Durable Object as `DATABASE` and includes a `new_sqlite_classes` migration so Cloudflare provisions the Durable Object namespace (required on the free plan). Deployments will automatically initialize or migrate the database on first request.
 
 ## Storybook
 

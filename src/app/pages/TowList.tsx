@@ -143,8 +143,10 @@ const TowCard = ({ tow }: { tow: TowItem }) => (
 async function loadTowList(): Promise<TowItem[]> {
   try {
     console.log("[TowList] Loading tows from database...");
+    console.log("[TowList] DB instance:", typeof db, Object.keys(db));
     const rows = await db.selectFrom("driver_dashboard").select(["id", "payload"]).execute();
     console.log(`[TowList] Found ${rows.length} rows in database`);
+    console.log("[TowList] Row IDs:", rows.map(r => r.id).join(", "));
 
     const tows = rows.map((row) => {
       const data = JSON.parse(row.payload);

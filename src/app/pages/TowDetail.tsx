@@ -4,109 +4,10 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { db } from "@/db";
 import { parseDashboardRow } from "@/app/data/driver-dashboard";
+import { capturePhoto, addNote } from "./TowDetail/functions";
 
 const MAP_PLACEHOLDER =
   "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?q=80&w=1600&auto=format&fit=crop";
-
-// Server Actions that accept towId as first parameter
-async function capturePhotoAction(towId: string) {
-  "use server";
-
-  try {
-    const row = await db
-      .selectFrom("driver_dashboard")
-      .select("payload")
-      .where("id", "=", towId)
-      .executeTakeFirst();
-
-    if (row) {
-      const data = typeof row.payload === 'string' ? JSON.parse(row.payload) : row.payload;
-
-      // Mark photo proof checklist item as complete
-      const photoProofItem = data.checklist?.find((item: any) => item.id === "photo-proof");
-      if (photoProofItem) {
-        photoProofItem.complete = true;
-      }
-
-      // Update next action
-      data.nextAction = {
-        label: "Photo captured successfully",
-        detail: "4-angle documentation complete. Ready for next step.",
-      };
-
-      // Save back to database
-      await db
-        .updateTable("driver_dashboard")
-        .set({
-          payload: JSON.stringify(data),
-          updated_at: Math.floor(Date.now() / 1000),
-        })
-        .where("id", "=", towId)
-        .execute();
-    }
-  } catch (error) {
-    console.error("Failed to capture photo:", error);
-  }
-}
-
-async function addNoteAction(towId: string) {
-  "use server";
-
-  try {
-    const row = await db
-      .selectFrom("driver_dashboard")
-      .select("payload")
-      .where("id", "=", towId)
-      .executeTakeFirst();
-
-    if (row) {
-      const data = typeof row.payload === 'string' ? JSON.parse(row.payload) : row.payload;
-
-      // Add a note to the route
-      if (!data.route.notes) {
-        data.route.notes = [];
-      }
-
-      data.route.notes.push({
-        id: `note-${Date.now()}`,
-        timestamp: new Date().toISOString(),
-        text: "Driver note added from toolbar",
-        author: data.driver.name,
-      });
-
-      // Update next action
-      data.nextAction = {
-        label: "Note added to tow record",
-        detail: "Continue with current workflow step.",
-      };
-
-      // Save back to database
-      await db
-        .updateTable("driver_dashboard")
-        .set({
-          payload: JSON.stringify(data),
-          updated_at: Math.floor(Date.now() / 1000),
-        })
-        .where("id", "=", towId)
-        .execute();
-    }
-  } catch (error) {
-    console.error("Failed to add note:", error);
-  }
-}
-
-// Keep the original functions for other pages
-async function capturePhoto(formData: FormData) {
-  "use server";
-  const towId = formData.get("towId") as string;
-  await capturePhotoAction(towId);
-}
-
-async function addNote(formData: FormData) {
-  "use server";
-  const towId = formData.get("towId") as string;
-  await addNoteAction(towId);
-}
 
 async function updateStatus(formData: FormData) {
   "use server";
@@ -249,9 +150,10 @@ export const TowDetail = async (requestInfo: RequestInfo) => {
               </svg>
             </a>
 
-            <form>
+            <form action={capturePhoto}>
+              <input type="hidden" name="towId" value={towId} />
               <button
-                formAction={capturePhotoAction.bind(null, towId)}
+                type="submit"
                 className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-white/10 hover:text-foreground"
                 title="Take photo"
               >
@@ -267,9 +169,10 @@ export const TowDetail = async (requestInfo: RequestInfo) => {
               </button>
             </form>
 
-            <form>
+            <form action={addNote}>
+              <input type="hidden" name="towId" value={towId} />
               <button
-                formAction={addNoteAction.bind(null, towId)}
+                type="submit"
                 className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-white/10 hover:text-foreground"
                 title="Add note"
               >

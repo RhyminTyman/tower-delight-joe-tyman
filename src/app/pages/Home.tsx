@@ -12,7 +12,7 @@ export const Home = async (requestInfo: RequestInfo) => {
   return <HomeScreen {...data} />;
 };
 
-const HomeScreen = ({
+export const HomeScreen = ({
   driver,
   dispatch,
   workflow,

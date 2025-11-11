@@ -7,7 +7,7 @@ Mobile-first dispatch, pickup, and impound workflow for Tower Delight heavy-duty
 1. Install dependencies (peer warnings are expected with React canary builds):
 
    ```shell
-   npm install --force
+   npm install
    ```
 
 2. Seed your driver dashboard endpoint (optional). By default the app serves a static fallback at `/api/driver-dashboard`. To point at a real service:
@@ -28,6 +28,21 @@ Mobile-first dispatch, pickup, and impound workflow for Tower Delight heavy-duty
    ```shell
    npm run types
    ```
+
+## Storybook
+
+Storybook ships alongside the app so designers and engineers can iterate on driver workflows without booting the entire worker stack.
+
+```shell
+npm run storybook
+```
+
+Key stories:
+
+- `UI/Button` & `UI/Badge` exercise the shadcn-inspired primitives used across the workflow.
+- `Screens/DriverWorkflow` renders `HomeScreen` with persona variants (active dispatch, impound hold, offline fallback) backed by the same fixture as the live route.
+
+The Storybook Vite config loads the Redwood plugin, respects the `@` alias, and injects the Tailwind CDN so component styling matches production.
 
 ## Data Loading Architecture
 

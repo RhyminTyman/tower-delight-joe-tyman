@@ -19,24 +19,34 @@
     "release": "rw-scripts ensure-deploy-env && npm run clean && npm run build && wrangler deploy",
     "generate": "rw-scripts ensure-env && wrangler types --include-runtime false",
     "check": "npm run generate && npm run types",
-    "types": "tsc"
+    "types": "tsc",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
   },
   "dependencies": {
+    "@radix-ui/react-slot": "^1.1.1",
+    "class-variance-authority": "^0.7.0",
+    "clsx": "^2.1.1",
     "react": "19.3.0-canary-fa50caf5-20251107",
     "react-dom": "19.3.0-canary-fa50caf5-20251107",
     "react-server-dom-webpack": "19.3.0-canary-fa50caf5-20251107",
     "rwsdk": "1.0.0-beta.27",
-    "@radix-ui/react-slot": "^1.1.1",
-    "class-variance-authority": "^0.7.0",
-    "clsx": "^2.1.1",
     "tailwind-merge": "^2.5.2"
   },
   "devDependencies": {
+    "@chromatic-com/storybook": "^4.1.2",
     "@cloudflare/vite-plugin": "1.14.0",
     "@cloudflare/workers-types": "4.20251109.0",
+    "@storybook/addon-a11y": "^10.0.6",
+    "@storybook/addon-docs": "^10.0.6",
+    "@storybook/addon-onboarding": "^10.0.6",
+    "@storybook/addon-vitest": "^10.0.6",
+    "@storybook/react": "^10.0.6",
+    "@storybook/react-vite": "^10.0.6",
     "@types/node": "~24.5.2",
     "@types/react": "19.1.2",
     "@types/react-dom": "19.1.2",
+    "storybook": "^10.0.6",
     "typescript": "5.8.3",
     "vite": "7.2.2",
     "wrangler": "4.46.0"

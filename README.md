@@ -69,7 +69,13 @@ The Storybook Vite config mirrors the Redwood/Vite setup, respects the `@` alias
 
 ## Deployment & Extras
 
-- `npm run release` will build and deploy to Cloudflare Workers once you update `wrangler.jsonc` with your project name (already set to `tower-delight-driver`) and credentials.
+- `npm run release` will build and deploy to Cloudflare Workers once you update `wrangler.jsonc` with your project name (already set to `tower-delight`) and credentials.
+
+**After deploying, seed the database:**
+```bash
+curl https://your-worker-url.workers.dev/api/seed
+```
+This will populate the Durable Object with 5 sample tows.
 - Storybook is ready to go (see above). For Playwright end-to-end checks:
 
   ```shell

@@ -40,6 +40,20 @@ const app = defineApp([
     const payload = await loadDashboardFromDatabase();
     return Response.json(payload ?? STATIC_DRIVER_DASHBOARD);
   }),
+  route("/api/seed", async () => {
+    try {
+      // Import seed function dynamically
+      const seedModule = await import("./scripts/seed");
+      await seedModule.default();
+      return Response.json({ success: true, message: "Database seeded successfully" });
+    } catch (error) {
+      console.error("Seed failed:", error);
+      return Response.json(
+        { success: false, message: error instanceof Error ? error.message : "Seed failed" },
+        { status: 500 }
+      );
+    }
+  }),
 ]);
 
 export default {

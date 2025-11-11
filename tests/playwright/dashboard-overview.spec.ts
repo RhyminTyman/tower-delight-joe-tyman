@@ -40,7 +40,7 @@ test.describe("Tow detail dashboard", () => {
 
   test("has complete toolbar with all action icons", async ({ page }) => {
     // Back button
-    await expect(page.getByRole("link", { title: "Back to all tows" })).toBeVisible();
+    await expect(page.locator('a[title="Back to all tows"]')).toBeVisible();
     
     // Tow number
     await expect(page.getByText(/tow #tow-001/i)).toBeVisible();

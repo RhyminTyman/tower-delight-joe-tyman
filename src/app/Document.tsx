@@ -1,5 +1,3 @@
-import "@/styles/globals.css";
-
 export const Document: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => (
@@ -21,7 +19,7 @@ export const Document: React.FC<{ children: React.ReactNode }> = ({
     </head>
     <body className="bg-background text-foreground font-sans antialiased">
       <div id="root">{children}</div>
-      <script>import("/src/client.tsx")</script>
+      <script type="module" dangerouslySetInnerHTML={{ __html: `import("/src/client.tsx")` }} />
     </body>
   </html>
 );

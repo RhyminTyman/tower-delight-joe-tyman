@@ -39,56 +39,6 @@ const app = defineApp([
     route("/tow/:id/address/:type", EditAddress),
     route("/tow/:id/note", AddNote),
   ]),
-  // Handle POST for address updates
-  route("/tow/:id/address/:type", async (req: Request, params: { id: string; type: string }) => {
-    if (req.method !== "POST") {
-      return; // Let render() handle GET requests
-    }
-    
-    const towId = params.id;
-    const addressType = params.type as "pickup" | "destination";
-    const formData = await req.formData();
-    
-    const title = formData.get("title") as string;
-    const address = formData.get("address") as string;
-    const distance = formData.get("distance") as string;
-
-    console.log("[POST /address] Form submitted:", { towId, addressType, title, address, distance });
-
-    try {
-      const row = await db
-        .selectFrom("driver_dashboard")
-        .select("payload")
-        .where("id", "=", towId)
-        .executeTakeFirst();
-
-      if (row) {
-        const data = typeof row.payload === 'string' ? JSON.parse(row.payload) : row.payload;
-
-        if (addressType === "pickup") {
-          data.route.pickup = { title, address, distance };
-        } else if (addressType === "destination") {
-          data.route.destination = { title, address, distance };
-        }
-
-        await db
-          .updateTable("driver_dashboard")
-          .set({
-            payload: JSON.stringify(data),
-            updated_at: Math.floor(Date.now() / 1000),
-          })
-          .where("id", "=", towId)
-          .execute();
-
-        console.log("[POST /address] Database updated successfully");
-      }
-    } catch (error) {
-      console.error("[POST /address] Error:", error);
-    }
-    
-    const url = new URL(req.url);
-    return Response.redirect(url.origin + `/tow/${towId}`, 303);
-  }),
   route("/api/driver-dashboard", async () => {
     const payload = await loadDashboardFromDatabase();
     return Response.json(payload ?? STATIC_DRIVER_DASHBOARD);

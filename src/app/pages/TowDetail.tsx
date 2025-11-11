@@ -2,6 +2,8 @@ import type { RequestInfo } from "rwsdk/worker";
 import { DriverDashboard } from "@/app/components/DriverDashboard";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { db } from "@/db";
+import { parseDashboardRow } from "@/app/data/driver-dashboard";
 
 export const TowDetail = async (requestInfo: RequestInfo) => {
   const towId = requestInfo.params.id;
@@ -100,7 +102,6 @@ const TowDetailHeader = ({ towId }: { towId: string }) => (
 async function capturePhoto(formData: FormData) {
   "use server";
 
-  const { db } = await import("@/db");
   const towId = formData.get("towId") as string;
 
   try {
@@ -143,7 +144,6 @@ async function capturePhoto(formData: FormData) {
 async function addNote(formData: FormData) {
   "use server";
 
-  const { db } = await import("@/db");
   const towId = formData.get("towId") as string;
 
   try {
@@ -190,9 +190,6 @@ async function addNote(formData: FormData) {
 }
 
 async function loadTowDetail(towId: string) {
-  const { db } = await import("@/db");
-  const { parseDashboardRow } = await import("@/app/data/driver-dashboard");
-  
   try {
     const row = await db
       .selectFrom("driver_dashboard")

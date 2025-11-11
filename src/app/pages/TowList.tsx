@@ -1,6 +1,7 @@
 import type { RequestInfo } from "rwsdk/worker";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
+import { db } from "@/db";
 
 interface TowItem {
   id: string;
@@ -140,8 +141,6 @@ const TowCard = ({ tow }: { tow: TowItem }) => (
 );
 
 async function loadTowList(): Promise<TowItem[]> {
-  const { db } = await import("@/db");
-
   try {
     console.log("[TowList] Loading tows from database...");
     const rows = await db.selectFrom("driver_dashboard").select(["id", "payload"]).execute();

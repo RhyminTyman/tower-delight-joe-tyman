@@ -1,6 +1,7 @@
 import type { RequestInfo } from "rwsdk/worker";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { db } from "@/db";
 
 interface TowEditData {
   ticketId: string;
@@ -264,8 +265,6 @@ const EditTowScreen = ({ towId, data }: { towId: string; data: TowEditData }) =>
 
 async function updateTow(formData: FormData) {
   "use server";
-
-  const { db } = await import("@/db");
   
   const towId = formData.get("towId") as string;
   const ticketId = formData.get("ticketId") as string;
@@ -330,8 +329,6 @@ async function updateTow(formData: FormData) {
 }
 
 async function loadTowData(towId: string): Promise<TowEditData | null> {
-  const { db } = await import("@/db");
-  
   try {
     const row = await db
       .selectFrom("driver_dashboard")

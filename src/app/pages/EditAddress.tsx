@@ -1,6 +1,7 @@
 import type { RequestInfo } from "rwsdk/worker";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { db } from "@/db";
 
 interface AddressEditData {
   ticketId: string;
@@ -106,8 +107,6 @@ const EditAddressScreen = ({ towId, data }: { towId: string; data: AddressEditDa
 
 async function updateAddress(formData: FormData) {
   "use server";
-
-  const { db } = await import("@/db");
   
   const towId = formData.get("towId") as string;
   const addressType = formData.get("addressType") as "pickup" | "destination";
@@ -156,8 +155,6 @@ async function updateAddress(formData: FormData) {
 }
 
 async function loadAddressData(towId: string, addressType: "pickup" | "destination"): Promise<AddressEditData | null> {
-  const { db } = await import("@/db");
-  
   try {
     const row = await db
       .selectFrom("driver_dashboard")

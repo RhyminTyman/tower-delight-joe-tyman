@@ -1,8 +1,7 @@
 import type { RequestInfo } from "rwsdk/worker";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { db } from "@/db";
-import { updateAddress } from "./EditAddress/functions";
+import { EditAddressForm } from "./EditAddress/EditAddressForm";
 
 interface AddressEditData {
   ticketId: string;
@@ -21,90 +20,19 @@ export const EditAddress = async (requestInfo: RequestInfo) => {
     return <div>Address not found</div>;
   }
 
-  return <EditAddressScreen towId={towId} data={data} />;
+  return (
+    <div className="flex min-h-screen flex-col bg-background">
+      <EditAddressForm
+        towId={towId}
+        addressType={data.addressType}
+        ticketId={data.ticketId}
+        title={data.title}
+        address={data.address}
+        distance={data.distance}
+      />
+    </div>
+  );
 };
-
-const EditAddressScreen = ({ towId, data }: { towId: string; data: AddressEditData }) => (
-  <div className="relative min-h-screen bg-background">
-    <header className="sticky top-0 z-30 border-b border-border/60 bg-slate-950/95 px-4 py-3 backdrop-blur">
-      <div className="mx-auto flex max-w-md items-center justify-between">
-        <a href={`/tow/${towId}`} className="flex items-center gap-2 text-muted-foreground hover:text-foreground">
-          <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
-          <span className="text-sm font-medium">Cancel</span>
-        </a>
-        <span className="text-xs uppercase tracking-wide text-muted-foreground">
-          {data.ticketId}
-        </span>
-      </div>
-    </header>
-
-    <main className="mx-auto max-w-md px-4 py-6">
-      <h1 className="mb-2 text-xl font-semibold text-foreground">
-        Edit {data.addressType === "pickup" ? "Pickup" : "Destination"}
-      </h1>
-      <p className="mb-6 text-sm text-muted-foreground">
-        Update the {data.addressType} location details
-      </p>
-
-      <form action={updateAddress} className="flex flex-col gap-6">
-        <input type="hidden" name="towId" value={towId} />
-        <input type="hidden" name="addressType" value={data.addressType} />
-
-        <Card className="glass-card p-5">
-          <div className="flex flex-col gap-4">
-            <div>
-              <label htmlFor="title" className="mb-1.5 block text-xs text-muted-foreground">
-                Location Name
-              </label>
-              <input
-                type="text"
-                id="title"
-                name="title"
-                defaultValue={data.title}
-                className="w-full rounded-lg border border-border/60 bg-slate-900/50 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
-                placeholder="e.g. Kyle's Motors"
-              />
-            </div>
-
-            <div>
-              <label htmlFor="address" className="mb-1.5 block text-xs text-muted-foreground">
-                Street Address
-              </label>
-              <textarea
-                id="address"
-                name="address"
-                defaultValue={data.address}
-                rows={2}
-                className="w-full rounded-lg border border-border/60 bg-slate-900/50 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
-                placeholder="Enter full address"
-              />
-            </div>
-
-            <div>
-              <label htmlFor="distance" className="mb-1.5 block text-xs text-muted-foreground">
-                Distance/ETA
-              </label>
-              <input
-                type="text"
-                id="distance"
-                name="distance"
-                defaultValue={data.distance}
-                className="w-full rounded-lg border border-border/60 bg-slate-900/50 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
-                placeholder="e.g. 12 mi (26 m)"
-              />
-            </div>
-          </div>
-        </Card>
-
-        <Button type="submit" className="w-full" size="lg">
-          Save Changes
-        </Button>
-      </form>
-    </main>
-  </div>
-);
 
 async function loadAddressData(towId: string, addressType: "pickup" | "destination"): Promise<AddressEditData | null> {
   try {

@@ -2,6 +2,7 @@
 
 import { Card } from "@/components/ui/card";
 import { updateAddress } from "./functions";
+import { useEffect } from "react";
 
 interface EditAddressFormProps {
   towId: string;
@@ -13,6 +14,11 @@ interface EditAddressFormProps {
 }
 
 export function EditAddressForm({ towId, addressType, ticketId, title, address, distance }: EditAddressFormProps) {
+  useEffect(() => {
+    console.log("🎨 [CLIENT] EditAddressForm mounted on client");
+    console.log("🎨 [CLIENT] updateAddress function:", typeof updateAddress, updateAddress);
+  }, []);
+
   return (
     <>
       <header className="border-b border-border bg-card px-4 py-3">

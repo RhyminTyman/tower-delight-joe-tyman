@@ -265,8 +265,20 @@ const app = defineApp([
           status: "En Route",
           statusTone: "active" as const,
           vehicle: "2019 Honda Civic · Silver · ABC-1234",
-          pickup: { title: "Kyle's Motors", address: "830 South 17th Street, Columbus OH 43206", distance: "12 mi (26 m)" },
-          destination: { title: "City Impound Lot", address: "1440 Alum Creek Dr, Columbus OH 43209", distance: "8 mi (18 m)" },
+          pickup: { 
+            title: "Kyle's Motors", 
+            address: "830 South 17th Street, Columbus OH 43206", 
+            distance: "12 mi (26 m)",
+            lat: 39.9467,
+            lng: -82.9923
+          },
+          destination: { 
+            title: "City Impound Lot", 
+            address: "1440 Alum Creek Dr, Columbus OH 43209", 
+            distance: "8 mi (18 m)",
+            lat: 39.9573,
+            lng: -82.9621
+          },
           etaMinutes: 26,
         },
         {
@@ -275,8 +287,20 @@ const app = defineApp([
           status: "On Scene",
           statusTone: "active" as const,
           vehicle: "2021 Ford F-150 · White · XYZ-5678",
-          pickup: { title: "Walmart Parking Lot", address: "3600 Soldano Blvd, Columbus OH 43228", distance: "0 mi (0 m)" },
-          destination: { title: "West Side Impound", address: "2500 McKinley Ave, Columbus OH 43204", distance: "5 mi (12 m)" },
+          pickup: { 
+            title: "Walmart Parking Lot", 
+            address: "3600 Soldano Blvd, Columbus OH 43228", 
+            distance: "0 mi (0 m)",
+            lat: 39.9445,
+            lng: -83.1252
+          },
+          destination: { 
+            title: "West Side Impound", 
+            address: "2500 McKinley Ave, Columbus OH 43204", 
+            distance: "5 mi (12 m)",
+            lat: 39.9526,
+            lng: -83.0892
+          },
           etaMinutes: 0,
         },
         {
@@ -285,8 +309,20 @@ const app = defineApp([
           status: "Towing",
           statusTone: "completed" as const,
           vehicle: "2018 Toyota Camry · Black · DEF-9012",
-          pickup: { title: "Downtown Parking Garage", address: "55 E Spring St, Columbus OH 43215", distance: "0 mi (0 m)" },
-          destination: { title: "City Impound Lot", address: "1440 Alum Creek Dr, Columbus OH 43209", distance: "3 mi (8 m)" },
+          pickup: { 
+            title: "Downtown Parking Garage", 
+            address: "55 E Spring St, Columbus OH 43215", 
+            distance: "0 mi (0 m)",
+            lat: 39.9612,
+            lng: -82.9988
+          },
+          destination: { 
+            title: "City Impound Lot", 
+            address: "1440 Alum Creek Dr, Columbus OH 43209", 
+            distance: "3 mi (8 m)",
+            lat: 39.9573,
+            lng: -82.9621
+          },
           etaMinutes: 8,
         },
         {
@@ -295,8 +331,20 @@ const app = defineApp([
           status: "Dispatched",
           statusTone: "waiting" as const,
           vehicle: "2020 Jeep Wrangler · Red · GHI-3456",
-          pickup: { title: "Ohio State Campus", address: "1739 N High St, Columbus OH 43210", distance: "18 mi (32 m)" },
-          destination: { title: "North Impound Facility", address: "3232 Morse Rd, Columbus OH 43231", distance: "6 mi (14 m)" },
+          pickup: { 
+            title: "Ohio State Campus", 
+            address: "1739 N High St, Columbus OH 43210", 
+            distance: "18 mi (32 m)",
+            lat: 40.0067,
+            lng: -83.0305
+          },
+          destination: { 
+            title: "North Impound Facility", 
+            address: "3232 Morse Rd, Columbus OH 43231", 
+            distance: "6 mi (14 m)",
+            lat: 40.0465,
+            lng: -82.9355
+          },
           etaMinutes: 32,
         },
         {
@@ -305,8 +353,20 @@ const app = defineApp([
           status: "Waiting",
           statusTone: "waiting" as const,
           vehicle: "2017 Nissan Altima · Blue · JKL-7890",
-          pickup: { title: "Easton Town Center", address: "160 Easton Town Center, Columbus OH 43219", distance: "22 mi (38 m)" },
-          destination: { title: "East Side Storage", address: "5500 E Livingston Ave, Columbus OH 43232", distance: "9 mi (20 m)" },
+          pickup: { 
+            title: "Easton Town Center", 
+            address: "160 Easton Town Center, Columbus OH 43219", 
+            distance: "22 mi (38 m)",
+            lat: 40.0502,
+            lng: -82.9188
+          },
+          destination: { 
+            title: "East Side Storage", 
+            address: "5500 E Livingston Ave, Columbus OH 43232", 
+            distance: "9 mi (20 m)",
+            lat: 39.9567,
+            lng: -82.8821
+          },
           etaMinutes: 38,
         },
       ];
@@ -316,9 +376,31 @@ const app = defineApp([
       await db.deleteFrom("driver_dashboard").execute();
       console.log("[Seed] Cleared existing tows");
 
+      // Helper function to generate map URL
+      const generateMapUrl = (pickup: any, destination: any) => {
+        if (!pickup.lat || !pickup.lng || !destination.lat || !destination.lng) {
+          return undefined;
+        }
+        // OpenStreetMap static map URL (using staticmap.openstreetmap.de)
+        // Format: center, zoom, size, markers
+        const centerLat = (pickup.lat + destination.lat) / 2;
+        const centerLng = (pickup.lng + destination.lng) / 2;
+        
+        // Calculate approximate zoom level based on distance
+        const latDiff = Math.abs(pickup.lat - destination.lat);
+        const lngDiff = Math.abs(pickup.lng - destination.lng);
+        const maxDiff = Math.max(latDiff, lngDiff);
+        const zoom = maxDiff > 0.2 ? 10 : maxDiff > 0.1 ? 11 : maxDiff > 0.05 ? 12 : 13;
+        
+        // Use Mapbox Static API format (you can swap this for any static map API)
+        return `https://api.mapbox.com/styles/v1/mapbox/dark-v11/static/pin-s-a+ff0000(${pickup.lng},${pickup.lat}),pin-s-b+00ff00(${destination.lng},${destination.lat})/auto/600x400@2x?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw`;
+      };
+
       // Insert all seed tows
       console.log(`[Seed] Inserting ${SEED_TOWS.length} tows...`);
       for (const tow of SEED_TOWS) {
+        const mapUrl = generateMapUrl(tow.pickup, tow.destination);
+        
         const dashboardData = {
           ...STATIC_DRIVER_DASHBOARD,
           dispatch: {
@@ -333,6 +415,8 @@ const app = defineApp([
             statusTone: tow.statusTone,
             pickup: tow.pickup,
             destination: tow.destination,
+            mapUrl: mapUrl,
+            mapImage: mapUrl || STATIC_DRIVER_DASHBOARD.route.mapImage,
             statuses: STATIC_DRIVER_DASHBOARD.route.statuses.map((s) => {
               if (tow.status === "Waiting") {
                 return s.label === "Waiting" ? { ...s, status: "active" } : { ...s, status: "waiting" };

@@ -9,6 +9,32 @@ function cloneDashboard(): DashboardPayload {
   return JSON.parse(JSON.stringify(STATIC_DRIVER_DASHBOARD));
 }
 
+// Generate random GPS coordinates around Columbus, OH
+function generateRandomCoordinates() {
+  // Columbus, OH is approximately at 39.9612° N, 82.9988° W
+  const centerLat = 39.9612;
+  const centerLng = -82.9988;
+  
+  // Generate random offset within ~20 miles (roughly 0.3 degrees)
+  const latOffset = (Math.random() - 0.5) * 0.3;
+  const lngOffset = (Math.random() - 0.5) * 0.3;
+  
+  return {
+    lat: Number((centerLat + latOffset).toFixed(4)),
+    lng: Number((centerLng + lngOffset).toFixed(4)),
+  };
+}
+
+// Generate map URL from GPS coordinates
+function generateMapUrl(pickup: any, destination: any) {
+  if (!pickup.lat || !pickup.lng || !destination.lat || !destination.lng) {
+    return undefined;
+  }
+  
+  // Use Mapbox Static API format
+  return `https://api.mapbox.com/styles/v1/mapbox/dark-v11/static/pin-s-a+ff0000(${pickup.lng},${pickup.lat}),pin-s-b+00ff00(${destination.lng},${destination.lat})/auto/600x400@2x?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw`;
+}
+
 async function resolveDriverSnapshot(driverId: string | null) {
   if (!driverId) {
     return {
@@ -65,6 +91,10 @@ export async function createTow(formData: FormData) {
 
   const { driver, driverCallsign, truck } = await resolveDriverSnapshot(driverId);
 
+  // Generate random GPS coordinates for pickup and destination
+  const pickupCoords = generateRandomCoordinates();
+  const destinationCoords = generateRandomCoordinates();
+
   const payload = cloneDashboard();
 
   payload.driver = driver;
@@ -76,20 +106,33 @@ export async function createTow(formData: FormData) {
     location: pickupTitle || payload.dispatch.location,
   };
 
+  // Generate map URL with GPS coordinates
+  const pickupWithCoords = {
+    title: pickupTitle || payload.route.pickup.title,
+    address: pickupAddress || payload.route.pickup.address,
+    distance: pickupDistance || payload.route.pickup.distance,
+    lat: pickupCoords.lat,
+    lng: pickupCoords.lng,
+  };
+
+  const destinationWithCoords = {
+    title: destinationTitle || payload.route.destination.title,
+    address: destinationAddress || payload.route.destination.address,
+    distance: destinationDistance || payload.route.destination.distance,
+    lat: destinationCoords.lat,
+    lng: destinationCoords.lng,
+  };
+
+  const mapUrl = generateMapUrl(pickupWithCoords, destinationWithCoords);
+
   payload.route = {
     ...payload.route,
     status: "Waiting",
     statusTone: "waiting",
-    pickup: {
-      title: pickupTitle || payload.route.pickup.title,
-      address: pickupAddress || payload.route.pickup.address,
-      distance: pickupDistance || payload.route.pickup.distance,
-    },
-    destination: {
-      title: destinationTitle || payload.route.destination.title,
-      address: destinationAddress || payload.route.destination.address,
-      distance: destinationDistance || payload.route.destination.distance,
-    },
+    pickup: pickupWithCoords,
+    destination: destinationWithCoords,
+    mapUrl: mapUrl,
+    mapImage: mapUrl || payload.route.mapImage,
     dispatcher: payload.route.dispatcher,
     hasKeys: false,
     type,

@@ -104,6 +104,25 @@ export const TowDetail = async (requestInfo: RequestInfo) => {
                       {data.route.pickup.distance}
                     </p>
                   )}
+                  {data.route.pickup.lat && data.route.pickup.lng && (
+                    <div className="mt-2 flex gap-2">
+                      <a
+                        href={`https://maps.google.com/?q=${data.route.pickup.lat},${data.route.pickup.lng}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={`inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs font-medium transition-colors ${hasPhoto(data.route.mapImage) ? "bg-white/10 text-white hover:bg-white/20" : "bg-accent/10 text-accent hover:bg-accent/20"}`}
+                      >
+                        <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                        Navigate
+                      </a>
+                      <span className={`inline-flex items-center rounded-lg px-2 py-1 text-xs font-mono ${hasPhoto(data.route.mapImage) ? "bg-white/5 text-white/60" : "bg-muted text-muted-foreground"}`}>
+                        {data.route.pickup.lat.toFixed(4)}, {data.route.pickup.lng.toFixed(4)}
+                      </span>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -134,9 +153,45 @@ export const TowDetail = async (requestInfo: RequestInfo) => {
                       {data.route.destination.distance}
                     </p>
                   )}
+                  {data.route.destination.lat && data.route.destination.lng && (
+                    <div className="mt-2 flex gap-2">
+                      <a
+                        href={`https://maps.google.com/?q=${data.route.destination.lat},${data.route.destination.lng}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={`inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs font-medium transition-colors ${hasPhoto(data.route.mapImage) ? "bg-white/10 text-white hover:bg-white/20" : "bg-accent/10 text-accent hover:bg-accent/20"}`}
+                      >
+                        <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                        Navigate
+                      </a>
+                      <span className={`inline-flex items-center rounded-lg px-2 py-1 text-xs font-mono ${hasPhoto(data.route.mapImage) ? "bg-white/5 text-white/60" : "bg-muted text-muted-foreground"}`}>
+                        {data.route.destination.lat.toFixed(4)}, {data.route.destination.lng.toFixed(4)}
+                      </span>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
+            
+            {/* Full Route Navigation */}
+            {data.route.pickup.lat && data.route.pickup.lng && data.route.destination.lat && data.route.destination.lng && (
+              <div className="mt-4">
+                <a
+                  href={`https://www.google.com/maps/dir/?api=1&origin=${data.route.pickup.lat},${data.route.pickup.lng}&destination=${data.route.destination.lat},${data.route.destination.lng}&travelmode=driving`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`flex w-full items-center justify-center gap-2 rounded-xl px-4 py-3 font-medium transition-colors ${hasPhoto(data.route.mapImage) ? "bg-white/10 text-white hover:bg-white/20" : "bg-accent text-accent-foreground hover:bg-accent/90"}`}
+                >
+                  <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+                  </svg>
+                  Get Full Route Directions
+                </a>
+              </div>
+            )}
           </div>
         </div>
 

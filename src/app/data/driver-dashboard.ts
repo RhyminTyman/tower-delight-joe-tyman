@@ -38,6 +38,8 @@ export interface RouteStop {
   title: string;
   address: string;
   distance?: string;
+  lat?: number;
+  lng?: number;
 }
 
 export interface RouteTimelineEntry {
@@ -50,6 +52,7 @@ export interface RouteOverview {
   status: string;
   statusTone: "waiting" | "active" | "completed";
   mapImage: string;
+  mapUrl?: string;
   updateCta: string;
   pickup: RouteStop;
   destination: RouteStop;

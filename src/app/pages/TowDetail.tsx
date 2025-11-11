@@ -203,26 +203,6 @@ export const TowDetail = async (requestInfo: RequestInfo) => {
     return <div>Tow not found</div>;
   }
 
-  async function capturePhotoAction(formData: FormData) {
-    "use server";
-    await capturePhoto(formData);
-  }
-
-  async function addNoteAction(formData: FormData) {
-    "use server";
-    await addNote(formData);
-  }
-
-  async function updateStatusAction(formData: FormData) {
-    "use server";
-    await updateStatus(formData);
-  }
-
-  async function startCaptureAction(formData: FormData) {
-    "use server";
-    await startCapture(formData);
-  }
-
   return (
     <div className="relative min-h-screen bg-background">
       <header className="sticky top-0 z-30 border-b border-border/60 bg-slate-950/95 px-4 py-3 backdrop-blur">
@@ -257,7 +237,10 @@ export const TowDetail = async (requestInfo: RequestInfo) => {
               </svg>
             </a>
 
-            <form action={capturePhotoAction}>
+            <form action={async (formData: FormData) => {
+              "use server";
+              await capturePhoto(formData);
+            }}>
               <input type="hidden" name="towId" value={towId} />
               <button
                 type="submit"
@@ -276,7 +259,10 @@ export const TowDetail = async (requestInfo: RequestInfo) => {
               </button>
             </form>
 
-            <form action={addNoteAction}>
+            <form action={async (formData: FormData) => {
+              "use server";
+              await addNote(formData);
+            }}>
               <input type="hidden" name="towId" value={towId} />
               <button
                 type="submit"

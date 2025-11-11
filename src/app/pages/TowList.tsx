@@ -141,11 +141,28 @@ const TowCard = ({ tow }: { tow: TowItem }) => (
 );
 
 async function loadTowList(): Promise<TowItem[]> {
+  console.log("[TowList] START - Function called");
+  
   try {
-    console.log("[TowList] Loading tows from database...");
-    console.log("[TowList] DB instance:", typeof db, Object.keys(db));
+    console.log("[TowList] About to check db...");
+    
+    if (!db) {
+      console.error("[TowList] ERROR: db is undefined!");
+      return [];
+    }
+    
+    console.log("[TowList] DB exists, typeof:", typeof db);
+    console.log("[TowList] About to query database...");
+    
     const rows = await db.selectFrom("driver_dashboard").select(["id", "payload"]).execute();
-    console.log(`[TowList] Found ${rows.length} rows in database`);
+    
+    console.log(`[TowList] Query complete! Found ${rows.length} rows`);
+    
+    if (rows.length === 0) {
+      console.warn("[TowList] Database returned 0 rows - database is empty!");
+      return [];
+    }
+    
     console.log("[TowList] Row IDs:", rows.map(r => r.id).join(", "));
 
     const tows = rows.map((row) => {
@@ -168,10 +185,12 @@ async function loadTowList(): Promise<TowItem[]> {
       };
     });
     
-    console.log(`[TowList] Returning ${tows.length} tows`);
+    console.log(`[TowList] Successfully mapped ${tows.length} tows`);
     return tows;
   } catch (error) {
-    console.error("[TowList] Failed to load tow list:", error);
+    console.error("[TowList] EXCEPTION:", error);
+    console.error("[TowList] Error message:", error instanceof Error ? error.message : String(error));
+    console.error("[TowList] Error stack:", error instanceof Error ? error.stack : "no stack");
     return [];
   }
 }

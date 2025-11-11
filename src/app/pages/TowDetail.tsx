@@ -6,9 +6,7 @@ import { db } from "@/db";
 import { parseDashboardRow } from "@/app/data/driver-dashboard";
 import { TowActions } from "./TowDetail/TowActions";
 import { StatusBanner } from "./TowDetail/StatusBanner";
-
-const MAP_PLACEHOLDER =
-  "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?q=80&w=1600&auto=format&fit=crop";
+import { PhotoPreview } from "./TowDetail/PhotoPreview";
 
 export const TowDetail = async (requestInfo: RequestInfo) => {
   const towId = requestInfo.params.id;
@@ -75,63 +73,67 @@ export const TowDetail = async (requestInfo: RequestInfo) => {
       <StatusBanner towId={towId} currentStatus={data.route.status} />
       
       <main className="mx-auto flex min-h-screen max-w-md flex-col gap-5 px-4 pb-28 pt-6 sm:max-w-lg">
-        {/* Route Map Card */}
+        {/* Route Map / Photo Card */}
         <div className="overflow-hidden rounded-3xl border border-border/60 bg-secondary/40 shadow-card">
-          <div className="relative h-72">
-            <div
-              className="absolute inset-0 bg-cover bg-center"
-              style={{ backgroundImage: `url(${data.route.mapImage || MAP_PLACEHOLDER})` }}
-            />
-            <div className="absolute inset-0 bg-gradient-to-br from-black/20 via-black/40 to-black/70" />
-            <div className="relative flex h-full flex-col justify-end p-5 text-white">
-              <div className="flex flex-col gap-3 rounded-2xl bg-black/45 p-4 backdrop-blur">
-                {/* Pickup Row */}
-                <div className="flex items-start justify-between gap-3">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <p className="text-xs uppercase tracking-wide text-white/70">Pickup</p>
-                      <a
-                        href={`/tow/${towId}/address/pickup`}
-                        className="rounded p-1 hover:bg-white/20 transition-colors"
-                        title="Edit pickup"
-                      >
-                        <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                        </svg>
-                      </a>
-                    </div>
-                    <p className="text-sm font-semibold leading-tight">{data.route.pickup.title}</p>
-                    <p className="text-xs text-white/70">{data.route.pickup.address}</p>
-                    {data.route.pickup.distance && (
-                      <p className="mt-1 text-xs text-white/60">{data.route.pickup.distance}</p>
-                    )}
+          {data.route.mapImage ? (
+            <PhotoPreview towId={towId} imageUrl={data.route.mapImage} />
+          ) : null}
+          <div className={`p-5 ${data.route.mapImage ? "bg-slate-950/75 backdrop-blur text-white" : "text-foreground"}`}>
+            <div className={`${data.route.mapImage ? "rounded-2xl bg-black/45 p-4" : "rounded-2xl bg-card/50 p-4"}`}>
+              {/* Pickup Row */}
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex-1">
+                  <div className="mb-1 flex items-center gap-2">
+                    <p className={`text-xs uppercase tracking-wide ${data.route.mapImage ? "text-white/70" : "text-muted-foreground"}`}>Pickup</p>
+                    <a
+                      href={`/tow/${towId}/address/pickup`}
+                      className="rounded p-1 transition-colors hover:bg-white/20"
+                      title="Edit pickup"
+                    >
+                      <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                      </svg>
+                    </a>
                   </div>
+                  <p className="text-sm font-semibold leading-tight">{data.route.pickup.title}</p>
+                  <p className={`text-xs ${data.route.mapImage ? "text-white/70" : "text-muted-foreground"}`}>
+                    {data.route.pickup.address}
+                  </p>
+                  {data.route.pickup.distance && (
+                    <p className={`mt-1 text-xs ${data.route.mapImage ? "text-white/60" : "text-muted-foreground/80"}`}>
+                      {data.route.pickup.distance}
+                    </p>
+                  )}
                 </div>
+              </div>
 
-                {/* Divider */}
-                <div className="h-px bg-white/10" />
+              {/* Divider */}
+              <div className={`my-4 h-px ${data.route.mapImage ? "bg-white/10" : "bg-border"}`} />
 
-                {/* Destination Row */}
-                <div className="flex items-start justify-between gap-3">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <p className="text-xs uppercase tracking-wide text-white/70">Destination</p>
-                      <a
-                        href={`/tow/${towId}/address/destination`}
-                        className="rounded p-1 hover:bg-white/20 transition-colors"
-                        title="Edit destination"
-                      >
-                        <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                        </svg>
-                      </a>
-                    </div>
-                    <p className="text-sm font-semibold leading-tight">{data.route.destination.title}</p>
-                    <p className="text-xs text-white/70">{data.route.destination.address}</p>
-                    {data.route.destination.distance && (
-                      <p className="mt-1 text-xs text-white/60">{data.route.destination.distance}</p>
-                    )}
+              {/* Destination Row */}
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex-1">
+                  <div className="mb-1 flex items-center gap-2">
+                    <p className={`text-xs uppercase tracking-wide ${data.route.mapImage ? "text-white/70" : "text-muted-foreground"}`}>Destination</p>
+                    <a
+                      href={`/tow/${towId}/address/destination`}
+                      className="rounded p-1 transition-colors hover:bg-white/20"
+                      title="Edit destination"
+                    >
+                      <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                      </svg>
+                    </a>
                   </div>
+                  <p className="text-sm font-semibold leading-tight">{data.route.destination.title}</p>
+                  <p className={`text-xs ${data.route.mapImage ? "text-white/70" : "text-muted-foreground"}`}>
+                    {data.route.destination.address}
+                  </p>
+                  {data.route.destination.distance && (
+                    <p className={`mt-1 text-xs ${data.route.mapImage ? "text-white/60" : "text-muted-foreground/80"}`}>
+                      {data.route.destination.distance}
+                    </p>
+                  )}
                 </div>
               </div>
             </div>

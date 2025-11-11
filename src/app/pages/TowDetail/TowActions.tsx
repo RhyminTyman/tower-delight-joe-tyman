@@ -60,7 +60,6 @@ export function TowActions({ towId, currentStatus }: TowActionsProps) {
         ref={fileInputRef}
         type="file"
         accept="image/*"
-        capture="environment"
         className="hidden"
         onChange={handleFileChange}
         aria-hidden="true"

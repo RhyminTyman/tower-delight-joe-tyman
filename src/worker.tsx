@@ -72,6 +72,54 @@ const app = defineApp([
     console.log("[API capturePhoto] Starting for towId:", towId);
     const request = requestInfo.request;
 
+    if (request.method === "DELETE") {
+      try {
+        const row = await db
+          .selectFrom("driver_dashboard")
+          .select("payload")
+          .where("id", "=", towId)
+          .executeTakeFirst();
+
+        if (!row) {
+          return Response.json({ error: "Tow not found" }, { status: 404 });
+        }
+
+        const data = typeof row.payload === "string" ? JSON.parse(row.payload) : row.payload;
+
+        if (data.route) {
+          delete data.route.mapImage;
+          if (data.route.lastPhoto) {
+            delete data.route.lastPhoto;
+          }
+        }
+
+        const photoProofItem = data.checklist?.find((item: any) => item.id === "photo-proof");
+        if (photoProofItem) {
+          photoProofItem.complete = false;
+        }
+
+        data.nextAction = {
+          label: "Photo capture needed",
+          detail: "Upload fresh documentation to complete this step.",
+        };
+
+        await db
+          .updateTable("driver_dashboard")
+          .set({
+            payload: JSON.stringify(data),
+            updated_at: Math.floor(Date.now() / 1000),
+          })
+          .where("id", "=", towId)
+          .execute();
+
+        console.log("[API capturePhoto] Photo removed");
+        return Response.json({ success: true, mapImageUpdated: false });
+      } catch (error) {
+        console.error("[API capturePhoto] Error removing photo:", error);
+        return Response.json({ error: String(error) }, { status: 500 });
+      }
+    }
+
     let photoData: string | null = null;
     let fileName: string | null = null;
     let mimeType: string | null = null;

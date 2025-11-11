@@ -92,22 +92,6 @@ export const TowDetail = async (requestInfo: RequestInfo) => {
       </header>
       
       <main className="mx-auto flex min-h-screen max-w-md flex-col gap-5 px-4 pb-28 pt-6 sm:max-w-lg">
-        {/* Driver Header */}
-        <header className="flex items-center justify-between">
-          <div className="flex flex-col gap-1">
-            <span className="text-xs uppercase tracking-wide text-muted-foreground">
-              Tower Delight · Driver Ops
-            </span>
-            <h1 className="text-2xl font-semibold text-foreground">{data.driver.name}</h1>
-            <p className="text-sm text-muted-foreground">
-              {data.driver.role} · {data.driver.truck}
-            </p>
-          </div>
-          <Badge variant="accent" className="px-4 py-2 text-xs font-semibold uppercase tracking-wide">
-            {data.driver.status}
-          </Badge>
-        </header>
-
         {/* Route Map Card */}
         <div className="overflow-hidden rounded-3xl border border-border/60 bg-secondary/40 shadow-card">
           <div className="relative h-56">

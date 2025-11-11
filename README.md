@@ -10,6 +10,8 @@ Mobile-first dispatch, pickup, and impound workflow for Tower Delight heavy-duty
    npm install
    ```
 
+   The repo ships with an `.npmrc` that enables `legacy-peer-deps` so CI/CD (and Cloudflare builds) don’t choke on the React canary + Radix peer mismatch.
+
 2. Seed your driver dashboard endpoint (optional). By default the app serves a static fallback at `/api/driver-dashboard`. To point at a real service:
 
    - Update `wrangler.jsonc` → `vars.TOWER_API_BASE_URL`
@@ -52,8 +54,9 @@ The Storybook Vite config loads the Redwood plugin, respects the `@` alias, and 
 
 ## UI System
 
-- shadcn/ui primitives (`Button`, `Badge`, `Card`, `Separator`) live under `src/components/ui`. They’re theme-aligned with Tower Delight’s brand tokens injected via `tailwind.config` in `Document.tsx`.
-- Shared utility `cn()` (clsx + tailwind-merge) mirrors the shadcn pattern for composing responsive, mobile-first styles.
+- Official `shadcn/ui` components (generated via `components.json`) live in `src/components/ui` and run on a full Tailwind toolchain (`tailwind.config.ts`, `postcss.config.cjs`, `src/styles/globals.css`).
+- The Tailwind theme codifies Tower Delight brand tokens (`primary`, `accent`, `glass-card` utility) so web, Storybook, and Cloudflare worker stay visually identical.
+- Shared utility `cn()` combines `clsx` + `tailwind-merge` for ergonomic class composition inside every component and story.
 
 ## Deployment & Extras
 

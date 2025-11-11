@@ -11,7 +11,7 @@ const meta: Meta<typeof Button> = {
   argTypes: {
     variant: {
       control: { type: "select" },
-      options: ["default", "secondary", "ghost", "destructive"],
+      options: ["default", "secondary", "ghost", "outline", "destructive", "link"],
     },
     size: {
       control: { type: "inline-radio" },
@@ -47,6 +47,20 @@ export const Destructive: Story = {
   args: {
     variant: "destructive",
     children: "Cancel Ticket",
+  },
+};
+
+export const Outline: Story = {
+  args: {
+    variant: "outline",
+    children: "Add Notes",
+  },
+};
+
+export const Link: Story = {
+  args: {
+    variant: "link",
+    children: "View Incident Timeline",
   },
 };
 

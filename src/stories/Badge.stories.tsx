@@ -11,7 +11,7 @@ const meta: Meta<typeof Badge> = {
   argTypes: {
     variant: {
       control: { type: "inline-radio" },
-      options: ["default", "accent", "muted", "outline"],
+      options: ["default", "secondary", "accent", "muted", "outline"],
     },
   },
   parameters: {
@@ -29,6 +29,13 @@ export const Accent: Story = {
   args: {
     variant: "accent",
     children: "Priority",
+  },
+};
+
+export const Secondary: Story = {
+  args: {
+    variant: "secondary",
+    children: "Supervisor",
   },
 };
 

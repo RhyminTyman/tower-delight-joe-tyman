@@ -2,6 +2,7 @@ import type { DriverDashboardData } from "@/app/data/driver-dashboard";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { db } from "@/db";
 
 const MAP_PLACEHOLDER =
   "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?q=80&w=1600&auto=format&fit=crop";
@@ -227,8 +228,6 @@ const FooterNotes = () => (
 async function updateStatus(formData: FormData) {
   "use server";
   
-  const { db } = await import("@/db");
-  
   // Get current dashboard data
   const currentData = await db
     .selectFrom("driver_dashboard")
@@ -274,8 +273,6 @@ async function updateStatus(formData: FormData) {
 
 async function startCapture(formData: FormData) {
   "use server";
-  
-  const { db } = await import("@/db");
   
   // Get current dashboard data
   const currentData = await db

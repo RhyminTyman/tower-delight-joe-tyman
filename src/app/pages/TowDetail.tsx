@@ -72,34 +72,27 @@ export const TowDetail = async (requestInfo: RequestInfo) => {
 
       <StatusBanner towId={towId} currentStatus={data.route.status} />
       
-      <main className="mx-auto flex min-h-screen max-w-md flex-col gap-3 px-4 pb-28 pt-4 sm:max-w-lg">
+      <main className="mx-auto flex min-h-screen max-w-md flex-col px-4 pb-28 pt-4 sm:max-w-lg">
         {/* Route Map Card - Shows GPS map between pickup and destination */}
         {(data.route.mapUrl || data.route.mapImage) && (
-          <div>
-            <details className="group">
-              <summary className="glass-card cursor-pointer rounded-2xl border border-border/60 px-4 py-3 transition-all hover:bg-card/50 list-none">
-                <div className="flex items-center gap-3">
-                  <svg className="h-4 w-4 text-muted-foreground transition-transform group-open:rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                  <h2 className="text-sm font-semibold uppercase tracking-wide text-foreground">Route Map</h2>
-                </div>
-              </summary>
-              <div className="mt-2 overflow-hidden rounded-2xl border border-border/60 bg-slate-900">
-                <img
-                  src={data.route.mapUrl || data.route.mapImage}
-                  alt="Route map showing pickup and destination"
-                  className="h-full w-full object-cover"
-                />
-              </div>
-            </details>
+          <div className="border border-border/60 bg-secondary/40">
+            <div className="border-b border-border/60 px-4 py-2 bg-card/50">
+              <h2 className="text-sm font-semibold uppercase tracking-wide text-foreground">Route Map</h2>
+            </div>
+            <div className="overflow-hidden bg-slate-900">
+              <img
+                src={data.route.mapUrl || data.route.mapImage}
+                alt="Route map showing pickup and destination"
+                className="h-full w-full object-cover"
+              />
+            </div>
             {data.route.pickup.lat && data.route.pickup.lng && data.route.destination.lat && data.route.destination.lng && (
-              <div className="mt-2">
+              <div className="border-t border-border/60">
                 <a
                   href={`https://www.google.com/maps/dir/?api=1&origin=${data.route.pickup.lat},${data.route.pickup.lng}&destination=${data.route.destination.lat},${data.route.destination.lng}&travelmode=driving`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex w-full items-center justify-center gap-2 rounded-xl bg-accent px-4 py-2.5 text-sm font-semibold text-accent-foreground transition-colors hover:bg-accent/90 active:bg-accent/80"
+                  className="flex w-full items-center justify-center gap-2 bg-accent px-4 py-3 text-sm font-semibold text-accent-foreground transition-colors hover:bg-accent/90 active:bg-accent/80"
                 >
                   <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
@@ -113,25 +106,20 @@ export const TowDetail = async (requestInfo: RequestInfo) => {
 
         {/* Vehicle Photo Card - Shows photo of the actual car */}
         {data.route.lastPhoto && hasPhoto(data.route.lastPhoto.dataUrl) && (
-          <details className="group">
-            <summary className="glass-card cursor-pointer rounded-2xl border border-border/60 px-4 py-3 transition-all hover:bg-card/50 list-none">
-              <div className="flex items-center gap-3">
-                <svg className="h-4 w-4 text-muted-foreground transition-transform group-open:rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-                <h2 className="text-sm font-semibold uppercase tracking-wide text-foreground">Vehicle Photo</h2>
-              </div>
-            </summary>
-            <div className="mt-2 overflow-hidden rounded-2xl border border-border/60">
+          <div className="border border-border/60 bg-secondary/40">
+            <div className="border-b border-border/60 px-4 py-2 bg-card/50">
+              <h2 className="text-sm font-semibold uppercase tracking-wide text-foreground">Vehicle Photo</h2>
+            </div>
+            <div className="overflow-hidden">
               <PhotoPreview towId={towId} imageUrl={data.route.lastPhoto.dataUrl} />
             </div>
-          </details>
+          </div>
         )}
 
         {/* Route Details Card */}
-        <div className="overflow-hidden rounded-2xl border border-border/60 bg-secondary/40 shadow-card">
+        <div className="overflow-hidden border border-border/60 bg-secondary/40">
           <div className="p-4 text-foreground">
-            <div className="rounded-xl bg-card/50 p-3">
+            <div className="bg-card/50 p-3">
               {/* Pickup Row */}
               <div className="flex items-start justify-between gap-3">
                 <div className="flex-1">
@@ -162,7 +150,7 @@ export const TowDetail = async (requestInfo: RequestInfo) => {
                         href={`https://maps.google.com/?q=${data.route.pickup.lat},${data.route.pickup.lng}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 rounded-lg bg-accent/10 px-3 py-2 text-sm font-medium text-accent transition-colors hover:bg-accent/20 active:bg-accent/30"
+                        className="inline-flex items-center gap-2 bg-accent/10 px-3 py-2 text-sm font-medium text-accent transition-colors hover:bg-accent/20 active:bg-accent/30"
                       >
                         <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
@@ -208,7 +196,7 @@ export const TowDetail = async (requestInfo: RequestInfo) => {
                         href={`https://maps.google.com/?q=${data.route.destination.lat},${data.route.destination.lng}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 rounded-lg bg-emerald-500/10 px-3 py-2 text-sm font-medium text-emerald-400 transition-colors hover:bg-emerald-500/20 active:bg-emerald-500/30"
+                        className="inline-flex items-center gap-2 bg-emerald-500/10 px-3 py-2 text-sm font-medium text-emerald-400 transition-colors hover:bg-emerald-500/20 active:bg-emerald-500/30"
                       >
                         <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
@@ -229,7 +217,7 @@ export const TowDetail = async (requestInfo: RequestInfo) => {
                   href={`https://www.google.com/maps/dir/?api=1&origin=${data.route.pickup.lat},${data.route.pickup.lng}&destination=${data.route.destination.lat},${data.route.destination.lng}&travelmode=driving`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex w-full items-center justify-center gap-2 rounded-xl bg-accent px-5 py-3 text-base font-semibold text-accent-foreground transition-colors hover:bg-accent/90 active:bg-accent/80"
+                  className="flex w-full items-center justify-center gap-2 bg-accent px-5 py-3 text-base font-semibold text-accent-foreground transition-colors hover:bg-accent/90 active:bg-accent/80"
                 >
                   <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
@@ -242,13 +230,13 @@ export const TowDetail = async (requestInfo: RequestInfo) => {
         </div>
 
         {/* Route Detail Card */}
-        <Card className="glass-card flex flex-col gap-3 p-4">
+        <div className="border border-border/60 bg-secondary/40 flex flex-col gap-3 p-4">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-xs uppercase tracking-wide text-muted-foreground">PO #</p>
               <p className="text-base font-semibold text-foreground">{data.route.poNumber}</p>
             </div>
-            <Button asChild variant="secondary" className="rounded-full px-5 py-2 text-sm">
+            <Button asChild variant="secondary" className="px-5 py-2 text-sm">
               <a href={data.driver.contactNumber ? `tel:${data.driver.contactNumber}` : "#"}>Call Dispatch</a>
             </Button>
           </div>
@@ -274,10 +262,10 @@ export const TowDetail = async (requestInfo: RequestInfo) => {
               <dd className="font-medium">{data.route.truck}</dd>
             </div>
           </dl>
-        </Card>
+        </div>
 
         {/* Status Timeline */}
-        <Card className="glass-card p-4">
+        <div className="border border-border/60 bg-secondary/40 p-4">
           <h2 className="text-sm font-semibold text-foreground">Statuses</h2>
           <div className="mt-4 flex flex-col gap-4">
             {data.route.statuses.map((status, index) => {
@@ -302,7 +290,7 @@ export const TowDetail = async (requestInfo: RequestInfo) => {
               );
             })}
           </div>
-        </Card>
+        </div>
 
       </main>
     </div>

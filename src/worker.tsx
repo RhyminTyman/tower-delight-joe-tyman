@@ -132,7 +132,7 @@ const app = defineApp([
         fileName = (formData.get("fileName") as string) ?? null;
         mimeType = (formData.get("mimeType") as string) ?? null;
       } else if (contentType.includes("application/json")) {
-        const body = await request.json();
+        const body = await request.json() as { photoData?: unknown; fileName?: unknown; mimeType?: unknown };
         photoData = typeof body.photoData === "string" ? body.photoData : null;
         fileName = typeof body.fileName === "string" ? body.fileName : null;
         mimeType = typeof body.mimeType === "string" ? body.mimeType : null;

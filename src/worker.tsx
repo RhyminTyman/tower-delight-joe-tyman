@@ -33,10 +33,13 @@ const app = defineApp([
   setCommonHeaders(),
   hydrateAppContext,
   // Handle POST for address updates BEFORE render
-  route("/tow/:id/address/:type", async (req: Request, params: { id: string; type: string }) => {
-    if (req.method === "POST") {
-      const towId = params.id;
-      const addressType = params.type as "pickup" | "destination";
+  async (req: Request) => {
+    const url = new URL(req.url);
+    const match = url.pathname.match(/^\/tow\/([^\/]+)\/address\/(pickup|destination)$/);
+    
+    if (req.method === "POST" && match) {
+      const towId = match[1];
+      const addressType = match[2] as "pickup" | "destination";
       const formData = await req.formData();
       
       const title = formData.get("title") as string;
@@ -71,15 +74,15 @@ const app = defineApp([
             .execute();
 
           console.log("[POST /address] Database updated successfully");
-          return Response.redirect(`/tow/${towId}`, 303);
+          return Response.redirect(url.origin + `/tow/${towId}`, 303);
         }
       } catch (error) {
         console.error("[POST /address] Error:", error);
       }
-      return Response.redirect(`/tow/${towId}`, 303);
+      return Response.redirect(url.origin + `/tow/${towId}`, 303);
     }
-    // For GET requests, fall through to render
-  }),
+    // For all other requests, continue to next middleware
+  },
   render(Document, [
     route("/", TowList),
     route("/tow/:id", TowDetail),

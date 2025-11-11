@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { updateTowStatus } from "./functions";
+import { useOptimisticUpdate } from "@/hooks/useOptimisticUpdate";
 
 interface StatusBannerProps {
   towId: string;
@@ -20,25 +21,36 @@ const ALL_STATUSES = ["Waiting", "Dispatched", "En Route", "On Scene", "Towing"]
 
 export function StatusBanner({ towId, currentStatus }: StatusBannerProps) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [isUpdating, setIsUpdating] = useState(false);
+  
+  // Optimistic update for status
+  const { 
+    value: displayStatus, 
+    isUpdating, 
+    error: updateError,
+    update: updateStatus 
+  } = useOptimisticUpdate(currentStatus, {
+    onSuccess: () => {
+      // Reload page to get fresh data after successful update
+      window.location.reload();
+    },
+    onError: (error) => {
+      // Error is logged by the hook, status reverted automatically
+      alert(`Failed to update status: ${error.message}`);
+    }
+  });
 
-  const config = STATUS_CONFIG[currentStatus as keyof typeof STATUS_CONFIG] || STATUS_CONFIG["Waiting"];
+  const config = STATUS_CONFIG[displayStatus as keyof typeof STATUS_CONFIG] || STATUS_CONFIG["Waiting"];
   const nextStatus = config.next;
 
   async function handleStatusChange(newStatus: string) {
-    setIsUpdating(true);
     setIsDropdownOpen(false);
     
-    try {
+    await updateStatus(newStatus, async (status) => {
       const formData = new FormData();
       formData.append("towId", towId);
-      formData.append("status", newStatus);
+      formData.append("status", status);
       await updateTowStatus(formData);
-      window.location.reload();
-    } catch (error) {
-      console.error("Failed to update status:", error);
-      setIsUpdating(false);
-    }
+    });
   }
 
   async function handleNextStatus() {
@@ -51,7 +63,7 @@ export function StatusBanner({ towId, currentStatus }: StatusBannerProps) {
     <div className={`sticky top-0 z-50 ${config.color} px-4 py-3`}>
       <div className="mx-auto flex max-w-md items-center justify-between gap-4">
         <div className="flex-1">
-          <p className="text-lg font-bold text-white uppercase tracking-wide">{currentStatus}</p>
+          <p className="text-lg font-bold text-white uppercase tracking-wide">{displayStatus}</p>
         </div>
         
         <div className="relative flex items-stretch">

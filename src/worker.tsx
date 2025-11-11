@@ -12,6 +12,10 @@ import { EditTow } from "@/app/pages/EditTow";
 import { TowDetail } from "@/app/pages/TowDetail";
 import { TowList } from "@/app/pages/TowList";
 import { db } from "@/db";
+import { DISPATCHER_ID } from "@/config/constants";
+import { createLogger } from "@/utils/logger";
+
+const logger = createLogger('Worker');
 
 export type AppContext = {
   apiBaseUrl?: string;
@@ -70,7 +74,7 @@ const app = defineApp([
   }),
   route("/api/tow/:id/photo", async (requestInfo: RequestInfo) => {
     const towId = requestInfo.params.id;
-    console.log("[API capturePhoto] Starting for towId:", towId);
+    logger.info('Photo API called', { towId, action: 'capturePhoto' });
     const request = requestInfo.request;
 
     if (request.method === "DELETE") {
@@ -112,10 +116,10 @@ const app = defineApp([
           .where("id", "=", towId)
           .execute();
 
-        console.log("[API capturePhoto] Photo removed");
+        logger.info('Photo removed successfully', { towId });
         return Response.json({ success: true, mapImageUpdated: false });
       } catch (error) {
-        console.error("[API capturePhoto] Error removing photo:", error);
+        logger.error('Failed to remove photo', error, { towId });
         return Response.json({ error: String(error) }, { status: 500 });
       }
     }
@@ -138,7 +142,7 @@ const app = defineApp([
         mimeType = typeof body.mimeType === "string" ? body.mimeType : null;
       }
     } catch (parseError) {
-      console.warn("[API capturePhoto] Failed to parse request body:", parseError);
+      logger.warn('Failed to parse request body', { error: parseError, towId });
     }
 
     try {
@@ -194,7 +198,7 @@ const app = defineApp([
           .where("id", "=", towId)
           .execute();
 
-        console.log("[API capturePhoto] Success");
+        logger.info('Photo saved successfully', { towId, fileName });
         return Response.json({
           success: true,
           mapImageUpdated: Boolean(photoData),
@@ -664,7 +668,7 @@ const app = defineApp([
       console.log("[Seed Dispatcher] Starting seed operation...");
 
       const DISPATCHER = {
-        id: "dispatcher-001",
+        id: DISPATCHER_ID,
         name: "Alex Morgan",
         role: "Lead Dispatcher",
         shift: "24/7 Operations",
@@ -736,7 +740,7 @@ const app = defineApp([
       const dispatcher = await db
         .selectFrom("driver_dashboard")
         .select(["id", "payload"])
-        .where("id", "=", "dispatcher-001")
+        .where("id", "=", DISPATCHER_ID)
         .executeTakeFirst();
 
       if (!dispatcher) {

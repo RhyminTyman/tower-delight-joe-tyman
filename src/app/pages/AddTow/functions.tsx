@@ -2,6 +2,8 @@
 
 import { STATIC_DRIVER_DASHBOARD } from "@/app/data/driver-dashboard";
 import { db } from "@/db";
+import { generateMapUrl, generateRandomCoordinates } from "@/utils/maps";
+import { DISPATCHER_ID } from "@/config/constants";
 
 type DashboardPayload = typeof STATIC_DRIVER_DASHBOARD;
 
@@ -9,48 +11,12 @@ function cloneDashboard(): DashboardPayload {
   return JSON.parse(JSON.stringify(STATIC_DRIVER_DASHBOARD));
 }
 
-// Generate random GPS coordinates around Columbus, OH
-function generateRandomCoordinates() {
-  // Columbus, OH is approximately at 39.9612° N, 82.9988° W
-  const centerLat = 39.9612;
-  const centerLng = -82.9988;
-  
-  // Generate random offset within ~20 miles (roughly 0.3 degrees)
-  const latOffset = (Math.random() - 0.5) * 0.3;
-  const lngOffset = (Math.random() - 0.5) * 0.3;
-  
-  return {
-    lat: Number((centerLat + latOffset).toFixed(4)),
-    lng: Number((centerLng + lngOffset).toFixed(4)),
-  };
-}
-
-// Generate map URL from GPS coordinates using Google Maps Static API
-function generateMapUrl(pickup: any, destination: any) {
-  if (!pickup.lat || !pickup.lng || !destination.lat || !destination.lng) {
-    return undefined;
-  }
-  
-  const GOOGLE_MAPS_API_KEY = 'AIzaSyBa684TfLdTXSODlil08SYZNWvm5yCqApQ';
-  
-  // Google Maps Static API with markers and path
-  const markers = [
-    `color:red|label:A|${pickup.lat},${pickup.lng}`,
-    `color:green|label:B|${destination.lat},${destination.lng}`
-  ].join('&markers=');
-  
-  // Add a path line between pickup and destination
-  const path = `color:0x0066ff|weight:3|${pickup.lat},${pickup.lng}|${destination.lat},${destination.lng}`;
-  
-  return `https://maps.googleapis.com/maps/api/staticmap?size=600x400&scale=2&maptype=roadmap&markers=${markers}&path=${path}&key=${GOOGLE_MAPS_API_KEY}`;
-}
-
 async function getDispatcher() {
   try {
     const dispatcher = await db
       .selectFrom("driver_dashboard")
       .select("payload")
-      .where("id", "=", "dispatcher-001")
+      .where("id", "=", DISPATCHER_ID)
       .executeTakeFirst();
 
     if (dispatcher?.payload) {
@@ -73,38 +39,43 @@ async function getDispatcher() {
   };
 }
 
-async function resolveDriverSnapshot(driverId: string | null) {
-  if (!driverId) {
-    return {
-      driver: STATIC_DRIVER_DASHBOARD.driver,
-      driverCallsign: STATIC_DRIVER_DASHBOARD.route.driverCallsign,
-      truck: STATIC_DRIVER_DASHBOARD.route.truck,
-    };
-  }
-
-  const rows = await db.selectFrom("driver_dashboard").select("payload").execute();
-
-  for (const row of rows) {
-    if (!row.payload) continue;
-    try {
-      const data = typeof row.payload === "string" ? JSON.parse(row.payload) : row.payload;
-      if (data?.driver?.id === driverId) {
-        return {
-          driver: data.driver ?? STATIC_DRIVER_DASHBOARD.driver,
-          driverCallsign: data.route?.driverCallsign ?? STATIC_DRIVER_DASHBOARD.route.driverCallsign,
-          truck: data.route?.truck ?? STATIC_DRIVER_DASHBOARD.route.truck,
-        };
-      }
-    } catch (error) {
-      console.warn("[createTow] Failed to parse driver payload", error);
-    }
-  }
-
+function getDefaultDriverSnapshot() {
   return {
     driver: STATIC_DRIVER_DASHBOARD.driver,
     driverCallsign: STATIC_DRIVER_DASHBOARD.route.driverCallsign,
     truck: STATIC_DRIVER_DASHBOARD.route.truck,
   };
+}
+
+async function resolveDriverSnapshot(driverId: string | null) {
+  if (!driverId) {
+    return getDefaultDriverSnapshot();
+  }
+
+  try {
+    // Query specific driver directly instead of fetching all rows
+    const row = await db
+      .selectFrom("driver_dashboard")
+      .select("payload")
+      .where("id", "=", driverId)
+      .executeTakeFirst();
+
+    if (!row?.payload) {
+      console.warn("[resolveDriverSnapshot] Driver not found:", driverId);
+      return getDefaultDriverSnapshot();
+    }
+
+    const data = typeof row.payload === "string" ? JSON.parse(row.payload) : row.payload;
+    
+    return {
+      driver: data.driver ?? STATIC_DRIVER_DASHBOARD.driver,
+      driverCallsign: data.route?.driverCallsign ?? STATIC_DRIVER_DASHBOARD.route.driverCallsign,
+      truck: data.route?.truck ?? STATIC_DRIVER_DASHBOARD.route.truck,
+    };
+  } catch (error) {
+    console.error("[resolveDriverSnapshot] Failed to resolve driver:", error);
+    return getDefaultDriverSnapshot();
+  }
 }
 
 export async function createTow(formData: FormData) {

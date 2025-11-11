@@ -1,24 +1,7 @@
 "use server";
 
 import { db } from "@/db";
-
-const GOOGLE_MAPS_API_KEY = 'AIzaSyBa684TfLdTXSODlil08SYZNWvm5yCqApQ';
-
-// Generate map URL from GPS coordinates using Google Maps Static API
-function generateMapUrl(pickup: any, destination: any) {
-  if (!pickup.lat || !pickup.lng || !destination.lat || !destination.lng) {
-    return undefined;
-  }
-  
-  const markers = [
-    `color:red|label:A|${pickup.lat},${pickup.lng}`,
-    `color:green|label:B|${destination.lat},${destination.lng}`
-  ].join('&markers=');
-  
-  const path = `color:0x0066ff|weight:3|${pickup.lat},${pickup.lng}|${destination.lat},${destination.lng}`;
-  
-  return `https://maps.googleapis.com/maps/api/staticmap?size=600x400&scale=2&maptype=roadmap&markers=${markers}&path=${path}&key=${GOOGLE_MAPS_API_KEY}`;
-}
+import { generateMapUrl } from "@/utils/maps";
 
 export async function updateTow(formData: FormData) {
   const towId = formData.get("towId") as string;

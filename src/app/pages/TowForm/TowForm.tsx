@@ -5,39 +5,22 @@ import { useEffect, useMemo, useRef, useState, type ChangeEvent } from "react";
 import type { DriverSnapshot } from "@/app/data/driver-dashboard";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { loadGoogleMapsScript } from "@/utils/maps";
+import { GOOGLE_MAPS_INIT_DELAY_MS, GEOLOCATION_TIMEOUT_MS, GEOLOCATION_HIGH_ACCURACY } from "@/config/constants";
+import type { DistanceResult } from "@/types/maps";
 
 const STATUS_OPTIONS = ["Light", "Medium", "Heavy"] as const;
 
 export type TowTypeOption = (typeof STATUS_OPTIONS)[number];
 
-const GOOGLE_MAPS_API_KEY = 'AIzaSyBa684TfLdTXSODlil08SYZNWvm5yCqApQ';
-
-// Load Google Maps script
-function loadGoogleMapsScript(): Promise<void> {
-  return new Promise((resolve, reject) => {
-    if (typeof window !== 'undefined' && (window as any).google?.maps?.places) {
-      resolve();
-      return;
-    }
-
-    const script = document.createElement('script');
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_API_KEY}&libraries=places`;
-    script.async = true;
-    script.defer = true;
-    script.onload = () => resolve();
-    script.onerror = () => reject(new Error('Failed to load Google Maps script'));
-    document.head.appendChild(script);
-  });
-}
-
 // Calculate distance using Google Maps JavaScript Distance Service
 async function calculateDistance(
   origin: { lat: number; lng: number },
   destination: { lat: number; lng: number }
-): Promise<{ distance: string; duration: string } | null> {
+): Promise<DistanceResult | null> {
   return new Promise((resolve) => {
     try {
-      const google = (window as any).google;
+      const google = window.google;
       if (!google?.maps?.DistanceMatrixService) {
         console.warn('[Distance] Google Maps not loaded');
         resolve(null);
@@ -55,7 +38,7 @@ async function calculateDistance(
           travelMode: google.maps.TravelMode.DRIVING,
           unitSystem: google.maps.UnitSystem.IMPERIAL,
         },
-        (response: any, status: any) => {
+        (response: any, status: string) => {
           if (status === 'OK' && response?.rows[0]?.elements[0]?.status === 'OK') {
             const element = response.rows[0].elements[0];
             resolve({
@@ -95,7 +78,10 @@ async function getUserLocation(): Promise<{ lat: number; lng: number } | null> {
         console.warn('[Location] Failed to get user location:', error);
         resolve(null);
       },
-      { timeout: 5000, enableHighAccuracy: false }
+      { 
+        timeout: GEOLOCATION_TIMEOUT_MS, 
+        enableHighAccuracy: GEOLOCATION_HIGH_ACCURACY 
+      }
     );
   });
 }
@@ -273,7 +259,7 @@ export function TowForm({
       }
 
       // Wait a bit to ensure Google Maps API is fully initialized
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await new Promise(resolve => setTimeout(resolve, GOOGLE_MAPS_INIT_DELAY_MS));
 
       setIsCalculatingDistances(true);
       console.log('[Distance] Starting calculations...');
@@ -376,7 +362,7 @@ export function TowForm({
     return () => {
       // Cleanup autocomplete listeners
       try {
-        const google = (window as any).google;
+        const google = window.google;
         if (pickupAutocomplete && google?.maps?.event) {
           google.maps.event.clearInstanceListeners(pickupAutocomplete);
         }

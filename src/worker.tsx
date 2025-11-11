@@ -379,24 +379,24 @@ const app = defineApp([
       await db.deleteFrom("driver_dashboard").execute();
       console.log("[Seed] Cleared existing tows");
 
-      // Helper function to generate map URL
+      // Helper function to generate map URL using Google Maps Static API
       const generateMapUrl = (pickup: any, destination: any) => {
         if (!pickup.lat || !pickup.lng || !destination.lat || !destination.lng) {
           return undefined;
         }
-        // OpenStreetMap static map URL (using staticmap.openstreetmap.de)
-        // Format: center, zoom, size, markers
-        const centerLat = (pickup.lat + destination.lat) / 2;
-        const centerLng = (pickup.lng + destination.lng) / 2;
         
-        // Calculate approximate zoom level based on distance
-        const latDiff = Math.abs(pickup.lat - destination.lat);
-        const lngDiff = Math.abs(pickup.lng - destination.lng);
-        const maxDiff = Math.max(latDiff, lngDiff);
-        const zoom = maxDiff > 0.2 ? 10 : maxDiff > 0.1 ? 11 : maxDiff > 0.05 ? 12 : 13;
+        const GOOGLE_MAPS_API_KEY = 'AIzaSyBa684TfLdTXSODlil08SYZNWvm5yCqApQ';
         
-        // Use Mapbox Static API format (you can swap this for any static map API)
-        return `https://api.mapbox.com/styles/v1/mapbox/dark-v11/static/pin-s-a+ff0000(${pickup.lng},${pickup.lat}),pin-s-b+00ff00(${destination.lng},${destination.lat})/auto/600x400@2x?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw`;
+        // Google Maps Static API with markers and path
+        const markers = [
+          `color:red|label:A|${pickup.lat},${pickup.lng}`,
+          `color:green|label:B|${destination.lat},${destination.lng}`
+        ].join('&markers=');
+        
+        // Add a path line between pickup and destination
+        const path = `color:0x0066ff|weight:3|${pickup.lat},${pickup.lng}|${destination.lat},${destination.lng}`;
+        
+        return `https://maps.googleapis.com/maps/api/staticmap?size=600x400&scale=2&maptype=roadmap&markers=${markers}&path=${path}&key=${GOOGLE_MAPS_API_KEY}`;
       };
 
       // Insert all seed tows

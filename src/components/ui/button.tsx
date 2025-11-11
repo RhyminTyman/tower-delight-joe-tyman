@@ -5,22 +5,25 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center whitespace-nowrap rounded-2xl text-sm font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 disabled:pointer-events-none disabled:opacity-40 data-[state=open]:bg-slate-800/80",
+  "inline-flex items-center justify-center whitespace-nowrap rounded-[var(--radius)] text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 data-[state=open]:bg-secondary data-[state=open]:text-secondary-foreground",
   {
     variants: {
       variant: {
         default:
-          "bg-brand text-brand-foreground shadow-lg shadow-brand/40 hover:bg-brand/90 ring-brand",
+          "bg-primary text-primary-foreground shadow-brand hover:bg-primary/90",
         secondary:
-          "border border-slate-800 bg-slate-900/60 text-slate-100 shadow-md shadow-slate-950/40 hover:bg-slate-900 ring-slate-700",
-        ghost: "text-slate-200 hover:bg-slate-800/60 ring-slate-800",
+          "bg-secondary text-secondary-foreground shadow-card hover:bg-secondary/80",
+        ghost: "text-foreground hover:bg-muted/60 hover:text-foreground",
+        outline:
+          "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
         destructive:
-          "bg-red-600 text-white shadow-lg shadow-red-900/40 hover:bg-red-500 ring-red-400",
+          "bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90",
+        link: "text-primary underline-offset-4 hover:underline",
       },
       size: {
-        default: "h-11 px-6 py-3",
-        sm: "h-9 px-4 text-xs",
-        lg: "h-12 px-8 text-base",
+        default: "h-11 px-6",
+        sm: "h-9 rounded-[calc(var(--radius)-4px)] px-4 text-xs",
+        lg: "h-12 rounded-[calc(var(--radius))] px-7 text-base",
         icon: "h-11 w-11",
       },
     },

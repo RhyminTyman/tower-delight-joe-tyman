@@ -6,9 +6,9 @@ import { Document } from "@/app/Document";
 import { STATIC_DRIVER_DASHBOARD, loadDashboardFromDatabase } from "@/app/data/driver-dashboard";
 import { setCommonHeaders } from "@/app/headers";
 import { AddNote } from "@/app/pages/AddNote";
+import { AddTow } from "@/app/pages/AddTow";
 import { EditAddress } from "@/app/pages/EditAddress";
 import { EditTow } from "@/app/pages/EditTow";
-import { Home } from "@/app/pages/Home";
 import { TowDetail } from "@/app/pages/TowDetail";
 import { TowList } from "@/app/pages/TowList";
 import { db } from "@/db";
@@ -34,6 +34,7 @@ const app = defineApp([
   hydrateAppContext,
   render(Document, [
     route("/", TowList),
+    route("/tow/new", AddTow),
     route("/tow/:id", TowDetail),
     route("/tow/:id/edit", EditTow),
     route("/tow/:id/address/:type", EditAddress),

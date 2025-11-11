@@ -75,16 +75,16 @@ export const TowDetail = async (requestInfo: RequestInfo) => {
       <main className="mx-auto flex min-h-screen max-w-md flex-col gap-5 px-4 pb-28 pt-6 sm:max-w-lg">
         {/* Route Map / Photo Card */}
         <div className="overflow-hidden rounded-3xl border border-border/60 bg-secondary/40 shadow-card">
-          {data.route.mapImage ? (
-            <PhotoPreview towId={towId} imageUrl={data.route.mapImage} />
+          {hasPhoto(data.route.mapImage) ? (
+            <PhotoPreview towId={towId} imageUrl={data.route.mapImage.trim()} />
           ) : null}
-          <div className={`p-5 ${data.route.mapImage ? "bg-slate-950/75 backdrop-blur text-white" : "text-foreground"}`}>
-            <div className={`${data.route.mapImage ? "rounded-2xl bg-black/45 p-4" : "rounded-2xl bg-card/50 p-4"}`}>
+          <div className={`p-5 ${hasPhoto(data.route.mapImage) ? "bg-slate-950/75 backdrop-blur text-white" : "text-foreground"}`}>
+            <div className={`${hasPhoto(data.route.mapImage) ? "rounded-2xl bg-black/45 p-4" : "rounded-2xl bg-card/50 p-4"}`}>
               {/* Pickup Row */}
               <div className="flex items-start justify-between gap-3">
                 <div className="flex-1">
                   <div className="mb-1 flex items-center gap-2">
-                    <p className={`text-xs uppercase tracking-wide ${data.route.mapImage ? "text-white/70" : "text-muted-foreground"}`}>Pickup</p>
+                    <p className={`text-xs uppercase tracking-wide ${hasPhoto(data.route.mapImage) ? "text-white/70" : "text-muted-foreground"}`}>Pickup</p>
                     <a
                       href={`/tow/${towId}/address/pickup`}
                       className="rounded p-1 transition-colors hover:bg-white/20"
@@ -96,11 +96,11 @@ export const TowDetail = async (requestInfo: RequestInfo) => {
                     </a>
                   </div>
                   <p className="text-sm font-semibold leading-tight">{data.route.pickup.title}</p>
-                  <p className={`text-xs ${data.route.mapImage ? "text-white/70" : "text-muted-foreground"}`}>
+                  <p className={`text-xs ${hasPhoto(data.route.mapImage) ? "text-white/70" : "text-muted-foreground"}`}>
                     {data.route.pickup.address}
                   </p>
                   {data.route.pickup.distance && (
-                    <p className={`mt-1 text-xs ${data.route.mapImage ? "text-white/60" : "text-muted-foreground/80"}`}>
+                    <p className={`mt-1 text-xs ${hasPhoto(data.route.mapImage) ? "text-white/60" : "text-muted-foreground/80"}`}>
                       {data.route.pickup.distance}
                     </p>
                   )}
@@ -108,13 +108,13 @@ export const TowDetail = async (requestInfo: RequestInfo) => {
               </div>
 
               {/* Divider */}
-              <div className={`my-4 h-px ${data.route.mapImage ? "bg-white/10" : "bg-border"}`} />
+              <div className={`my-4 h-px ${hasPhoto(data.route.mapImage) ? "bg-white/10" : "bg-border"}`} />
 
               {/* Destination Row */}
               <div className="flex items-start justify-between gap-3">
                 <div className="flex-1">
                   <div className="mb-1 flex items-center gap-2">
-                    <p className={`text-xs uppercase tracking-wide ${data.route.mapImage ? "text-white/70" : "text-muted-foreground"}`}>Destination</p>
+                    <p className={`text-xs uppercase tracking-wide ${hasPhoto(data.route.mapImage) ? "text-white/70" : "text-muted-foreground"}`}>Destination</p>
                     <a
                       href={`/tow/${towId}/address/destination`}
                       className="rounded p-1 transition-colors hover:bg-white/20"
@@ -126,11 +126,11 @@ export const TowDetail = async (requestInfo: RequestInfo) => {
                     </a>
                   </div>
                   <p className="text-sm font-semibold leading-tight">{data.route.destination.title}</p>
-                  <p className={`text-xs ${data.route.mapImage ? "text-white/70" : "text-muted-foreground"}`}>
+                  <p className={`text-xs ${hasPhoto(data.route.mapImage) ? "text-white/70" : "text-muted-foreground"}`}>
                     {data.route.destination.address}
                   </p>
                   {data.route.destination.distance && (
-                    <p className={`mt-1 text-xs ${data.route.mapImage ? "text-white/60" : "text-muted-foreground/80"}`}>
+                    <p className={`mt-1 text-xs ${hasPhoto(data.route.mapImage) ? "text-white/60" : "text-muted-foreground/80"}`}>
                       {data.route.destination.distance}
                     </p>
                   )}
@@ -224,5 +224,16 @@ async function loadTowDetail(towId: string) {
   }
 
   return null;
+}
+
+function hasPhoto(image?: string | null): boolean {
+  if (!image) {
+    return false;
+  }
+  const trimmed = image.trim();
+  if (trimmed.length === 0) {
+    return false;
+  }
+  return trimmed.startsWith("data:") || trimmed.startsWith("http");
 }
 

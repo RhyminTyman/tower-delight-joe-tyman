@@ -2,7 +2,6 @@
 
 import { Card } from "@/components/ui/card";
 import { updateAddress } from "./functions";
-import { useState } from "react";
 
 interface EditAddressFormProps {
   towId: string;
@@ -14,30 +13,6 @@ interface EditAddressFormProps {
 }
 
 export function EditAddressForm({ towId, addressType, ticketId, title, address, distance }: EditAddressFormProps) {
-  console.log("[EditAddressForm] Component rendering");
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    console.log("[EditAddressForm] onSubmit called, preventDefault executed");
-    
-    setIsSubmitting(true);
-    
-    try {
-      const formData = new FormData(e.currentTarget);
-      console.log("[EditAddressForm] Calling server action...");
-      
-      await updateAddress(formData);
-      
-      console.log("[EditAddressForm] Server action completed, redirecting...");
-      window.location.href = `/tow/${towId}`;
-    } catch (error) {
-      console.error("[EditAddressForm] Error:", error);
-      alert("Failed to save changes. Please try again.");
-      setIsSubmitting(false);
-    }
-  };
-  
   return (
     <>
       <header className="border-b border-border bg-card px-4 py-3">
@@ -62,7 +37,7 @@ export function EditAddressForm({ towId, addressType, ticketId, title, address, 
           Update the {addressType} location details
         </p>
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+        <form action={updateAddress} className="flex flex-col gap-6">
           <input type="hidden" name="towId" value={towId} />
           <input type="hidden" name="addressType" value={addressType} />
 
@@ -121,10 +96,9 @@ export function EditAddressForm({ towId, addressType, ticketId, title, address, 
             </a>
             <button
               type="submit"
-              disabled={isSubmitting}
-              className="flex-1 rounded-lg bg-primary px-4 py-3 font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 rounded-lg bg-primary px-4 py-3 font-medium text-primary-foreground transition-colors hover:bg-primary/90"
             >
-              {isSubmitting ? "Saving..." : "Save Changes"}
+              Save Changes
             </button>
           </div>
         </form>

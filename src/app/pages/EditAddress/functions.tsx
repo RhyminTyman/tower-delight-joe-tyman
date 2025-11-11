@@ -63,6 +63,6 @@ export async function updateAddress(formData: FormData) {
     throw error;
   }
 
-  // After successful update, framework will handle reload
+  // After successful update, done
   console.log("[updateAddress] ========== ACTION COMPLETE ==========");
 }

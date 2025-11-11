@@ -175,8 +175,8 @@ export async function createTow(formData: FormData) {
   const mapUrl = generateMapUrl(pickupWithCoords, destinationWithCoords);
 
   // Get current time for the timestamp
-  const now = new Date();
-  const currentTime = now.toLocaleTimeString('en-US', { 
+  const currentDate = new Date();
+  const currentTime = currentDate.toLocaleTimeString('en-US', { 
     hour: 'numeric', 
     minute: '2-digit',
     hour12: true 

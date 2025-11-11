@@ -118,6 +118,7 @@ export async function createTow(formData: FormData) {
   const driverId = (formData.get("driverId") as string | null)?.trim() ?? null;
   const type = (formData.get("towType") as string | null)?.trim() ?? "Light";
   const etaMinutesRaw = (formData.get("etaMinutes") as string | null)?.trim();
+  const poNumber = (formData.get("poNumber") as string | null)?.trim() ?? "";
   const pickupTitle = (formData.get("pickupTitle") as string | null)?.trim() ?? "";
   const pickupAddress = (formData.get("pickupAddress") as string | null)?.trim() ?? "";
   const pickupDistance = (formData.get("pickupDistance") as string | null)?.trim() ?? "";
@@ -184,7 +185,7 @@ export async function createTow(formData: FormData) {
     dispatcher: dispatcherInfo.name,
     hasKeys: false,
     type,
-    poNumber: "",
+    poNumber: poNumber,
     driverCallsign,
     truck,
     statuses: payload.route.statuses.map((status) => {

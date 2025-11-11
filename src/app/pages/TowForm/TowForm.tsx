@@ -580,26 +580,24 @@ export function TowForm({
                     value={formValues.etaMinutes}
                     onChange={handleChange("etaMinutes")}
                     className="w-full rounded-none border border-border/60 bg-slate-900/50 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
-                    placeholder="Optional"
-                  />
-                </div>
-
-                {mode === "edit" ? (
-                  <div>
-                    <label htmlFor="poNumber" className="mb-1.5 block text-xs text-muted-foreground">
-                      PO Number
-                    </label>
-                    <input
-                      id="poNumber"
-                      name="poNumber"
-                      value={formValues.poNumber}
-                      onChange={handleChange("poNumber")}
-                      className="w-full rounded-none border border-border/60 bg-slate-900/50 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
-                      placeholder="e.g. 123"
-                    />
-                  </div>
-                ) : null}
+                  placeholder="Optional"
+                />
               </div>
+
+              <div>
+                <label htmlFor="poNumber" className="mb-1.5 block text-xs text-muted-foreground">
+                  PO Number
+                </label>
+                <input
+                  id="poNumber"
+                  name="poNumber"
+                  value={formValues.poNumber}
+                  onChange={handleChange("poNumber")}
+                  className="w-full rounded-none border border-border/60 bg-slate-900/50 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+                  placeholder="Optional"
+                />
+              </div>
+            </div>
 
               {mode === "edit" ? (
                 <div className="grid grid-cols-2 gap-3">

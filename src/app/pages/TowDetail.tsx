@@ -8,11 +8,9 @@ import { parseDashboardRow } from "@/app/data/driver-dashboard";
 const MAP_PLACEHOLDER =
   "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?q=80&w=1600&auto=format&fit=crop";
 
-// Server Actions
-async function capturePhoto(formData: FormData) {
+// Server Actions that accept towId as first parameter
+async function capturePhotoAction(towId: string) {
   "use server";
-
-  const towId = formData.get("towId") as string;
 
   try {
     const row = await db
@@ -51,10 +49,8 @@ async function capturePhoto(formData: FormData) {
   }
 }
 
-async function addNote(formData: FormData) {
+async function addNoteAction(towId: string) {
   "use server";
-
-  const towId = formData.get("towId") as string;
 
   try {
     const row = await db
@@ -97,6 +93,19 @@ async function addNote(formData: FormData) {
   } catch (error) {
     console.error("Failed to add note:", error);
   }
+}
+
+// Keep the original functions for other pages
+async function capturePhoto(formData: FormData) {
+  "use server";
+  const towId = formData.get("towId") as string;
+  await capturePhotoAction(towId);
+}
+
+async function addNote(formData: FormData) {
+  "use server";
+  const towId = formData.get("towId") as string;
+  await addNoteAction(towId);
 }
 
 async function updateStatus(formData: FormData) {
@@ -240,10 +249,9 @@ export const TowDetail = async (requestInfo: RequestInfo) => {
               </svg>
             </a>
 
-            <form action={capturePhoto}>
-              <input type="hidden" name="towId" value={towId} />
+            <form>
               <button
-                type="submit"
+                formAction={capturePhotoAction.bind(null, towId)}
                 className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-white/10 hover:text-foreground"
                 title="Take photo"
               >
@@ -259,10 +267,9 @@ export const TowDetail = async (requestInfo: RequestInfo) => {
               </button>
             </form>
 
-            <form action={addNote}>
-              <input type="hidden" name="towId" value={towId} />
+            <form>
               <button
-                type="submit"
+                formAction={addNoteAction.bind(null, towId)}
                 className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-white/10 hover:text-foreground"
                 title="Add note"
               >

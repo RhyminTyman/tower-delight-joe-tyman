@@ -48,7 +48,7 @@ export function StatusBanner({ towId, currentStatus }: StatusBannerProps) {
   }
 
   return (
-    <div className={`${config.color} px-4 py-3`}>
+    <div className={`sticky top-0 z-50 ${config.color} px-4 py-3`}>
       <div className="mx-auto flex max-w-md items-center justify-between gap-4">
         <div className="flex-1">
           <p className="text-lg font-bold text-white uppercase tracking-wide">{currentStatus}</p>

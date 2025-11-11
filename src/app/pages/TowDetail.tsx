@@ -76,43 +76,57 @@ export const TowDetail = async (requestInfo: RequestInfo) => {
         {/* Route Map Card - Shows GPS map between pickup and destination */}
         {(data.route.mapUrl || data.route.mapImage) && (
           <div className="border border-border/60 bg-secondary/40">
-            <div className="border-b border-border/60 px-4 py-2 bg-card/50">
-              <h2 className="text-sm font-semibold uppercase tracking-wide text-foreground">Route Map</h2>
-            </div>
-            <div className="overflow-hidden bg-slate-900">
-              <img
-                src={data.route.mapUrl || data.route.mapImage}
-                alt="Route map showing pickup and destination"
-                className="h-full w-full object-cover"
-              />
-            </div>
-            {data.route.pickup.lat && data.route.pickup.lng && data.route.destination.lat && data.route.destination.lng && (
-              <div className="border-t border-border/60">
-                <a
-                  href={`https://www.google.com/maps/dir/?api=1&origin=${data.route.pickup.lat},${data.route.pickup.lng}&destination=${data.route.destination.lat},${data.route.destination.lng}&travelmode=driving`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex w-full items-center justify-center gap-2 bg-accent px-4 py-3 text-sm font-semibold text-accent-foreground transition-colors hover:bg-accent/90 active:bg-accent/80"
-                >
-                  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+            <details className="group" open>
+              <summary className="cursor-pointer border-b border-border/60 px-4 py-2 bg-card/50 list-none">
+                <div className="flex items-center gap-3">
+                  <svg className="h-4 w-4 text-muted-foreground transition-transform group-open:rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                   </svg>
-                  Open Route in Maps
-                </a>
+                  <h2 className="text-sm font-semibold uppercase tracking-wide text-foreground">Route Map</h2>
+                </div>
+              </summary>
+              <div className="overflow-hidden bg-slate-900">
+                <img
+                  src={data.route.mapUrl || data.route.mapImage}
+                  alt="Route map showing pickup and destination"
+                  className="h-full w-full object-cover"
+                />
               </div>
-            )}
+              {data.route.pickup.lat && data.route.pickup.lng && data.route.destination.lat && data.route.destination.lng && (
+                <div className="border-t border-border/60">
+                  <a
+                    href={`https://www.google.com/maps/dir/?api=1&origin=${data.route.pickup.lat},${data.route.pickup.lng}&destination=${data.route.destination.lat},${data.route.destination.lng}&travelmode=driving`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex w-full items-center justify-center gap-2 bg-accent px-4 py-3 text-sm font-semibold text-accent-foreground transition-colors hover:bg-accent/90 active:bg-accent/80"
+                  >
+                    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+                    </svg>
+                    Open Route in Maps
+                  </a>
+                </div>
+              )}
+            </details>
           </div>
         )}
 
         {/* Vehicle Photo Card - Shows photo of the actual car */}
         {data.route.lastPhoto && hasPhoto(data.route.lastPhoto.dataUrl) && (
           <div className="border border-border/60 bg-secondary/40">
-            <div className="border-b border-border/60 px-4 py-2 bg-card/50">
-              <h2 className="text-sm font-semibold uppercase tracking-wide text-foreground">Vehicle Photo</h2>
-            </div>
-            <div className="overflow-hidden">
-              <PhotoPreview towId={towId} imageUrl={data.route.lastPhoto.dataUrl} />
-            </div>
+            <details className="group">
+              <summary className="cursor-pointer border-b border-border/60 px-4 py-2 bg-card/50 list-none">
+                <div className="flex items-center gap-3">
+                  <svg className="h-4 w-4 text-muted-foreground transition-transform group-open:rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                  <h2 className="text-sm font-semibold uppercase tracking-wide text-foreground">Vehicle Photo</h2>
+                </div>
+              </summary>
+              <div className="overflow-hidden">
+                <PhotoPreview towId={towId} imageUrl={data.route.lastPhoto.dataUrl} />
+              </div>
+            </details>
           </div>
         )}
 

@@ -45,13 +45,16 @@ const app = defineApp([
   }),
   route("/api/debug/tows", async () => {
     try {
-      const rows = await db.selectFrom("driver_dashboard").select(["id", "payload"]).execute();
+      const rows = await db.selectFrom("driver_dashboard").select(["id", "payload", "updated_at"]).execute();
       return Response.json({
         count: rows.length,
         ids: rows.map(r => r.id),
         rows: rows.map(r => ({
           id: r.id,
-          payload: JSON.parse(r.payload)
+          updated_at: r.updated_at,
+          updated_date: new Date(r.updated_at * 1000).toISOString(),
+          pickup: JSON.parse(r.payload).route.pickup,
+          destination: JSON.parse(r.payload).route.destination
         }))
       });
     } catch (error) {

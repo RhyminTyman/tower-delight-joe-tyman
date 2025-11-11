@@ -123,7 +123,7 @@ const FALLBACK_DASHBOARD: DriverDashboardData = {
     status: "En Route",
     statusTone: "active",
     mapImage:
-      "https://images.unsplash.com/photo-1524678714210-9917a6c619c4?q=80&w=1800&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?q=80&w=1600&auto=format&fit=crop",
     updateCta: "Update Status",
     pickup: {
       title: "Kyle's Motors",

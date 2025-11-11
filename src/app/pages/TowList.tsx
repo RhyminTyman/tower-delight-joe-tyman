@@ -21,12 +21,18 @@ interface TowItem {
 }
 
 export const TowList = async (requestInfo: RequestInfo) => {
+  console.log("=== TowList component called ===");
+  console.log("TowList: About to call loadTowList()");
+  
   const tows = await loadTowList();
+  
+  console.log("TowList: loadTowList returned", tows.length, "tows");
   
   // Prevent caching of this page
   requestInfo.response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
   requestInfo.response.headers.set('Pragma', 'no-cache');
   
+  console.log("TowList: About to render TowListScreen");
   return <TowListScreen tows={tows} />;
 };
 

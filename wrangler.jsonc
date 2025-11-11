@@ -17,6 +17,16 @@
     "binding": "ASSETS"
   },
 
+  // Durable Object database binding
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "DATABASE",
+        "class_name": "Database"
+      }
+    ]
+  },
+
   // Observability settings
   "observability": {
     "enabled": true

@@ -7,6 +7,7 @@ declare namespace Cloudflare {
 	interface Env {
 		TOWER_API_BASE_URL: "https://placeholder.api.tower-delight.local";
 		ASSETS: Fetcher;
+		DATABASE: DurableObjectNamespace;
 	}
 }
 interface Env extends Cloudflare.Env {}

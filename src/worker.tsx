@@ -3,7 +3,7 @@ import { render, route } from "rwsdk/router";
 import { defineApp } from "rwsdk/worker";
 
 import { Document } from "@/app/Document";
-import { STATIC_DRIVER_DASHBOARD } from "@/app/data/driver-dashboard";
+import { STATIC_DRIVER_DASHBOARD, loadDashboardFromDatabase } from "@/app/data/driver-dashboard";
 import { setCommonHeaders } from "@/app/headers";
 import { Home } from "@/app/pages/Home";
 
@@ -27,8 +27,9 @@ const app = defineApp([
   setCommonHeaders(),
   hydrateAppContext,
   render(Document, [route("/", Home)]),
-  route("/api/driver-dashboard", {
-    get: () => Response.json(STATIC_DRIVER_DASHBOARD),
+  route("/api/driver-dashboard", async () => {
+    const payload = await loadDashboardFromDatabase();
+    return Response.json(payload ?? STATIC_DRIVER_DASHBOARD);
   }),
 ]);
 
@@ -38,3 +39,5 @@ export default {
     return app.fetch(request, env, cf);
   },
 };
+
+export { Database } from "@/db/durable-object";

@@ -1,5 +1,11 @@
 import type { RequestInfo } from "rwsdk/worker";
 
+import { db } from "@/db";
+import type { DriverDashboardRow } from "@/db";
+
+const DRIVER_DASHBOARD_TABLE = "driver_dashboard" as const;
+const DASHBOARD_ROW_ID = "primary" as const;
+
 type DispatchWorkflowStageStatus = "complete" | "active" | "upcoming";
 
 export interface DispatchWorkflowStage {
@@ -222,6 +228,11 @@ const FALLBACK_DASHBOARD: DriverDashboardData = {
 export async function loadDriverDashboard(
   requestInfo?: Pick<RequestInfo, "ctx">,
 ): Promise<DriverDashboardData> {
+  const dashboardFromDb = await loadDashboardFromDatabase();
+  if (dashboardFromDb) {
+    return dashboardFromDb;
+  }
+
   const apiBaseUrl = resolveApiBaseUrl(requestInfo);
   if (!apiBaseUrl) {
     return FALLBACK_DASHBOARD;
@@ -366,4 +377,36 @@ function mergeDashboard(remote: RemoteDashboardResponse): DriverDashboardData {
 }
 
 export const STATIC_DRIVER_DASHBOARD = FALLBACK_DASHBOARD;
+
+export async function loadDashboardFromDatabase(): Promise<DriverDashboardData | null> {
+  try {
+    const row = await db
+      .selectFrom(DRIVER_DASHBOARD_TABLE)
+      .select("payload")
+      .where("id", "=", DASHBOARD_ROW_ID)
+      .executeTakeFirst();
+
+    if (!row?.payload) {
+      return null;
+    }
+
+    return parseDashboardRow(row);
+  } catch (error) {
+    if (error instanceof Error) {
+      console.warn("[driver-dashboard] Failed to load from database:", error.message);
+    } else {
+      console.warn("[driver-dashboard] Failed to load from database:", error);
+    }
+    return null;
+  }
+}
+
+function parseDashboardRow(row: Pick<DriverDashboardRow, "payload">): DriverDashboardData | null {
+  try {
+    return JSON.parse(row.payload) as DriverDashboardData;
+  } catch (error) {
+    console.warn("[driver-dashboard] Failed to parse database payload:", error);
+    return null;
+  }
+}
 

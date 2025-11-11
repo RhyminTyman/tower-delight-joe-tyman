@@ -29,7 +29,7 @@ export function EditAddressForm({ towId, addressType, ticketId, title, address, 
         </div>
       </header>
 
-      <main className="mx-auto max-w-md px-4 py-6">
+      <main className="mx-auto w-full max-w-md px-4 py-6">
         <h1 className="mb-2 text-xl font-semibold text-foreground">
           Edit {addressType === "pickup" ? "Pickup" : "Destination"}
         </h1>

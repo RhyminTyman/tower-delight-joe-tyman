@@ -17,23 +17,37 @@ export function EditAddressForm({ towId, addressType, ticketId, title, address, 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    console.log("[Client] ========== FORM SUBMIT HANDLER CALLED ==========");
     e.preventDefault();
+    console.log("[Client] Default prevented");
     setIsSubmitting(true);
-    
-    console.log("[Client] Form submission prevented, calling server action...");
+    console.log("[Client] isSubmitting set to true");
     
     const formData = new FormData(e.currentTarget);
+    console.log("[Client] FormData created, values:", {
+      towId: formData.get("towId"),
+      addressType: formData.get("addressType"),
+      title: formData.get("title"),
+      address: formData.get("address"),
+      distance: formData.get("distance"),
+    });
+    
+    console.log("[Client] updateAddress function type:", typeof updateAddress);
+    console.log("[Client] About to call server action...");
     
     try {
-      console.log("[Client] Calling updateAddress server action...");
-      await updateAddress(formData);
-      console.log("[Client] Server action completed, redirecting...");
+      const result = await updateAddress(formData);
+      console.log("[Client] Server action returned:", result);
+      
+      // Wait a bit to ensure database write completes
+      await new Promise(resolve => setTimeout(resolve, 500));
+      console.log("[Client] Waited 500ms, now redirecting...");
       
       // Redirect after successful save
       window.location.href = `/tow/${towId}`;
     } catch (error) {
-      console.error("[Client] Error:", error);
-      alert("Failed to save changes. Please try again.");
+      console.error("[Client] Error caught:", error);
+      alert("Failed to save changes: " + (error instanceof Error ? error.message : String(error)));
       setIsSubmitting(false);
     }
   };

@@ -17,6 +17,7 @@ export interface DriverSnapshot {
   shift: string;
   truck: string;
   status: string;
+  contactNumber?: string;
 }
 
 export interface DispatchTicket {
@@ -25,6 +26,34 @@ export interface DispatchTicket {
   location: string;
   vehicle: string;
   customer: string;
+}
+
+export interface RouteStop {
+  title: string;
+  address: string;
+  distance?: string;
+}
+
+export interface RouteTimelineEntry {
+  label: string;
+  time: string;
+  status: "waiting" | "active" | "completed";
+}
+
+export interface RouteOverview {
+  status: string;
+  statusTone: "waiting" | "active" | "completed";
+  mapImage: string;
+  updateCta: string;
+  pickup: RouteStop;
+  destination: RouteStop;
+  dispatcher: string;
+  hasKeys: boolean;
+  type: string;
+  poNumber: string;
+  driverCallsign: string;
+  truck: string;
+  statuses: RouteTimelineEntry[];
 }
 
 export interface ChecklistItem {
@@ -51,6 +80,7 @@ export interface DriverDashboardData {
     label: string;
     detail: string;
   };
+  route: RouteOverview;
 }
 
 type RemoteDashboardResponse = {
@@ -61,6 +91,9 @@ type RemoteDashboardResponse = {
   checklist?: Array<Partial<ChecklistItem>>;
   impoundPreparation?: Array<Partial<ImpoundPreparationItem>>;
   nextAction?: Partial<DriverDashboardData["nextAction"]>;
+  route?: Partial<RouteOverview> & {
+    statuses?: Array<Partial<RouteTimelineEntry>>;
+  };
 };
 
 const FALLBACK_DASHBOARD: DriverDashboardData = {
@@ -71,6 +104,7 @@ const FALLBACK_DASHBOARD: DriverDashboardData = {
     shift: "Night Shift · 6:00p — 2:00a",
     truck: "Unit HD-12 · Peterbilt 567",
     status: "On Call",
+    contactNumber: "+1 (512) 555-0114",
   },
   dispatch: {
     ticketId: "TD-4827",
@@ -78,6 +112,36 @@ const FALLBACK_DASHBOARD: DriverDashboardData = {
     location: "I-35 Frontage Rd & 5th St, Austin",
     vehicle: "2022 Ford F-150 · Blue · TX 9KP-3821",
     customer: "APD · Officer Nguyen",
+  },
+  route: {
+    status: "En Route",
+    statusTone: "active",
+    mapImage:
+      "https://images.unsplash.com/photo-1524678714210-9917a6c619c4?q=80&w=1800&auto=format&fit=crop",
+    updateCta: "Update Status",
+    pickup: {
+      title: "Kyle's Motors",
+      address: "830 South 17th Street, Columbus OH 43206",
+      distance: "1241 mi (18 h 4 m)",
+    },
+    destination: {
+      title: "Destination",
+      address: "830 South 17th Street, Columbus OH 43206",
+      distance: "1 ft (1 min)",
+    },
+    dispatcher: "Kyle Ed",
+    hasKeys: false,
+    type: "Light",
+    poNumber: "123",
+    driverCallsign: "Kyle Ed",
+    truck: "Richie",
+    statuses: [
+      { label: "Waiting", time: "10:55 AM", status: "completed" },
+      { label: "Dispatched", time: "10:56 AM", status: "completed" },
+      { label: "En Route", time: "10:57 AM", status: "active" },
+      { label: "On Scene", time: "--", status: "waiting" },
+      { label: "Towing", time: "--", status: "waiting" },
+    ],
   },
   workflow: [
     {
@@ -265,6 +329,24 @@ function mergeDashboard(remote: RemoteDashboardResponse): DriverDashboardData {
       };
     }) ?? FALLBACK_DASHBOARD.impoundPreparation;
   const nextAction = { ...FALLBACK_DASHBOARD.nextAction, ...remote.nextAction };
+  const routeStatuses =
+    remote.route?.statuses?.map((entry, index) => {
+      const fallback =
+        (entry.label
+          ? FALLBACK_DASHBOARD.route.statuses.find((status) => status.label === entry.label)
+          : FALLBACK_DASHBOARD.route.statuses[index]) ??
+        FALLBACK_DASHBOARD.route.statuses[index]!;
+      return {
+        label: entry.label ?? fallback.label,
+        time: entry.time ?? fallback.time,
+        status: entry.status ?? fallback.status,
+      };
+    }) ?? FALLBACK_DASHBOARD.route.statuses;
+  const route: RouteOverview = {
+    ...FALLBACK_DASHBOARD.route,
+    ...remote.route,
+    statuses: routeStatuses,
+  };
 
   return {
     driver,
@@ -279,6 +361,7 @@ function mergeDashboard(remote: RemoteDashboardResponse): DriverDashboardData {
     checklist,
     impoundPreparation,
     nextAction,
+    route,
   };
 }
 

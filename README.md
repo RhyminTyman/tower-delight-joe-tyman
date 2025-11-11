@@ -29,6 +29,21 @@ Mobile-first dispatch, pickup, and impound workflow for Tower Delight heavy-duty
    npm run types
    ```
 
+## Storybook
+
+Storybook ships alongside the app so designers and engineers can iterate on driver workflows without booting the entire worker stack.
+
+```shell
+npm run storybook
+```
+
+Key stories:
+
+- `UI/Button` & `UI/Badge` exercise the shadcn/ui primitives used across the workflow.
+- `Screens/DriverOps/RouteDashboard` renders `HomeScreen` with persona-driven scenarios (`EnRoutePrimary`, `BlizzardDetour`, `TowComplete`) backed by the same fixture as the live route.
+
+The Storybook Vite config mirrors the Redwood/Vite setup, respects the `@` alias, and uses the shared Tailwind theme (`tailwind.config.ts`, `src/styles/globals.css`) so component styling matches production.
+
 ## Data Loading Architecture
 
 - `src/app/data/driver-dashboard.ts` centralizes network access. It merges responses from the `/driver-dashboard` endpoint into the persona-aware UI model and gracefully falls back to local fixtures.
@@ -37,15 +52,19 @@ Mobile-first dispatch, pickup, and impound workflow for Tower Delight heavy-duty
 
 ## UI System
 
-- shadcn/ui primitives (`Button`, `Badge`, `Card`, `Separator`) live under `src/components/ui`. They’re theme-aligned with Tower Delight’s brand tokens injected via `tailwind.config` in `Document.tsx`.
+- shadcn/ui primitives (`Button`, `Badge`, `Card`, `Separator`) live under `src/components/ui`. They’re theme-aligned with Tower Delight’s brand tokens defined in `tailwind.config.ts` and consumed by `src/styles/globals.css`.
 - Shared utility `cn()` (clsx + tailwind-merge) mirrors the shadcn pattern for composing responsive, mobile-first styles.
 
 ## Deployment & Extras
 
 - `npm run release` will build and deploy to Cloudflare Workers once you update `wrangler.jsonc` with your project name (already set to `tower-delight-driver`) and credentials.
-- Storybook & Playwright aren’t checked in yet, but the component structure and API fixtures were designed so they can be layered in quickly:
-  - Storybook: point stories at the exported `STATIC_DRIVER_DASHBOARD`.
-  - Playwright: reuse `/api/driver-dashboard` for deterministic E2E setup.
+- Storybook is ready to go (see above). For Playwright end-to-end checks:
+
+  ```shell
+  npm run test:e2e        # runs @playwright/test using playwright.config.ts
+  ```
+
+  Tests live under `tests/playwright/` (`dashboard-overview`, `workflow-progress`, `route-details`, `next-action`) and exercise the same `/api/driver-dashboard` fixture that powers the app. Set `PLAYWRIGHT_BASE_URL` if you want to target a deployed endpoint instead of the local dev server.
 
 ## References
 

@@ -172,7 +172,8 @@ async function loadTowList(): Promise<TowItem[]> {
     console.log("[TowList] Row IDs:", rows.map(r => r.id).join(", "));
 
     const tows = rows.map((row) => {
-      const data = JSON.parse(row.payload);
+      console.log("[TowList] Processing row, payload type:", typeof row.payload);
+      const data = typeof row.payload === 'string' ? JSON.parse(row.payload) : row.payload;
       return {
         id: row.id,
         ticketId: data.dispatch.ticketId,

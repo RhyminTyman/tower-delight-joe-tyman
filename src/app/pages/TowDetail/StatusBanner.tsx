@@ -61,7 +61,7 @@ export function StatusBanner({ towId, currentStatus }: StatusBannerProps) {
               disabled={isUpdating}
               type="button"
               title={`Advance to ${nextStatus}`}
-              className="rounded-l-lg bg-white/20 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-white/30 disabled:opacity-50 border-r border-white/20"
+              className="bg-white/20 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-white/30 disabled:opacity-50 border-r border-white/20"
             >
               {isUpdating ? "Updating..." : `→ ${nextStatus}`}
             </button>
@@ -72,7 +72,7 @@ export function StatusBanner({ towId, currentStatus }: StatusBannerProps) {
             disabled={isUpdating}
             type="button"
             title="Change status"
-            className={`${nextStatus ? 'rounded-r-lg' : 'rounded-lg'} bg-white/20 px-3 py-2 text-white transition-colors hover:bg-white/30 disabled:opacity-50`}
+            className={`${nextStatus ? '' : ''} bg-white/20 p-2 text-white transition-colors hover:bg-white/30 disabled:opacity-50 aspect-square flex items-center justify-center`}
           >
             <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -85,14 +85,14 @@ export function StatusBanner({ towId, currentStatus }: StatusBannerProps) {
                 className="fixed inset-0 z-40" 
                 onClick={() => setIsDropdownOpen(false)}
               />
-              <div className="absolute right-0 top-full mt-2 z-50 w-48 rounded-lg bg-slate-800 shadow-xl border border-slate-700">
+              <div className="absolute right-0 top-full mt-2 z-50 w-48 bg-slate-800 shadow-xl border border-slate-700">
                 {ALL_STATUSES.map((status) => (
                   <button
                     key={status}
                     onClick={() => handleStatusChange(status)}
                     disabled={status === currentStatus}
                     type="button"
-                    className={`w-full px-4 py-3 text-left text-sm font-medium transition-colors first:rounded-t-lg last:rounded-b-lg ${
+                    className={`w-full px-4 py-3 text-left text-sm font-medium transition-colors ${
                       status === currentStatus
                         ? "bg-slate-700 text-slate-400 cursor-not-allowed"
                         : "text-white hover:bg-slate-700"

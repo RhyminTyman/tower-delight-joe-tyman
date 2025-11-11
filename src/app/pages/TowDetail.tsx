@@ -250,7 +250,7 @@ export const TowDetail = async (requestInfo: RequestInfo) => {
               <p className="text-xs uppercase tracking-wide text-muted-foreground">PO #</p>
               <p className="text-base font-semibold text-foreground">{data.route.poNumber}</p>
             </div>
-            <Button asChild variant="secondary" className="px-5 py-2 text-sm">
+            <Button asChild variant="secondary" className="px-5 py-2 text-sm rounded-none">
               <a href={data.driver.contactNumber ? `tel:${data.driver.contactNumber}` : "#"}>Call Dispatch</a>
             </Button>
           </div>

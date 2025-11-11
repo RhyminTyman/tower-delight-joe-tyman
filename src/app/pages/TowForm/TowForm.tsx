@@ -30,6 +30,57 @@ function loadGoogleMapsScript(): Promise<void> {
   });
 }
 
+// Calculate distance using Google Maps Distance Matrix API
+async function calculateDistance(
+  origin: { lat: number; lng: number },
+  destination: { lat: number; lng: number }
+): Promise<{ distance: string; duration: string } | null> {
+  try {
+    const response = await fetch(
+      `https://maps.googleapis.com/maps/api/distancematrix/json?origins=${origin.lat},${origin.lng}&destinations=${destination.lat},${destination.lng}&key=${GOOGLE_MAPS_API_KEY}&units=imperial`
+    );
+    const data = await response.json();
+    
+    if (data.status === 'OK' && data.rows[0]?.elements[0]?.status === 'OK') {
+      const element = data.rows[0].elements[0];
+      return {
+        distance: element.distance.text,
+        duration: element.duration.text,
+      };
+    }
+    
+    return null;
+  } catch (error) {
+    console.error('[Distance] Calculation failed:', error);
+    return null;
+  }
+}
+
+// Get user's current location
+async function getUserLocation(): Promise<{ lat: number; lng: number } | null> {
+  return new Promise((resolve) => {
+    if (!navigator.geolocation) {
+      console.warn('[Location] Geolocation not supported');
+      resolve(null);
+      return;
+    }
+    
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        resolve({
+          lat: position.coords.latitude,
+          lng: position.coords.longitude,
+        });
+      },
+      (error) => {
+        console.warn('[Location] Failed to get user location:', error);
+        resolve(null);
+      },
+      { timeout: 5000, enableHighAccuracy: false }
+    );
+  });
+}
+
 export type DriverOption = {
   id: string;
   name: string;
@@ -140,6 +191,8 @@ export function TowForm({
 
   const [isSaving, setIsSaving] = useState(false);
   const [isLoadingMaps, setIsLoadingMaps] = useState(true);
+  const [isCalculatingDistances, setIsCalculatingDistances] = useState(false);
+  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const pickupInputRef = useRef<HTMLInputElement>(null);
   const destinationInputRef = useRef<HTMLInputElement>(null);
 
@@ -175,6 +228,61 @@ export function TowForm({
       [field]: value,
     }));
   };
+
+  // Get user's location on mount
+  useEffect(() => {
+    const fetchUserLocation = async () => {
+      const location = await getUserLocation();
+      if (location) {
+        setUserLocation(location);
+      }
+    };
+    fetchUserLocation();
+  }, []);
+
+  // Calculate distances when pickup and destination coordinates are set
+  useEffect(() => {
+    const calculateDistances = async () => {
+      const pickupLat = parseFloat(formValues.pickupLat);
+      const pickupLng = parseFloat(formValues.pickupLng);
+      const destLat = parseFloat(formValues.destinationLat);
+      const destLng = parseFloat(formValues.destinationLng);
+
+      // Need all coordinates
+      if (!pickupLat || !pickupLng || !destLat || !destLng) {
+        return;
+      }
+
+      setIsCalculatingDistances(true);
+
+      // Calculate distance from user to pickup
+      if (userLocation) {
+        const userToPickup = await calculateDistance(userLocation, { lat: pickupLat, lng: pickupLng });
+        if (userToPickup) {
+          setFormValues((prev) => ({
+            ...prev,
+            pickupDistance: `${userToPickup.distance} (${userToPickup.duration})`,
+          }));
+        }
+      }
+
+      // Calculate distance from pickup to destination
+      const pickupToDest = await calculateDistance(
+        { lat: pickupLat, lng: pickupLng },
+        { lat: destLat, lng: destLng }
+      );
+      if (pickupToDest) {
+        setFormValues((prev) => ({
+          ...prev,
+          destinationDistance: `${pickupToDest.distance} (${pickupToDest.duration})`,
+        }));
+      }
+
+      setIsCalculatingDistances(false);
+    };
+
+    calculateDistances();
+  }, [formValues.pickupLat, formValues.pickupLng, formValues.destinationLat, formValues.destinationLng, userLocation]);
 
   // Initialize Google Maps Autocomplete
   useEffect(() => {
@@ -577,16 +685,20 @@ export function TowForm({
                 )}
               </div>
               <div>
-                <label htmlFor="pickupDistance" className="mb-1.5 block text-xs text-muted-foreground">
-                  Distance / ETA
+                <label htmlFor="pickupDistance" className="mb-1.5 flex items-center gap-2 text-xs text-muted-foreground">
+                  Distance / ETA (from your location)
+                  {isCalculatingDistances && (
+                    <span className="text-xs text-yellow-500">Calculating...</span>
+                  )}
                 </label>
                 <input
                   id="pickupDistance"
                   name="pickupDistance"
                   value={formValues.pickupDistance}
                   onChange={handleChange("pickupDistance")}
+                  readOnly={isCalculatingDistances}
                   className="w-full rounded-none border border-border/60 bg-slate-900/50 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
-                  placeholder="Optional"
+                  placeholder={isCalculatingDistances ? "Calculating..." : "Auto-calculated"}
                 />
               </div>
             </div>
@@ -642,16 +754,20 @@ export function TowForm({
                 )}
               </div>
               <div>
-                <label htmlFor="destinationDistance" className="mb-1.5 block text-xs text-muted-foreground">
-                  Distance / ETA
+                <label htmlFor="destinationDistance" className="mb-1.5 flex items-center gap-2 text-xs text-muted-foreground">
+                  Distance / ETA (from pickup)
+                  {isCalculatingDistances && (
+                    <span className="text-xs text-yellow-500">Calculating...</span>
+                  )}
                 </label>
                 <input
                   id="destinationDistance"
                   name="destinationDistance"
                   value={formValues.destinationDistance}
                   onChange={handleChange("destinationDistance")}
+                  readOnly={isCalculatingDistances}
                   className="w-full rounded-none border border-border/60 bg-slate-900/50 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
-                  placeholder="Optional"
+                  placeholder={isCalculatingDistances ? "Calculating..." : "Auto-calculated"}
                 />
               </div>
             </div>

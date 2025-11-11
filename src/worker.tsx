@@ -10,6 +10,7 @@ import { EditTow } from "@/app/pages/EditTow";
 import { Home } from "@/app/pages/Home";
 import { TowDetail } from "@/app/pages/TowDetail";
 import { TowList } from "@/app/pages/TowList";
+import { db } from "@/db";
 
 export type AppContext = {
   apiBaseUrl?: string;
@@ -62,8 +63,6 @@ const app = defineApp([
   route("/api/seed", async () => {
     try {
       console.log("[Seed] Starting seed process...");
-      const { db } = await import("@/db");
-      const { STATIC_DRIVER_DASHBOARD } = await import("@/app/data/driver-dashboard");
 
       const SEED_TOWS = [
         {

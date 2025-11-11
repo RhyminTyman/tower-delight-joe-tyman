@@ -1,4 +1,4 @@
-import "@/styles/globals.css";
+import styles from "@/styles/globals.css?url";
 
 export const Document: React.FC<{ children: React.ReactNode }> = ({
   children,
@@ -17,6 +17,7 @@ export const Document: React.FC<{ children: React.ReactNode }> = ({
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
         rel="stylesheet"
       />
+      <link rel="stylesheet" href={styles} />
       <link rel="modulepreload" href="/src/client.tsx" />
     </head>
     <body className="bg-background text-foreground font-sans antialiased">

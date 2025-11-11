@@ -61,6 +61,99 @@ const app = defineApp([
       }, { status: 500 });
     }
   }),
+  route("/api/tow/:id/photo", async (req: Request, params: { id: string }) => {
+    const towId = params.id;
+    console.log("[API capturePhoto] Starting for towId:", towId);
+
+    try {
+      const row = await db
+        .selectFrom("driver_dashboard")
+        .select("payload")
+        .where("id", "=", towId)
+        .executeTakeFirst();
+
+      if (row) {
+        const data = typeof row.payload === 'string' ? JSON.parse(row.payload) : row.payload;
+
+        const photoProofItem = data.checklist?.find((item: any) => item.id === "photo-proof");
+        if (photoProofItem) {
+          photoProofItem.complete = true;
+        }
+
+        data.nextAction = {
+          label: "Photo captured successfully",
+          detail: "4-angle documentation complete. Ready for next step.",
+        };
+
+        await db
+          .updateTable("driver_dashboard")
+          .set({
+            payload: JSON.stringify(data),
+            updated_at: Math.floor(Date.now() / 1000),
+          })
+          .where("id", "=", towId)
+          .execute();
+
+        console.log("[API capturePhoto] Success");
+        return Response.json({ success: true });
+      }
+
+      return Response.json({ error: "Tow not found" }, { status: 404 });
+    } catch (error) {
+      console.error("[API capturePhoto] Error:", error);
+      return Response.json({ error: String(error) }, { status: 500 });
+    }
+  }),
+  route("/api/tow/:id/status", async (req: Request, params: { id: string }) => {
+    const towId = params.id;
+    console.log("[API updateStatus] Starting for towId:", towId);
+
+    try {
+      const row = await db
+        .selectFrom("driver_dashboard")
+        .select("payload")
+        .where("id", "=", towId)
+        .executeTakeFirst();
+
+      if (row) {
+        const data = typeof row.payload === 'string' ? JSON.parse(row.payload) : row.payload;
+
+        const currentActiveIndex = data.route.statuses.findIndex((s: any) => s.status === "active");
+        if (currentActiveIndex >= 0 && currentActiveIndex < data.route.statuses.length - 1) {
+          data.route.statuses[currentActiveIndex].status = "completed";
+          data.route.statuses[currentActiveIndex].time = new Date().toLocaleTimeString("en-US", {
+            hour: "numeric",
+            minute: "2-digit",
+          });
+
+          data.route.statuses[currentActiveIndex + 1].status = "active";
+          data.route.statuses[currentActiveIndex + 1].time = new Date().toLocaleTimeString("en-US", {
+            hour: "numeric",
+            minute: "2-digit",
+          });
+
+          data.route.status = data.route.statuses[currentActiveIndex + 1].label;
+        }
+
+        await db
+          .updateTable("driver_dashboard")
+          .set({
+            payload: JSON.stringify(data),
+            updated_at: Math.floor(Date.now() / 1000),
+          })
+          .where("id", "=", towId)
+          .execute();
+
+        console.log("[API updateStatus] Success");
+        return Response.json({ success: true });
+      }
+
+      return Response.json({ error: "Tow not found" }, { status: 404 });
+    } catch (error) {
+      console.error("[API updateStatus] Error:", error);
+      return Response.json({ error: String(error) }, { status: 500 });
+    }
+  }),
   route("/api/seed", async () => {
     try {
       console.log("[Seed] Starting seed process...");

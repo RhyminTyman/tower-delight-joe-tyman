@@ -375,11 +375,16 @@ export function TowForm({
 
     return () => {
       // Cleanup autocomplete listeners
-      if (pickupAutocomplete) {
-        google.maps.event.clearInstanceListeners(pickupAutocomplete);
-      }
-      if (destinationAutocomplete) {
-        google.maps.event.clearInstanceListeners(destinationAutocomplete);
+      try {
+        const google = (window as any).google;
+        if (pickupAutocomplete && google?.maps?.event) {
+          google.maps.event.clearInstanceListeners(pickupAutocomplete);
+        }
+        if (destinationAutocomplete && google?.maps?.event) {
+          google.maps.event.clearInstanceListeners(destinationAutocomplete);
+        }
+      } catch (error) {
+        console.error("[Autocomplete] Failed to cleanup:", error);
       }
     };
   }, []);

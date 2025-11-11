@@ -91,7 +91,7 @@ export const TowDetail = async (requestInfo: RequestInfo) => {
       <main className="mx-auto flex min-h-screen max-w-md flex-col gap-5 px-4 pb-28 pt-6 sm:max-w-lg">
         {/* Route Map Card */}
         <div className="overflow-hidden rounded-3xl border border-border/60 bg-secondary/40 shadow-card">
-          <div className="relative h-96">
+          <div className="relative h-72">
             <div
               className="absolute inset-0 bg-cover bg-center"
               style={{ backgroundImage: `url(${data.route.mapImage || MAP_PLACEHOLDER})` }}

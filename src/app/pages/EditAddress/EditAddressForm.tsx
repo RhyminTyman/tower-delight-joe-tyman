@@ -1,6 +1,7 @@
 "use client";
 
 import { Card } from "@/components/ui/card";
+import { updateAddress } from "./functions";
 
 interface EditAddressFormProps {
   towId: string;
@@ -9,10 +10,9 @@ interface EditAddressFormProps {
   title: string;
   address: string;
   distance: string;
-  updateAddress: (formData: FormData) => Promise<void>;
 }
 
-export function EditAddressForm({ towId, addressType, ticketId, title, address, distance, updateAddress }: EditAddressFormProps) {
+export function EditAddressForm({ towId, addressType, ticketId, title, address, distance }: EditAddressFormProps) {
   return (
     <>
       <header className="border-b border-border bg-card px-4 py-3">

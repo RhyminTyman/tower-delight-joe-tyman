@@ -52,7 +52,7 @@ const TowListScreen = ({ tows }: { tows: TowItem[] }) => (
             <p className="mb-4 text-muted-foreground">No active tows</p>
             <a
               href="/tow/new"
-              className="inline-flex items-center gap-2 rounded-lg bg-accent px-4 py-2 text-sm font-medium text-accent-foreground transition-colors hover:bg-accent/90"
+              className="inline-flex items-center gap-2 rounded-none bg-accent px-4 py-2 text-sm font-medium text-accent-foreground transition-colors hover:bg-accent/90"
             >
               <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -69,7 +69,7 @@ const TowListScreen = ({ tows }: { tows: TowItem[] }) => (
     {/* Floating Action Button */}
     <a
       href="/tow/new"
-      className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-accent shadow-lg transition-all hover:scale-105 hover:bg-accent/90 hover:shadow-xl sm:h-16 sm:w-16"
+      className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-none bg-accent shadow-lg transition-all hover:scale-105 hover:bg-accent/90 hover:shadow-xl sm:h-16 sm:w-16"
       title="Add New Tow"
     >
       <svg className="h-6 w-6 text-accent-foreground sm:h-7 sm:w-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -100,7 +100,7 @@ const TowCard = ({ tow }: { tow: TowItem }) => (
 
         <p className="mb-4 text-sm text-muted-foreground">{tow.vehicle}</p>
 
-        <div className="space-y-3 rounded-xl bg-slate-900/40 p-4">
+        <div className="space-y-3 rounded-none bg-slate-900/40 p-4">
           <div>
             <div className="mb-1 flex items-center gap-2">
               <svg className="h-3.5 w-3.5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">

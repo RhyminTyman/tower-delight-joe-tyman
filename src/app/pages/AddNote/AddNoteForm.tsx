@@ -56,7 +56,7 @@ export function AddNoteForm({ towId, lastSavedNote }: AddNoteFormProps) {
           <button
             type="button"
             onClick={handleCancel}
-            className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+            className="flex h-9 w-9 items-center justify-center rounded-none text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
             title="Back to tow"
           >
             <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -83,7 +83,7 @@ export function AddNoteForm({ towId, lastSavedNote }: AddNoteFormProps) {
               onChange={(event) => setNoteText(event.target.value)}
               required
               rows={6}
-              className="rounded-lg border border-border bg-card px-4 py-3 text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+              className="rounded-none border border-border bg-card px-4 py-3 text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
               placeholder="Enter your note here..."
             />
           </div>
@@ -92,14 +92,14 @@ export function AddNoteForm({ towId, lastSavedNote }: AddNoteFormProps) {
             <button
               type="button"
               onClick={handleCancel}
-              className="flex-1 rounded-lg border border-border bg-card px-4 py-3 text-center font-medium text-foreground transition-colors hover:bg-muted"
+              className="flex-1 rounded-none border border-border bg-card px-4 py-3 text-center font-medium text-foreground transition-colors hover:bg-muted"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={!hasUnsavedChanges || isSaving}
-              className="flex-1 rounded-lg bg-primary px-4 py-3 font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 rounded-none bg-primary px-4 py-3 font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isSaving ? "Saving..." : "Save Note"}
             </button>

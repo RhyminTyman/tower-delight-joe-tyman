@@ -57,7 +57,7 @@ export function EditAddressForm({ towId, addressType, ticketId, title, address, 
                   id="title"
                   name="title"
                   defaultValue={title}
-                  className="w-full rounded-lg border border-border/60 bg-slate-900/50 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+                  className="w-full rounded-none border border-border/60 bg-slate-900/50 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
                   placeholder="e.g. Kyle's Motors"
                 />
               </div>
@@ -71,7 +71,7 @@ export function EditAddressForm({ towId, addressType, ticketId, title, address, 
                   name="address"
                   defaultValue={address}
                   rows={2}
-                  className="w-full rounded-lg border border-border/60 bg-slate-900/50 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+                  className="w-full rounded-none border border-border/60 bg-slate-900/50 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
                   placeholder="e.g. 830 South 17th Street, Columbus OH 43206"
                 />
               </div>
@@ -85,7 +85,7 @@ export function EditAddressForm({ towId, addressType, ticketId, title, address, 
                   id="distance"
                   name="distance"
                   defaultValue={distance}
-                  className="w-full rounded-lg border border-border/60 bg-slate-900/50 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+                  className="w-full rounded-none border border-border/60 bg-slate-900/50 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
                   placeholder="e.g. 12 mi (26 m)"
                 />
               </div>
@@ -95,13 +95,13 @@ export function EditAddressForm({ towId, addressType, ticketId, title, address, 
           <div className="flex gap-3">
             <a
               href={`/tow/${towId}`}
-              className="flex-1 rounded-lg border border-border bg-card px-4 py-3 text-center font-medium text-foreground transition-colors hover:bg-muted"
+              className="flex-1 rounded-none border border-border bg-card px-4 py-3 text-center font-medium text-foreground transition-colors hover:bg-muted"
             >
               Cancel
             </a>
                 <button
                   type="submit"
-                  className="flex-1 rounded-lg bg-primary px-4 py-3 font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+                  className="flex-1 rounded-none bg-primary px-4 py-3 font-medium text-primary-foreground transition-colors hover:bg-primary/90"
                 >
                   Save Changes
                 </button>

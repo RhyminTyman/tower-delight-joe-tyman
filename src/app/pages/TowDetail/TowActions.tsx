@@ -69,7 +69,7 @@ export function TowActions({ towId, currentStatus }: TowActionsProps) {
         type="button"
         onClick={handlePhotoClick}
         disabled={isUploading}
-        className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-white/10 hover:text-foreground disabled:opacity-50"
+        className="flex h-9 w-9 items-center justify-center rounded-none text-muted-foreground transition-colors hover:bg-white/10 hover:text-foreground disabled:opacity-50"
         title="Capture photo"
       >
         {isUploading ? (

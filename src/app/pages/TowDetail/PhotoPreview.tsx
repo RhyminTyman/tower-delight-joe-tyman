@@ -44,7 +44,7 @@ export function PhotoPreview({ towId, imageUrl }: PhotoPreviewProps) {
         type="button"
         onClick={handleDelete}
         disabled={isDeleting}
-        className="absolute left-3 top-3 rounded-full bg-black/60 px-3 py-1 text-xs font-medium text-white transition hover:bg-black/80 disabled:opacity-50"
+        className="absolute left-3 top-3 rounded-none bg-black/60 px-3 py-1 text-xs font-medium text-white transition hover:bg-black/80 disabled:opacity-50"
       >
         {isDeleting ? "Removing…" : "✕"}
       </button>

@@ -139,6 +139,7 @@ export function TowForm({
   }, [driverOptions, formValues.driverId, mode]);
 
   const [isSaving, setIsSaving] = useState(false);
+  const [isLoadingMaps, setIsLoadingMaps] = useState(true);
   const pickupInputRef = useRef<HTMLInputElement>(null);
   const destinationInputRef = useRef<HTMLInputElement>(null);
 
@@ -182,6 +183,7 @@ export function TowForm({
 
     const initAutocomplete = async () => {
       try {
+        setIsLoadingMaps(true);
         await loadGoogleMapsScript();
         const google = (window as any).google;
 
@@ -226,8 +228,11 @@ export function TowForm({
             }
           });
         }
+        
+        setIsLoadingMaps(false);
       } catch (error) {
         console.error('[Autocomplete] Failed to initialize:', error);
+        setIsLoadingMaps(false);
       }
     };
 
@@ -278,7 +283,7 @@ export function TowForm({
           <div className="mx-auto flex max-w-md items-center justify-between">
             <a
               href="/"
-              className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+              className="flex h-9 w-9 items-center justify-center rounded-none text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
             >
               <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -306,7 +311,7 @@ export function TowForm({
           <div className="mx-auto flex max-w-md items-center justify-between">
             <a
               href={cancelHref}
-              className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+              className="flex h-9 w-9 items-center justify-center rounded-none text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
               title="Cancel"
             >
               <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -359,7 +364,7 @@ export function TowForm({
                   value={formValues.ticketId}
                   onChange={handleChange("ticketId")}
                   required
-                  className="w-full rounded-lg border border-border/60 bg-slate-900/50 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+                  className="w-full rounded-none border border-border/60 bg-slate-900/50 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
                   placeholder="e.g. TD-4921"
                 />
               </div>
@@ -374,7 +379,7 @@ export function TowForm({
                   value={formValues.vehicle}
                   onChange={handleChange("vehicle")}
                   required
-                  className="w-full rounded-lg border border-border/60 bg-slate-900/50 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+                  className="w-full rounded-none border border-border/60 bg-slate-900/50 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
                   placeholder="e.g. 2022 Ford F-150 · Blue · TX 9KP-3821"
                 />
               </div>
@@ -391,7 +396,7 @@ export function TowForm({
                       value={formValues.driverId}
                       onChange={handleChange("driverId")}
                       required
-                      className="w-full rounded-lg border border-border/60 bg-slate-900/50 px-3 py-2 text-sm text-foreground focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+                      className="w-full rounded-none border border-border/60 bg-slate-900/50 px-3 py-2 text-sm text-foreground focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
                     >
                       {driverOptions.map((driver) => (
                         <option key={driver.id} value={driver.id}>
@@ -416,7 +421,7 @@ export function TowForm({
                         towType: event.target.value as TowTypeOption,
                       }))
                     }
-                    className="w-full rounded-lg border border-border/60 bg-slate-900/50 px-3 py-2 text-sm text-foreground focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+                    className="w-full rounded-none border border-border/60 bg-slate-900/50 px-3 py-2 text-sm text-foreground focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
                   >
                     {STATUS_OPTIONS.map((option) => (
                       <option key={option} value={option}>
@@ -439,7 +444,7 @@ export function TowForm({
                     min={0}
                     value={formValues.etaMinutes}
                     onChange={handleChange("etaMinutes")}
-                    className="w-full rounded-lg border border-border/60 bg-slate-900/50 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+                    className="w-full rounded-none border border-border/60 bg-slate-900/50 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
                     placeholder="Optional"
                   />
                 </div>
@@ -454,7 +459,7 @@ export function TowForm({
                       name="poNumber"
                       value={formValues.poNumber}
                       onChange={handleChange("poNumber")}
-                      className="w-full rounded-lg border border-border/60 bg-slate-900/50 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+                      className="w-full rounded-none border border-border/60 bg-slate-900/50 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
                       placeholder="e.g. 123"
                     />
                   </div>
@@ -472,7 +477,7 @@ export function TowForm({
                       name="dispatcher"
                       value={formValues.dispatcher}
                       onChange={handleChange("dispatcher")}
-                      className="w-full rounded-lg border border-border/60 bg-slate-900/50 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+                      className="w-full rounded-none border border-border/60 bg-slate-900/50 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
                       placeholder="e.g. Kyle Ed"
                     />
                   </div>
@@ -485,7 +490,7 @@ export function TowForm({
                       name="hasKeys"
                       value={formValues.hasKeys}
                       onChange={handleChange("hasKeys")}
-                      className="w-full rounded-lg border border-border/60 bg-slate-900/50 px-3 py-2 text-sm text-foreground focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+                      className="w-full rounded-none border border-border/60 bg-slate-900/50 px-3 py-2 text-sm text-foreground focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
                     >
                       <option value="yes">Yes</option>
                       <option value="no">No</option>
@@ -500,7 +505,7 @@ export function TowForm({
                       name="driverCallsign"
                       value={formValues.driverCallsign}
                       onChange={handleChange("driverCallsign")}
-                      className="w-full rounded-lg border border-border/60 bg-slate-900/50 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+                      className="w-full rounded-none border border-border/60 bg-slate-900/50 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
                       placeholder="Optional"
                     />
                   </div>
@@ -513,7 +518,7 @@ export function TowForm({
                       name="truck"
                       value={formValues.truck}
                       onChange={handleChange("truck")}
-                      className="w-full rounded-lg border border-border/60 bg-slate-900/50 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+                      className="w-full rounded-none border border-border/60 bg-slate-900/50 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
                       placeholder="Optional"
                     />
                   </div>
@@ -535,13 +540,22 @@ export function TowForm({
                   value={formValues.pickupTitle}
                   onChange={handleChange("pickupTitle")}
                   required
-                  className="w-full rounded-lg border border-border/60 bg-slate-900/50 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+                  className="w-full rounded-none border border-border/60 bg-slate-900/50 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
                   placeholder="e.g. Kyle's Motors"
                 />
               </div>
               <div>
-                <label htmlFor="pickupAddress" className="mb-1.5 block text-xs text-muted-foreground">
+                <label htmlFor="pickupAddress" className="mb-1.5 flex items-center gap-2 text-xs text-muted-foreground">
                   Address {formValues.pickupLat && <span className="text-green-500">✓</span>}
+                  {isLoadingMaps && (
+                    <span className="flex items-center gap-1 text-yellow-500">
+                      <svg className="h-3 w-3 animate-spin" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                      </svg>
+                      Loading Maps...
+                    </span>
+                  )}
                 </label>
                 <input
                   ref={pickupInputRef}
@@ -551,8 +565,9 @@ export function TowForm({
                   value={formValues.pickupAddress}
                   onChange={handleChange("pickupAddress")}
                   required
-                  className="w-full rounded-lg border border-border/60 bg-slate-900/50 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
-                  placeholder="Start typing an address..."
+                  disabled={isLoadingMaps}
+                  className="w-full rounded-none border border-border/60 bg-slate-900/50 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent disabled:opacity-50 disabled:cursor-wait"
+                  placeholder={isLoadingMaps ? "Loading Google Maps..." : "Start typing an address..."}
                   autoComplete="off"
                 />
                 {formValues.pickupLat && formValues.pickupLng && (
@@ -570,7 +585,7 @@ export function TowForm({
                   name="pickupDistance"
                   value={formValues.pickupDistance}
                   onChange={handleChange("pickupDistance")}
-                  className="w-full rounded-lg border border-border/60 bg-slate-900/50 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+                  className="w-full rounded-none border border-border/60 bg-slate-900/50 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
                   placeholder="Optional"
                 />
               </div>
@@ -590,13 +605,22 @@ export function TowForm({
                   value={formValues.destinationTitle}
                   onChange={handleChange("destinationTitle")}
                   required
-                  className="w-full rounded-lg border border-border/60 bg-slate-900/50 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+                  className="w-full rounded-none border border-border/60 bg-slate-900/50 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
                   placeholder="e.g. City Impound Lot"
                 />
               </div>
               <div>
-                <label htmlFor="destinationAddress" className="mb-1.5 block text-xs text-muted-foreground">
+                <label htmlFor="destinationAddress" className="mb-1.5 flex items-center gap-2 text-xs text-muted-foreground">
                   Address {formValues.destinationLat && <span className="text-green-500">✓</span>}
+                  {isLoadingMaps && (
+                    <span className="flex items-center gap-1 text-yellow-500">
+                      <svg className="h-3 w-3 animate-spin" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                      </svg>
+                      Loading Maps...
+                    </span>
+                  )}
                 </label>
                 <input
                   ref={destinationInputRef}
@@ -606,8 +630,9 @@ export function TowForm({
                   value={formValues.destinationAddress}
                   onChange={handleChange("destinationAddress")}
                   required
-                  className="w-full rounded-lg border border-border/60 bg-slate-900/50 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
-                  placeholder="Start typing an address..."
+                  disabled={isLoadingMaps}
+                  className="w-full rounded-none border border-border/60 bg-slate-900/50 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent disabled:opacity-50 disabled:cursor-wait"
+                  placeholder={isLoadingMaps ? "Loading Google Maps..." : "Start typing an address..."}
                   autoComplete="off"
                 />
                 {formValues.destinationLat && formValues.destinationLng && (
@@ -625,7 +650,7 @@ export function TowForm({
                   name="destinationDistance"
                   value={formValues.destinationDistance}
                   onChange={handleChange("destinationDistance")}
-                  className="w-full rounded-lg border border-border/60 bg-slate-900/50 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+                  className="w-full rounded-none border border-border/60 bg-slate-900/50 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
                   placeholder="Optional"
                 />
               </div>
@@ -636,14 +661,14 @@ export function TowForm({
             <div className="flex gap-3">
               <a
                 href={cancelHref}
-                className="flex-1 rounded-lg border border-border bg-card px-4 py-3 text-center font-medium text-foreground transition-colors hover:bg-muted"
+                className="flex-1 rounded-none border border-border bg-card px-4 py-3 text-center font-medium text-foreground transition-colors hover:bg-muted"
               >
                 Cancel
               </a>
               <button
                 type="submit"
                 disabled={!canSubmit || isSaving}
-                className="flex-1 rounded-lg bg-primary px-4 py-3 font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50"
+                className="flex-1 rounded-none bg-primary px-4 py-3 font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {isSaving ? submittingLabel : submitLabel}
               </button>

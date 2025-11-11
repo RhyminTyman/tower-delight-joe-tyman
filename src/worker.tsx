@@ -40,8 +40,28 @@ const app = defineApp([
     const payload = await loadDashboardFromDatabase();
     return Response.json(payload ?? STATIC_DRIVER_DASHBOARD);
   }),
+  route("/api/debug/tows", async () => {
+    try {
+      const { db } = await import("@/db");
+      const rows = await db.selectFrom("driver_dashboard").select(["id", "payload"]).execute();
+      return Response.json({
+        count: rows.length,
+        ids: rows.map(r => r.id),
+        rows: rows.map(r => ({
+          id: r.id,
+          payload: JSON.parse(r.payload)
+        }))
+      });
+    } catch (error) {
+      return Response.json({
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined
+      }, { status: 500 });
+    }
+  }),
   route("/api/seed", async () => {
     try {
+      console.log("[Seed] Starting seed process...");
       const { db } = await import("@/db");
       const { STATIC_DRIVER_DASHBOARD } = await import("@/app/data/driver-dashboard");
 
@@ -99,9 +119,12 @@ const app = defineApp([
       ];
 
       // Clear existing tows
+      console.log("[Seed] Clearing existing tows...");
       await db.deleteFrom("driver_dashboard").execute();
+      console.log("[Seed] Cleared existing tows");
 
       // Insert all seed tows
+      console.log(`[Seed] Inserting ${SEED_TOWS.length} tows...`);
       for (const tow of SEED_TOWS) {
         const dashboardData = {
           ...STATIC_DRIVER_DASHBOARD,
@@ -158,11 +181,21 @@ const app = defineApp([
             updated_at: Math.floor(Date.now() / 1000),
           })
           .execute();
+        console.log(`[Seed] Inserted tow: ${tow.id}`);
       }
+
+      // Verify the insert
+      const verifyRows = await db.selectFrom("driver_dashboard").select(["id"]).execute();
+      console.log(`[Seed] Verification: ${verifyRows.length} rows in database`);
 
       return Response.json({ 
         success: true, 
-        message: `Database seeded successfully with ${SEED_TOWS.length} tows` 
+        message: `Database seeded successfully with ${SEED_TOWS.length} tows`,
+        verification: {
+          inserted: SEED_TOWS.length,
+          found: verifyRows.length,
+          ids: verifyRows.map(r => r.id)
+        }
       });
     } catch (error) {
       console.error("Seed failed:", error);

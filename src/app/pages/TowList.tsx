@@ -138,9 +138,11 @@ async function loadTowList(): Promise<TowItem[]> {
   const { db } = await import("@/db");
 
   try {
+    console.log("[TowList] Loading tows from database...");
     const rows = await db.selectFrom("driver_dashboard").select(["id", "payload"]).execute();
+    console.log(`[TowList] Found ${rows.length} rows in database`);
 
-    return rows.map((row) => {
+    const tows = rows.map((row) => {
       const data = JSON.parse(row.payload);
       return {
         id: row.id,
@@ -159,8 +161,11 @@ async function loadTowList(): Promise<TowItem[]> {
         etaMinutes: data.dispatch.etaMinutes,
       };
     });
+    
+    console.log(`[TowList] Returning ${tows.length} tows`);
+    return tows;
   } catch (error) {
-    console.error("Failed to load tow list:", error);
+    console.error("[TowList] Failed to load tow list:", error);
     return [];
   }
 }

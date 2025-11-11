@@ -1,4 +1,5 @@
 import styles from "@/styles/globals.css?url";
+import clientEntry from "@/client.tsx?url";
 
 export const Document: React.FC<{ children: React.ReactNode }> = ({
   children,
@@ -21,6 +22,7 @@ export const Document: React.FC<{ children: React.ReactNode }> = ({
     </head>
     <body className="bg-background text-foreground font-sans antialiased">
       <div id="root">{children}</div>
+      <script type="module" src={clientEntry}></script>
     </body>
   </html>
 );

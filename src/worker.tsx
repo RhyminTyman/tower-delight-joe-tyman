@@ -5,7 +5,10 @@ import { defineApp } from "rwsdk/worker";
 import { Document } from "@/app/Document";
 import { STATIC_DRIVER_DASHBOARD, loadDashboardFromDatabase } from "@/app/data/driver-dashboard";
 import { setCommonHeaders } from "@/app/headers";
+import { EditTow } from "@/app/pages/EditTow";
 import { Home } from "@/app/pages/Home";
+import { TowDetail } from "@/app/pages/TowDetail";
+import { TowList } from "@/app/pages/TowList";
 
 export type AppContext = {
   apiBaseUrl?: string;
@@ -26,7 +29,11 @@ const hydrateAppContext = (requestInfo: RequestInfo<any, AppContext>) => {
 const app = defineApp([
   setCommonHeaders(),
   hydrateAppContext,
-  render(Document, [route("/", Home)]),
+  render(Document, [
+    route("/", TowList),
+    route("/tow/:id", TowDetail),
+    route("/tow/:id/edit", EditTow),
+  ]),
   route("/api/driver-dashboard", async () => {
     const payload = await loadDashboardFromDatabase();
     return Response.json(payload ?? STATIC_DRIVER_DASHBOARD);

@@ -2,7 +2,7 @@ import { test, expect } from "@playwright/test";
 
 test.describe("Dispatch status timeline", () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/tow/primary");
   });
 
   test("lists each timeline entry with label and timestamp", async ({ page }) => {

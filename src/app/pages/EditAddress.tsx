@@ -2,6 +2,7 @@ import type { RequestInfo } from "rwsdk/worker";
 import { Button } from "@/components/ui/button";
 import { db } from "@/db";
 import { EditAddressForm } from "./EditAddress/EditAddressForm";
+import { updateAddress } from "./EditAddress/functions";
 
 interface AddressEditData {
   ticketId: string;
@@ -29,6 +30,7 @@ export const EditAddress = async (requestInfo: RequestInfo) => {
         title={data.title}
         address={data.address}
         distance={data.distance}
+        updateAddress={updateAddress}
       />
     </div>
   );

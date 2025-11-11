@@ -1,7 +1,6 @@
 "use client";
 
 import { Card } from "@/components/ui/card";
-import { updateAddress } from "./functions";
 
 interface EditAddressFormProps {
   towId: string;
@@ -10,16 +9,10 @@ interface EditAddressFormProps {
   title: string;
   address: string;
   distance: string;
+  updateAddress: (formData: FormData) => Promise<void>;
 }
 
-export function EditAddressForm({ towId, addressType, ticketId, title, address, distance }: EditAddressFormProps) {
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const formData = new FormData(e.currentTarget);
-    await updateAddress(formData);
-    window.location.href = `/tow/${towId}`;
-  };
-
+export function EditAddressForm({ towId, addressType, ticketId, title, address, distance, updateAddress }: EditAddressFormProps) {
   return (
     <>
       <header className="border-b border-border bg-card px-4 py-3">
@@ -44,7 +37,7 @@ export function EditAddressForm({ towId, addressType, ticketId, title, address, 
           Update the {addressType} location details
         </p>
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+        <form action={updateAddress} className="flex flex-col gap-6">
           <input type="hidden" name="towId" value={towId} />
           <input type="hidden" name="addressType" value={addressType} />
 

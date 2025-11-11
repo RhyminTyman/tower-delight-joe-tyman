@@ -240,10 +240,7 @@ export const TowDetail = async (requestInfo: RequestInfo) => {
               </svg>
             </a>
 
-            <form action={async (formData: FormData) => {
-              "use server";
-              await capturePhoto(formData);
-            }}>
+            <form action={capturePhoto}>
               <input type="hidden" name="towId" value={towId} />
               <button
                 type="submit"
@@ -262,10 +259,7 @@ export const TowDetail = async (requestInfo: RequestInfo) => {
               </button>
             </form>
 
-            <form action={async (formData: FormData) => {
-              "use server";
-              await addNote(formData);
-            }}>
+            <form action={addNote}>
               <input type="hidden" name="towId" value={towId} />
               <button
                 type="submit"

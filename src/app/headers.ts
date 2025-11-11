@@ -27,6 +27,6 @@ export const setCommonHeaders =
     // Note: 'unsafe-inline' is ignored when nonce is present, so we add hashes for rwsdk-injected inline scripts
     response.headers.set(
       "Content-Security-Policy",
-      `default-src 'self'; script-src 'self' 'unsafe-eval' 'nonce-${nonce}' 'sha256-u3gCCd7D7/bQXTNaXwDy5Sby3o90U9cRBq9SFb5LBNY=' https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' https://images.unsplash.com https://maps.googleapis.com data:; frame-ancestors 'self'; frame-src 'self' https://challenges.cloudflare.com; object-src 'none';`,
+      `default-src 'self'; script-src 'self' 'unsafe-eval' 'nonce-${nonce}' 'sha256-u3gCCd7D7/bQXTNaXwDy5Sby3o90U9cRBq9SFb5LBNY=' https://challenges.cloudflare.com https://maps.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' https://images.unsplash.com https://maps.googleapis.com data:; frame-ancestors 'self'; frame-src 'self' https://challenges.cloudflare.com; object-src 'none'; connect-src 'self' https://maps.googleapis.com;`,
     );
   };

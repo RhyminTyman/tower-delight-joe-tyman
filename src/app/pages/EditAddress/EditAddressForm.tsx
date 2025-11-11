@@ -1,8 +1,4 @@
-"use client";
-
 import { Card } from "@/components/ui/card";
-import { updateAddress } from "./functions";
-import { useState } from "react";
 
 interface EditAddressFormProps {
   towId: string;
@@ -14,44 +10,6 @@ interface EditAddressFormProps {
 }
 
 export function EditAddressForm({ towId, addressType, ticketId, title, address, distance }: EditAddressFormProps) {
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    console.log("[Client] ========== FORM SUBMIT HANDLER CALLED ==========");
-    e.preventDefault();
-    console.log("[Client] Default prevented");
-    setIsSubmitting(true);
-    console.log("[Client] isSubmitting set to true");
-    
-    const formData = new FormData(e.currentTarget);
-    console.log("[Client] FormData created, values:", {
-      towId: formData.get("towId"),
-      addressType: formData.get("addressType"),
-      title: formData.get("title"),
-      address: formData.get("address"),
-      distance: formData.get("distance"),
-    });
-    
-    console.log("[Client] updateAddress function type:", typeof updateAddress);
-    console.log("[Client] About to call server action...");
-    
-    try {
-      const result = await updateAddress(formData);
-      console.log("[Client] Server action returned:", result);
-      
-      // Wait a bit to ensure database write completes
-      await new Promise(resolve => setTimeout(resolve, 500));
-      console.log("[Client] Waited 500ms, now redirecting...");
-      
-      // Redirect after successful save
-      window.location.href = `/tow/${towId}`;
-    } catch (error) {
-      console.error("[Client] Error caught:", error);
-      alert("Failed to save changes: " + (error instanceof Error ? error.message : String(error)));
-      setIsSubmitting(false);
-    }
-  };
-
   return (
     <>
       <header className="border-b border-border bg-card px-4 py-3">
@@ -76,9 +34,7 @@ export function EditAddressForm({ towId, addressType, ticketId, title, address, 
           Update the {addressType} location details
         </p>
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-6">
-          <input type="hidden" name="towId" value={towId} />
-          <input type="hidden" name="addressType" value={addressType} />
+        <form method="POST" className="flex flex-col gap-6">
 
           <Card className="glass-card p-5">
             <div className="flex flex-col gap-4">
@@ -135,10 +91,9 @@ export function EditAddressForm({ towId, addressType, ticketId, title, address, 
             </a>
             <button
               type="submit"
-              disabled={isSubmitting}
-              className="flex-1 rounded-lg bg-primary px-4 py-3 font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 rounded-lg bg-primary px-4 py-3 font-medium text-primary-foreground transition-colors hover:bg-primary/90"
             >
-              {isSubmitting ? "Saving..." : "Save Changes"}
+              Save Changes
             </button>
           </div>
         </form>

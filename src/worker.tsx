@@ -408,6 +408,135 @@ const app = defineApp([
       );
     }
   }),
+  route("/api/seed/drivers", async () => {
+    try {
+      console.log("[Seed Drivers] Starting seed operation...");
+
+      const SEED_DRIVERS = [
+        {
+          id: "driver-001",
+          name: "Jordan Alvarez",
+          role: "Heavy Duty Operator",
+          shift: "Night Shift · 6:00p — 2:00a",
+          truck: "Unit HD-12 · Peterbilt 567",
+          status: "On Call",
+          contactNumber: "+1 (512) 555-0114",
+          callSign: "Tango-12",
+        },
+        {
+          id: "driver-002",
+          name: "Sarah Chen",
+          role: "Light Duty Operator",
+          shift: "Day Shift · 7:00a — 3:00p",
+          truck: "Unit LD-04 · Ford F-450",
+          status: "Active",
+          contactNumber: "+1 (512) 555-0201",
+          callSign: "Alpha-04",
+        },
+        {
+          id: "driver-003",
+          name: "Marcus Williams",
+          role: "Medium Duty Operator",
+          shift: "Swing Shift · 3:00p — 11:00p",
+          truck: "Unit MD-07 · International DuraStar",
+          status: "On Break",
+          contactNumber: "+1 (512) 555-0338",
+          callSign: "Bravo-07",
+        },
+        {
+          id: "driver-004",
+          name: "Emily Rodriguez",
+          role: "Light Duty Operator",
+          shift: "Day Shift · 6:00a — 2:00p",
+          truck: "Unit LD-02 · Chevrolet Silverado 3500",
+          status: "Active",
+          contactNumber: "+1 (512) 555-0445",
+          callSign: "Charlie-02",
+        },
+        {
+          id: "driver-005",
+          name: "David Thompson",
+          role: "Heavy Duty Operator",
+          shift: "Night Shift · 10:00p — 6:00a",
+          truck: "Unit HD-15 · Kenworth T880",
+          status: "Off Duty",
+          contactNumber: "+1 (512) 555-0552",
+          callSign: "Delta-15",
+        },
+      ];
+
+      let insertedCount = 0;
+
+      for (const driver of SEED_DRIVERS) {
+        // Check if driver already exists
+        const existing = await db
+          .selectFrom("driver_dashboard")
+          .select("id")
+          .where("id", "=", driver.id)
+          .executeTakeFirst();
+
+        if (existing) {
+          console.log(`[Seed Drivers] Driver ${driver.id} already exists, skipping...`);
+          continue;
+        }
+
+        const driverData = {
+          ...STATIC_DRIVER_DASHBOARD,
+          driver: {
+            id: driver.id,
+            name: driver.name,
+            role: driver.role,
+            shift: driver.shift,
+            truck: driver.truck,
+            status: driver.status,
+            contactNumber: driver.contactNumber,
+          },
+          route: {
+            ...STATIC_DRIVER_DASHBOARD.route,
+            driverCallsign: driver.callSign,
+            truck: driver.truck,
+          },
+          dispatch: {
+            ...STATIC_DRIVER_DASHBOARD.dispatch,
+            ticketId: `DRIVER-${driver.id}`,
+          },
+        };
+
+        await db
+          .insertInto("driver_dashboard")
+          .values({
+            id: driver.id,
+            payload: JSON.stringify(driverData),
+            updated_at: Math.floor(Date.now() / 1000),
+          })
+          .execute();
+
+        console.log(`[Seed Drivers] Inserted driver: ${driver.id} (${driver.name})`);
+        insertedCount++;
+      }
+
+      const response = Response.json({
+        success: true,
+        message: `Seeded ${insertedCount} drivers`,
+        drivers: SEED_DRIVERS.map(d => ({ id: d.id, name: d.name, callSign: d.callSign })),
+      });
+
+      response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate');
+      response.headers.set('Pragma', 'no-cache');
+
+      return response;
+    } catch (error) {
+      console.error("[Seed Drivers] Failed:", error);
+      return Response.json(
+        {
+          success: false,
+          message: error instanceof Error ? error.message : "Seed drivers failed",
+          error: error instanceof Error ? error.stack : String(error),
+        },
+        { status: 500 }
+      );
+    }
+  }),
 ]);
 
 export default {

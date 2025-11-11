@@ -20,7 +20,7 @@ test.describe("Tow list overview", () => {
 
 test.describe("Tow detail dashboard", () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto("/tow/primary");
+    await page.goto("/tow/tow-001");
   });
 
   test("shows driver identity and current duty status", async ({ page }) => {
@@ -38,13 +38,31 @@ test.describe("Tow detail dashboard", () => {
     await expect(page.getByText(/830 south 17th street, columbus oh 43206/i)).toBeVisible();
   });
 
-  test("has edit addresses button in header", async ({ page }) => {
-    await expect(page.getByRole("link", { name: /edit addresses/i })).toBeVisible();
+  test("has complete toolbar with all action icons", async ({ page }) => {
+    // Back button
+    await expect(page.getByRole("link", { title: "Back to all tows" })).toBeVisible();
+    
+    // Tow number
+    await expect(page.getByText(/tow #tow-001/i)).toBeVisible();
+    
+    // Edit icon
+    await expect(page.locator('a[title="Edit tow"]')).toBeVisible();
+    
+    // Photo icon
+    await expect(page.locator('button[title="Take photo"]')).toBeVisible();
+    
+    // Note icon
+    await expect(page.locator('button[title="Add note"]')).toBeVisible();
   });
 
-  test("has edit icon next to pickup address", async ({ page }) => {
-    const editIcon = page.locator('a[href="/tow/primary/edit"][title="Edit addresses"]').first();
-    await expect(editIcon).toBeVisible();
+  test("has individual edit icons for pickup and destination", async ({ page }) => {
+    // Edit pickup icon
+    const pickupEditIcon = page.locator('a[href="/tow/tow-001/address/pickup"][title="Edit pickup"]');
+    await expect(pickupEditIcon).toBeVisible();
+    
+    // Edit destination icon
+    const destinationEditIcon = page.locator('a[href="/tow/tow-001/address/destination"][title="Edit destination"]');
+    await expect(destinationEditIcon).toBeVisible();
   });
 });
 

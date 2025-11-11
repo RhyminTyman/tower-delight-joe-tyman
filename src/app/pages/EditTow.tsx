@@ -2,8 +2,14 @@ import type { RequestInfo } from "rwsdk/worker";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 
-interface TowAddresses {
+interface TowEditData {
   ticketId: string;
+  vehicle: string;
+  status: string;
+  dispatcher: string;
+  hasKeys: boolean;
+  type: string;
+  poNumber: string;
   pickup: {
     title: string;
     address: string;
@@ -18,7 +24,7 @@ interface TowAddresses {
 
 export const EditTow = async (requestInfo: RequestInfo) => {
   const towId = requestInfo.params.id;
-  const data = await loadTowAddresses(towId);
+  const data = await loadTowData(towId);
   
   if (!data) {
     return <div>Tow not found</div>;
@@ -27,7 +33,7 @@ export const EditTow = async (requestInfo: RequestInfo) => {
   return <EditTowScreen towId={towId} data={data} />;
 };
 
-const EditTowScreen = ({ towId, data }: { towId: string; data: TowAddresses }) => (
+const EditTowScreen = ({ towId, data }: { towId: string; data: TowEditData }) => (
   <div className="relative min-h-screen bg-background">
     <header className="sticky top-0 z-30 border-b border-border/60 bg-slate-950/95 px-4 py-3 backdrop-blur">
       <div className="mx-auto flex max-w-md items-center justify-between">
@@ -44,10 +50,109 @@ const EditTowScreen = ({ towId, data }: { towId: string; data: TowAddresses }) =
     </header>
 
     <main className="mx-auto max-w-md px-4 py-6">
-      <h1 className="mb-6 text-xl font-semibold text-foreground">Edit Addresses</h1>
+      <h1 className="mb-6 text-xl font-semibold text-foreground">Edit Tow</h1>
 
-      <form action={updateAddresses} className="flex flex-col gap-6">
+      <form action={updateTow} className="flex flex-col gap-6">
         <input type="hidden" name="towId" value={towId} />
+
+        <Card className="glass-card p-5">
+          <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-accent">
+            Tow Information
+          </h2>
+
+          <div className="flex flex-col gap-4">
+            <div>
+              <label htmlFor="ticketId" className="mb-1.5 block text-xs text-muted-foreground">
+                Ticket ID
+              </label>
+              <input
+                type="text"
+                id="ticketId"
+                name="ticketId"
+                defaultValue={data.ticketId}
+                className="w-full rounded-lg border border-border/60 bg-slate-900/50 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+                placeholder="e.g. APD-2024-1847"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="vehicle" className="mb-1.5 block text-xs text-muted-foreground">
+                Vehicle Description
+              </label>
+              <input
+                type="text"
+                id="vehicle"
+                name="vehicle"
+                defaultValue={data.vehicle}
+                className="w-full rounded-lg border border-border/60 bg-slate-900/50 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+                placeholder="e.g. 2019 Honda Civic · Silver · ABC-1234"
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label htmlFor="poNumber" className="mb-1.5 block text-xs text-muted-foreground">
+                  PO Number
+                </label>
+                <input
+                  type="text"
+                  id="poNumber"
+                  name="poNumber"
+                  defaultValue={data.poNumber}
+                  className="w-full rounded-lg border border-border/60 bg-slate-900/50 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+                  placeholder="e.g. 123"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="type" className="mb-1.5 block text-xs text-muted-foreground">
+                  Type
+                </label>
+                <select
+                  id="type"
+                  name="type"
+                  defaultValue={data.type}
+                  className="w-full rounded-lg border border-border/60 bg-slate-900/50 px-3 py-2 text-sm text-foreground focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+                >
+                  <option value="Light">Light</option>
+                  <option value="Medium">Medium</option>
+                  <option value="Heavy">Heavy</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label htmlFor="dispatcher" className="mb-1.5 block text-xs text-muted-foreground">
+                  Dispatcher
+                </label>
+                <input
+                  type="text"
+                  id="dispatcher"
+                  name="dispatcher"
+                  defaultValue={data.dispatcher}
+                  className="w-full rounded-lg border border-border/60 bg-slate-900/50 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+                  placeholder="e.g. Kyle Ed"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="hasKeys" className="mb-1.5 block text-xs text-muted-foreground">
+                  Has Keys
+                </label>
+                <select
+                  id="hasKeys"
+                  name="hasKeys"
+                  defaultValue={data.hasKeys ? "yes" : "no"}
+                  className="w-full rounded-lg border border-border/60 bg-slate-900/50 px-3 py-2 text-sm text-foreground focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+                >
+                  <option value="yes">Yes</option>
+                  <option value="no">No</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </Card>
 
         <Card className="glass-card p-5">
           <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-accent">
@@ -157,12 +262,18 @@ const EditTowScreen = ({ towId, data }: { towId: string; data: TowAddresses }) =
   </div>
 );
 
-async function updateAddresses(formData: FormData) {
+async function updateTow(formData: FormData) {
   "use server";
 
   const { db } = await import("@/db");
   
   const towId = formData.get("towId") as string;
+  const ticketId = formData.get("ticketId") as string;
+  const vehicle = formData.get("vehicle") as string;
+  const poNumber = formData.get("poNumber") as string;
+  const type = formData.get("type") as string;
+  const dispatcher = formData.get("dispatcher") as string;
+  const hasKeys = formData.get("hasKeys") === "yes";
   const pickupTitle = formData.get("pickupTitle") as string;
   const pickupAddress = formData.get("pickupAddress") as string;
   const pickupDistance = formData.get("pickupDistance") as string;
@@ -180,6 +291,16 @@ async function updateAddresses(formData: FormData) {
     if (row) {
       const data = JSON.parse(row.payload);
 
+      // Update tow information
+      data.dispatch.ticketId = ticketId;
+      data.dispatch.vehicle = vehicle;
+      
+      // Update route details
+      data.route.poNumber = poNumber;
+      data.route.type = type;
+      data.route.dispatcher = dispatcher;
+      data.route.hasKeys = hasKeys;
+      
       // Update addresses
       data.route.pickup = {
         title: pickupTitle,
@@ -204,11 +325,11 @@ async function updateAddresses(formData: FormData) {
         .execute();
     }
   } catch (error) {
-    console.error("Failed to update addresses:", error);
+    console.error("Failed to update tow:", error);
   }
 }
 
-async function loadTowAddresses(towId: string): Promise<TowAddresses | null> {
+async function loadTowData(towId: string): Promise<TowEditData | null> {
   const { db } = await import("@/db");
   
   try {
@@ -222,12 +343,18 @@ async function loadTowAddresses(towId: string): Promise<TowAddresses | null> {
       const data = JSON.parse(row.payload);
       return {
         ticketId: data.dispatch.ticketId,
+        vehicle: data.dispatch.vehicle,
+        status: data.route.status,
+        dispatcher: data.route.dispatcher,
+        hasKeys: data.route.hasKeys,
+        type: data.route.type,
+        poNumber: data.route.poNumber,
         pickup: data.route.pickup,
         destination: data.route.destination,
       };
     }
   } catch (error) {
-    console.error("Failed to load tow addresses:", error);
+    console.error("Failed to load tow data:", error);
   }
 
   return null;

@@ -73,9 +73,9 @@ const RouteMapCard = ({ route, towId }: { route: DriverDashboardProps["route"]; 
                 <p className="text-xs uppercase tracking-wide text-white/70">Pickup</p>
                 {towId && (
                   <a
-                    href={`/tow/${towId}/edit`}
+                    href={`/tow/${towId}/address/pickup`}
                     className="rounded p-1 hover:bg-white/20 transition-colors"
-                    title="Edit addresses"
+                    title="Edit pickup"
                   >
                     <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -90,7 +90,20 @@ const RouteMapCard = ({ route, towId }: { route: DriverDashboardProps["route"]; 
               ) : null}
             </div>
             <div className="flex-1 text-right">
-              <p className="text-xs uppercase tracking-wide text-white/70">Destination</p>
+              <div className="flex items-center justify-end gap-2">
+                <p className="text-xs uppercase tracking-wide text-white/70">Destination</p>
+                {towId && (
+                  <a
+                    href={`/tow/${towId}/address/destination`}
+                    className="rounded p-1 hover:bg-white/20 transition-colors"
+                    title="Edit destination"
+                  >
+                    <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                  </a>
+                )}
+              </div>
               <p className="text-sm font-semibold leading-tight">{route.destination.title}</p>
               <p className="text-xs text-white/70">{route.destination.address}</p>
               {route.destination.distance ? (

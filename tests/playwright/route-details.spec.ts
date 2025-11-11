@@ -2,7 +2,7 @@ import { test, expect } from "@playwright/test";
 
 test.describe("Route detail card", () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto("/tow/primary");
+    await page.goto("/tow/tow-001");
   });
 
   test("shows PO number, dispatcher, keys, type, driver, and truck info", async ({ page }) => {

@@ -5,6 +5,7 @@ import { defineApp } from "rwsdk/worker";
 import { Document } from "@/app/Document";
 import { STATIC_DRIVER_DASHBOARD, loadDashboardFromDatabase } from "@/app/data/driver-dashboard";
 import { setCommonHeaders } from "@/app/headers";
+import { EditAddress } from "@/app/pages/EditAddress";
 import { EditTow } from "@/app/pages/EditTow";
 import { Home } from "@/app/pages/Home";
 import { TowDetail } from "@/app/pages/TowDetail";
@@ -33,6 +34,7 @@ const app = defineApp([
     route("/", TowList),
     route("/tow/:id", TowDetail),
     route("/tow/:id/edit", EditTow),
+    route("/tow/:id/address/:type", EditAddress),
   ]),
   route("/api/driver-dashboard", async () => {
     const payload = await loadDashboardFromDatabase();

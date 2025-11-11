@@ -401,7 +401,7 @@ export async function loadDashboardFromDatabase(): Promise<DriverDashboardData |
   }
 }
 
-function parseDashboardRow(row: Pick<DriverDashboardRow, "payload">): DriverDashboardData | null {
+export function parseDashboardRow(row: Pick<DriverDashboardRow, "payload">): DriverDashboardData | null {
   try {
     return JSON.parse(row.payload) as DriverDashboardData;
   } catch (error) {

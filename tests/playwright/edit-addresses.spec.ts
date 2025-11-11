@@ -1,12 +1,21 @@
 import { test, expect } from "@playwright/test";
 
-test.describe("Edit tow addresses", () => {
+test.describe("Edit tow", () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto("/tow/primary/edit");
+    await page.goto("/tow/tow-001/edit");
   });
 
-  test("shows edit form with pickup and destination fields", async ({ page }) => {
-    await expect(page.getByRole("heading", { name: /edit addresses/i })).toBeVisible();
+  test("shows edit form with all tow fields", async ({ page }) => {
+    await expect(page.getByRole("heading", { name: /edit tow/i })).toBeVisible();
+    
+    // Tow information section
+    await expect(page.getByText(/tow information/i)).toBeVisible();
+    await expect(page.getByLabel(/ticket id/i)).toBeVisible();
+    await expect(page.getByLabel(/vehicle description/i)).toBeVisible();
+    await expect(page.getByLabel(/po number/i)).toBeVisible();
+    await expect(page.getByLabel(/type/i)).toBeVisible();
+    await expect(page.getByLabel(/dispatcher/i)).toBeVisible();
+    await expect(page.getByLabel(/has keys/i)).toBeVisible();
     
     // Pickup section
     await expect(page.getByText(/pickup location/i)).toBeVisible();
@@ -26,7 +35,7 @@ test.describe("Edit tow addresses", () => {
 
   test("has cancel link that goes back to tow detail", async ({ page }) => {
     await expect(page.getByRole("link", { name: /cancel/i })).toBeVisible();
-    await expect(page.getByRole("link", { name: /cancel/i })).toHaveAttribute("href", "/tow/primary");
+    await expect(page.getByRole("link", { name: /cancel/i })).toHaveAttribute("href", "/tow/tow-001");
   });
 
   test("displays current address values in form fields", async ({ page }) => {

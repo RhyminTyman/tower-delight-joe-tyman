@@ -2,7 +2,7 @@ import { test, expect } from "@playwright/test";
 
 test.describe("Next action guidance", () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto("/tow/primary");
+    await page.goto("/tow/tow-001");
   });
 
   test("pins the next best action above the call-to-action button", async ({ page }) => {

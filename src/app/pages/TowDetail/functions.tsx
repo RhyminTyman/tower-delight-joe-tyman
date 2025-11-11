@@ -2,6 +2,55 @@
 
 import { db } from "@/db";
 
+export async function updateStatus(formData: FormData) {
+  const towId = formData.get("towId") as string;
+
+  try {
+    const row = await db
+      .selectFrom("driver_dashboard")
+      .select("payload")
+      .where("id", "=", towId)
+      .executeTakeFirst();
+
+    if (row) {
+      const data = typeof row.payload === 'string' ? JSON.parse(row.payload) : row.payload;
+
+      // Advance the workflow to next status
+      const currentActiveIndex = data.route.statuses.findIndex((s: any) => s.status === "active");
+      if (currentActiveIndex >= 0 && currentActiveIndex < data.route.statuses.length - 1) {
+        // Mark current as completed
+        data.route.statuses[currentActiveIndex].status = "completed";
+        data.route.statuses[currentActiveIndex].time = new Date().toLocaleTimeString("en-US", {
+          hour: "numeric",
+          minute: "2-digit",
+        });
+
+        // Mark next as active
+        data.route.statuses[currentActiveIndex + 1].status = "active";
+        data.route.statuses[currentActiveIndex + 1].time = new Date().toLocaleTimeString("en-US", {
+          hour: "numeric",
+          minute: "2-digit",
+        });
+
+        // Update route status label
+        data.route.status = data.route.statuses[currentActiveIndex + 1].label;
+      }
+
+      // Save back to database
+      await db
+        .updateTable("driver_dashboard")
+        .set({
+          payload: JSON.stringify(data),
+          updated_at: Math.floor(Date.now() / 1000),
+        })
+        .where("id", "=", towId)
+        .execute();
+    }
+  } catch (error) {
+    console.error("Failed to update status:", error);
+  }
+}
+
 export async function capturePhoto(formData: FormData) {
   const towId = formData.get("towId") as string;
 

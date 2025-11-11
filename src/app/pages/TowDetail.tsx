@@ -4,109 +4,10 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { db } from "@/db";
 import { parseDashboardRow } from "@/app/data/driver-dashboard";
-import { capturePhoto, addNote } from "./TowDetail/functions";
+import { capturePhoto, addNote, updateStatus } from "./TowDetail/functions";
 
 const MAP_PLACEHOLDER =
   "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?q=80&w=1600&auto=format&fit=crop";
-
-async function updateStatus(formData: FormData) {
-  "use server";
-
-  const towId = formData.get("towId") as string;
-
-  try {
-    const row = await db
-      .selectFrom("driver_dashboard")
-      .select("payload")
-      .where("id", "=", towId)
-      .executeTakeFirst();
-
-    if (row) {
-      const data = typeof row.payload === 'string' ? JSON.parse(row.payload) : row.payload;
-
-      // Advance the workflow to next status
-      const currentActiveIndex = data.route.statuses.findIndex((s: any) => s.status === "active");
-      if (currentActiveIndex >= 0 && currentActiveIndex < data.route.statuses.length - 1) {
-        // Mark current as completed
-        data.route.statuses[currentActiveIndex].status = "completed";
-        data.route.statuses[currentActiveIndex].time = new Date().toLocaleTimeString("en-US", {
-          hour: "numeric",
-          minute: "2-digit",
-        });
-
-        // Mark next as active
-        data.route.statuses[currentActiveIndex + 1].status = "active";
-        data.route.statuses[currentActiveIndex + 1].time = new Date().toLocaleTimeString("en-US", {
-          hour: "numeric",
-          minute: "2-digit",
-        });
-
-        // Update route status label
-        data.route.status = data.route.statuses[currentActiveIndex + 1].label;
-      }
-
-      // Save back to database
-      await db
-        .updateTable("driver_dashboard")
-        .set({
-          payload: JSON.stringify(data),
-          updated_at: Math.floor(Date.now() / 1000),
-        })
-        .where("id", "=", towId)
-        .execute();
-    }
-  } catch (error) {
-    console.error("Failed to update status:", error);
-  }
-}
-
-async function startCapture(formData: FormData) {
-  "use server";
-
-  const towId = formData.get("towId") as string;
-
-  try {
-    const row = await db
-      .selectFrom("driver_dashboard")
-      .select("payload")
-      .where("id", "=", towId)
-      .executeTakeFirst();
-
-    if (row) {
-      const data = typeof row.payload === 'string' ? JSON.parse(row.payload) : row.payload;
-
-      // Mark VIN scan checklist item as complete
-      const vinScanItem = data.checklist?.find((item: any) => item.id === "vin-scan");
-      if (vinScanItem) {
-        vinScanItem.complete = true;
-      }
-
-      // Mark photo proof checklist item as complete
-      const photoProofItem = data.checklist?.find((item: any) => item.id === "photo-proof");
-      if (photoProofItem) {
-        photoProofItem.complete = true;
-      }
-
-      // Update next action
-      data.nextAction = {
-        label: "Review captured evidence",
-        detail: "VIN and photos captured. Ready for impound intake.",
-      };
-
-      // Save back to database
-      await db
-        .updateTable("driver_dashboard")
-        .set({
-          payload: JSON.stringify(data),
-          updated_at: Math.floor(Date.now() / 1000),
-        })
-        .where("id", "=", towId)
-        .execute();
-    }
-  } catch (error) {
-    console.error("Failed to start capture:", error);
-  }
-}
 
 export const TowDetail = async (requestInfo: RequestInfo) => {
   const towId = requestInfo.params.id;
@@ -217,12 +118,15 @@ export const TowDetail = async (requestInfo: RequestInfo) => {
             <div className="absolute inset-0 bg-gradient-to-br from-black/20 via-black/40 to-black/70" />
             <div className="relative flex h-full flex-col justify-between p-5 text-white">
               <div className="flex items-center justify-between">
-                <Badge
-                  variant={data.route.statusTone === "active" ? "accent" : "muted"}
-                  className="bg-white/10 px-4 py-2 text-xs uppercase tracking-wide"
-                >
-                  {data.route.status}
-                </Badge>
+                <form action={updateStatus}>
+                  <input type="hidden" name="towId" value={towId} />
+                  <button
+                    type="submit"
+                    className="rounded-full bg-white/10 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-white transition-colors hover:bg-white/20"
+                  >
+                    {data.route.status}
+                  </button>
+                </form>
               </div>
               <div className="flex flex-col gap-3 rounded-2xl bg-black/45 p-4 backdrop-blur">
                 {/* Pickup Row */}

@@ -9,12 +9,16 @@ export async function updateAddress(formData: FormData) {
   const address = formData.get("address") as string;
   const distance = formData.get("distance") as string;
 
+  console.log("[updateAddress] Starting:", { towId, addressType, title, address, distance });
+
   try {
     const row = await db
       .selectFrom("driver_dashboard")
       .select("payload")
       .where("id", "=", towId)
       .executeTakeFirst();
+
+    console.log("[updateAddress] Row found:", !!row);
 
     if (row) {
       const data = typeof row.payload === 'string' ? JSON.parse(row.payload) : row.payload;
@@ -25,15 +29,17 @@ export async function updateAddress(formData: FormData) {
           address,
           distance,
         };
+        console.log("[updateAddress] Updated pickup");
       } else if (addressType === "destination") {
         data.route.destination = {
           title,
           address,
           distance,
         };
+        console.log("[updateAddress] Updated destination");
       }
 
-      await db
+      const result = await db
         .updateTable("driver_dashboard")
         .set({
           payload: JSON.stringify(data),
@@ -41,9 +47,10 @@ export async function updateAddress(formData: FormData) {
         })
         .where("id", "=", towId)
         .execute();
+      
+      console.log("[updateAddress] Database update result:", result);
     }
   } catch (error) {
-    console.error("Failed to update address:", error);
+    console.error("[updateAddress] Failed to update address:", error);
   }
 }
-

@@ -17,12 +17,16 @@ export async function updateTow(formData: FormData) {
   const driverCallsign = formData.get("driverCallsign") as string;
   const truck = formData.get("truck") as string;
 
+  console.log("[updateTow] Starting for towId:", towId);
+
   try {
     const row = await db
       .selectFrom("driver_dashboard")
       .select("payload")
       .where("id", "=", towId)
       .executeTakeFirst();
+
+    console.log("[updateTow] Row found:", !!row);
 
     if (row) {
       const data = typeof row.payload === 'string' ? JSON.parse(row.payload) : row.payload;
@@ -43,7 +47,7 @@ export async function updateTow(formData: FormData) {
       data.route.driverCallsign = driverCallsign;
       data.route.truck = truck;
 
-      await db
+      const result = await db
         .updateTable("driver_dashboard")
         .set({
           payload: JSON.stringify(data),
@@ -51,9 +55,10 @@ export async function updateTow(formData: FormData) {
         })
         .where("id", "=", towId)
         .execute();
+      
+      console.log("[updateTow] Database update result:", result);
     }
   } catch (error) {
-    console.error("Failed to update tow:", error);
+    console.error("[updateTow] Failed to update tow:", error);
   }
 }
-

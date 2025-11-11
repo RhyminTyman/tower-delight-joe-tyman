@@ -7,15 +7,21 @@ interface TowActionsProps {
 
 export function TowActions({ towId, currentStatus }: TowActionsProps) {
   const handlePhoto = async () => {
+    console.log('[TowActions] Photo button clicked, towId:', towId);
     try {
+      console.log('[TowActions] Calling API...');
       const response = await fetch(`/api/tow/${towId}/photo`, {
         method: 'POST',
       });
+      console.log('[TowActions] API response:', response.status);
       if (response.ok) {
+        console.log('[TowActions] Success, reloading page');
         window.location.reload();
+      } else {
+        console.error('[TowActions] API returned error:', response.status);
       }
     } catch (error) {
-      console.error('Failed to capture photo:', error);
+      console.error('[TowActions] Failed to capture photo:', error);
     }
   };
 
@@ -45,15 +51,21 @@ interface StatusButtonProps {
 
 export function StatusButton({ towId, currentStatus }: StatusButtonProps) {
   const handleStatusChange = async () => {
+    console.log('[StatusButton] Status button clicked, towId:', towId);
     try {
+      console.log('[StatusButton] Calling API...');
       const response = await fetch(`/api/tow/${towId}/status`, {
         method: 'POST',
       });
+      console.log('[StatusButton] API response:', response.status);
       if (response.ok) {
+        console.log('[StatusButton] Success, reloading page');
         window.location.reload();
+      } else {
+        console.error('[StatusButton] API returned error:', response.status);
       }
     } catch (error) {
-      console.error('Failed to update status:', error);
+      console.error('[StatusButton] Failed to update status:', error);
     }
   };
 

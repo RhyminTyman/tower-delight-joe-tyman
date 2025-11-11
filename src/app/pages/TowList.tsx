@@ -21,18 +21,9 @@ interface TowItem {
 }
 
 export const TowList = async (requestInfo: RequestInfo) => {
-  console.log("=== TowList component called ===");
-  console.log("TowList: About to call loadTowList()");
-  
   const tows = await loadTowList();
+
   
-  console.log("TowList: loadTowList returned", tows.length, "tows");
-  
-  // Prevent caching of this page
-  requestInfo.response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
-  requestInfo.response.headers.set('Pragma', 'no-cache');
-  
-  console.log("TowList: About to render TowListScreen");
   return <TowListScreen tows={tows} />;
 };
 
@@ -147,57 +138,37 @@ const TowCard = ({ tow }: { tow: TowItem }) => (
 );
 
 async function loadTowList(): Promise<TowItem[]> {
-  console.log("[TowList] START - Function called");
-  
   try {
-    console.log("[TowList] About to check db...");
-    
-    if (!db) {
-      console.error("[TowList] ERROR: db is undefined!");
-      return [];
-    }
-    
-    console.log("[TowList] DB exists, typeof:", typeof db);
-    console.log("[TowList] About to query database...");
-    
     const rows = await db.selectFrom("driver_dashboard").select(["id", "payload"]).execute();
     
-    console.log(`[TowList] Query complete! Found ${rows.length} rows`);
-    
-    if (rows.length === 0) {
-      console.warn("[TowList] Database returned 0 rows - database is empty!");
-      return [];
-    }
-    
-    console.log("[TowList] Row IDs:", rows.map(r => r.id).join(", "));
-
-    const tows = rows.map((row) => {
-      console.log("[TowList] Processing row, payload type:", typeof row.payload);
-      const data = typeof row.payload === 'string' ? JSON.parse(row.payload) : row.payload;
-      return {
-        id: row.id,
-        ticketId: data.dispatch.ticketId,
-        status: data.route.status,
-        statusTone: data.route.statusTone,
-        vehicle: data.dispatch.vehicle,
-        pickup: {
-          title: data.route.pickup.title,
-          address: data.route.pickup.address,
-        },
-        destination: {
-          title: data.route.destination.title,
-          address: data.route.destination.address,
-        },
-        etaMinutes: data.dispatch.etaMinutes,
-      };
+    const tows = rows.filter(row => row.payload).map((row) => {
+      try {
+        const data = typeof row.payload === 'string' ? JSON.parse(row.payload) : row.payload;
+        return {
+          id: row.id,
+          ticketId: data?.dispatch?.ticketId || '',
+          status: data?.route?.status || '',
+          statusTone: (data?.route?.statusTone || 'waiting') as "waiting" | "active" | "completed",
+          vehicle: data?.dispatch?.vehicle || '',
+          pickup: {
+            title: data?.route?.pickup?.title || '',
+            address: data?.route?.pickup?.address || '',
+          },
+          destination: {
+            title: data?.route?.destination?.title || '',
+            address: data?.route?.destination?.address || '',
+          },
+          etaMinutes: data?.dispatch?.etaMinutes,
+        };
+      } catch (err) {
+        console.error("[TowList] Error parsing row:", row.id, err);
+        throw err;
+      }
     });
     
-    console.log(`[TowList] Successfully mapped ${tows.length} tows`);
     return tows;
   } catch (error) {
-    console.error("[TowList] EXCEPTION:", error);
-    console.error("[TowList] Error message:", error instanceof Error ? error.message : String(error));
-    console.error("[TowList] Error stack:", error instanceof Error ? error.stack : "no stack");
+    console.error("[TowList] Failed to load tow list:", error);
     return [];
   }
 }

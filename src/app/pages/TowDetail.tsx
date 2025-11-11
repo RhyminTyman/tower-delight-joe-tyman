@@ -5,99 +5,6 @@ import { Card } from "@/components/ui/card";
 import { db } from "@/db";
 import { parseDashboardRow } from "@/app/data/driver-dashboard";
 
-export const TowDetail = async (requestInfo: RequestInfo) => {
-  const towId = requestInfo.params.id;
-  const data = await loadTowDetail(towId);
-  
-  if (!data) {
-    return <div>Tow not found</div>;
-  }
-
-  return (
-    <div className="relative min-h-screen bg-background">
-      <TowDetailHeader towId={towId} />
-      <DriverDashboard {...data} towId={towId} />
-    </div>
-  );
-};
-
-const TowDetailHeader = ({ towId }: { towId: string }) => (
-  <header className="sticky top-0 z-30 border-b border-border/60 bg-slate-950/95 px-4 py-3 backdrop-blur">
-    <div className="mx-auto flex max-w-md items-center justify-between gap-3">
-      {/* Back button */}
-      <a
-        href="/"
-        className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-white/10 hover:text-foreground"
-        title="Back to all tows"
-      >
-        <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-        </svg>
-      </a>
-
-      {/* Tow number - centered */}
-      <div className="flex-1 text-center">
-        <span className="text-sm font-semibold text-foreground">TOW #{towId.toUpperCase()}</span>
-      </div>
-
-      {/* Action icons */}
-      <div className="flex items-center gap-1">
-        <a
-          href={`/tow/${towId}/edit`}
-          className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-white/10 hover:text-foreground"
-          title="Edit tow"
-        >
-          <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-            />
-          </svg>
-        </a>
-
-        <form action={capturePhoto}>
-          <input type="hidden" name="towId" value={towId} />
-          <button
-            type="submit"
-            className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-white/10 hover:text-foreground"
-            title="Take photo"
-          >
-            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
-              />
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-            </svg>
-          </button>
-        </form>
-
-        <form action={addNote}>
-          <input type="hidden" name="towId" value={towId} />
-          <button
-            type="submit"
-            className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-white/10 hover:text-foreground"
-            title="Add note"
-          >
-            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-              />
-            </svg>
-          </button>
-        </form>
-      </div>
-    </div>
-  </header>
-);
-
 // Server Actions
 async function capturePhoto(formData: FormData) {
   "use server";
@@ -188,6 +95,107 @@ async function addNote(formData: FormData) {
     console.error("Failed to add note:", error);
   }
 }
+
+export const TowDetail = async (requestInfo: RequestInfo) => {
+  const towId = requestInfo.params.id;
+  const data = await loadTowDetail(towId);
+
+  if (!data) {
+    return <div>Tow not found</div>;
+  }
+
+  return (
+    <div className="relative min-h-screen bg-background">
+      <TowDetailHeader towId={towId} capturePhoto={capturePhoto} addNote={addNote} />
+      <DriverDashboard {...data} towId={towId} />
+    </div>
+  );
+};
+
+const TowDetailHeader = ({ 
+  towId, 
+  capturePhoto, 
+  addNote 
+}: { 
+  towId: string;
+  capturePhoto: (formData: FormData) => Promise<void>;
+  addNote: (formData: FormData) => Promise<void>;
+}) => (
+  <header className="sticky top-0 z-30 border-b border-border/60 bg-slate-950/95 px-4 py-3 backdrop-blur">
+    <div className="mx-auto flex max-w-md items-center justify-between gap-3">
+      {/* Back button */}
+      <a
+        href="/"
+        className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-white/10 hover:text-foreground"
+        title="Back to all tows"
+      >
+        <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+        </svg>
+      </a>
+
+      {/* Tow number - centered */}
+      <div className="flex-1 text-center">
+        <span className="text-sm font-semibold text-foreground">TOW #{towId.toUpperCase()}</span>
+      </div>
+
+      {/* Action icons */}
+      <div className="flex items-center gap-1">
+        <a
+          href={`/tow/${towId}/edit`}
+          className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-white/10 hover:text-foreground"
+          title="Edit tow"
+        >
+          <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+            />
+          </svg>
+        </a>
+
+        <form action={capturePhoto}>
+          <input type="hidden" name="towId" value={towId} />
+          <button
+            type="submit"
+            className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-white/10 hover:text-foreground"
+            title="Take photo"
+          >
+            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
+              />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+          </button>
+        </form>
+
+        <form action={addNote}>
+          <input type="hidden" name="towId" value={towId} />
+          <button
+            type="submit"
+            className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-white/10 hover:text-foreground"
+            title="Add note"
+          >
+            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+              />
+            </svg>
+          </button>
+        </form>
+      </div>
+    </div>
+  </header>
+);
 
 async function loadTowDetail(towId: string) {
   try {

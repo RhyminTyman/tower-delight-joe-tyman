@@ -37,7 +37,7 @@ export function EditAddressForm({ towId, addressType, ticketId, title, address, 
           Update the {addressType} location details
         </p>
 
-        <form className="flex flex-col gap-6">
+        <form action={updateAddress} className="flex flex-col gap-6">
           <input type="hidden" name="towId" value={towId} />
           <input type="hidden" name="addressType" value={addressType} />
 
@@ -96,7 +96,6 @@ export function EditAddressForm({ towId, addressType, ticketId, title, address, 
             </a>
             <button
               type="submit"
-              formAction={updateAddress}
               className="flex-1 rounded-lg bg-primary px-4 py-3 font-medium text-primary-foreground transition-colors hover:bg-primary/90"
             >
               Save Changes

@@ -2,7 +2,11 @@
 
 import { db } from "@/db";
 
+console.log("✅ [MODULE LOAD] AddNote/functions.tsx module loaded at:", new Date().toISOString());
+console.log("✅ [MODULE LOAD] addNote function defined");
+
 export async function addNote(formData: FormData) {
+  console.log("🔥 [ENTRY POINT] addNote function CALLED at:", new Date().toISOString());
   const towId = formData.get("towId") as string;
   const noteText = formData.get("note") as string;
 

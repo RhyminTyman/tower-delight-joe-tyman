@@ -60,6 +60,6 @@ export async function updateTow(formData: FormData) {
     }
   } catch (error) {
     console.error("[updateTow] Failed to update tow:", error);
+    throw error;
   }
-
 }

@@ -2,7 +2,11 @@
 
 import { db } from "@/db";
 
+console.log("✅ [MODULE LOAD] EditAddress/functions.tsx module loaded at:", new Date().toISOString());
+console.log("✅ [MODULE LOAD] updateAddress function defined");
+
 export async function updateAddress(formData: FormData) {
+  console.log("🔥 [ENTRY POINT] updateAddress function CALLED at:", new Date().toISOString());
   const timestamp = new Date().toISOString();
   console.log(`[updateAddress ${timestamp}] ========== SERVER ACTION CALLED ==========`);
   console.log(`[updateAddress ${timestamp}] Function invoked at top level`);

@@ -15,11 +15,15 @@ interface TowEditData {
     title: string;
     address: string;
     distance: string;
+    lat?: number;
+    lng?: number;
   };
   destination: {
     title: string;
     address: string;
     distance: string;
+    lat?: number;
+    lng?: number;
   };
   driverCallsign?: string;
   truck?: string;
@@ -54,9 +58,13 @@ export function EditTowForm({ towId, data }: EditTowFormProps) {
         pickupTitle: data.pickup.title,
         pickupAddress: data.pickup.address,
         pickupDistance: data.pickup.distance,
+        pickupLat: data.pickup.lat?.toString() ?? "",
+        pickupLng: data.pickup.lng?.toString() ?? "",
         destinationTitle: data.destination.title,
         destinationAddress: data.destination.address,
         destinationDistance: data.destination.distance,
+        destinationLat: data.destination.lat?.toString() ?? "",
+        destinationLng: data.destination.lng?.toString() ?? "",
         dispatcher: data.dispatcher,
         hasKeys: data.hasKeys ? "yes" : "no",
         poNumber: data.poNumber,

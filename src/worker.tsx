@@ -495,6 +495,40 @@ const app = defineApp([
       );
     }
   }),
+  route("/api/seed/drivers/reset", async () => {
+    try {
+      console.log("[Reset Drivers] Deleting all driver entries...");
+      
+      // Delete all driver entries (they all have IDs starting with "driver-")
+      const result = await db
+        .deleteFrom("driver_dashboard")
+        .where("id", "like", "driver-%")
+        .execute();
+      
+      console.log(`[Reset Drivers] Deleted driver entries`);
+      
+      return new Response(
+        JSON.stringify({ 
+          success: true, 
+          message: "All drivers deleted. Visit /api/seed/drivers to reseed."
+        }),
+        { 
+          status: 200,
+          headers: { "Content-Type": "application/json" }
+        }
+      );
+    } catch (error) {
+      console.error("[Reset Drivers] Error:", error);
+      return new Response(
+        JSON.stringify({ success: false, error: String(error) }),
+        { 
+          status: 500,
+          headers: { "Content-Type": "application/json" }
+        }
+      );
+    }
+  }),
+
   route("/api/seed/drivers", async () => {
     try {
       console.log("[Seed Drivers] Starting seed operation...");

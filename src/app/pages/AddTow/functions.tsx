@@ -101,9 +101,18 @@ export async function createTow(formData: FormData) {
 
   const { driver, driverCallsign, truck } = await resolveDriverSnapshot(driverId);
 
-  // Generate random GPS coordinates for pickup and destination
-  const pickupCoords = generateRandomCoordinates();
-  const destinationCoords = generateRandomCoordinates();
+  // Use provided GPS coordinates or generate random ones
+  const pickupLatStr = (formData.get("pickupLat") as string | null)?.trim();
+  const pickupLngStr = (formData.get("pickupLng") as string | null)?.trim();
+  const destinationLatStr = (formData.get("destinationLat") as string | null)?.trim();
+  const destinationLngStr = (formData.get("destinationLng") as string | null)?.trim();
+  
+  const pickupCoords = (pickupLatStr && pickupLngStr) 
+    ? { lat: parseFloat(pickupLatStr), lng: parseFloat(pickupLngStr) }
+    : generateRandomCoordinates();
+  const destinationCoords = (destinationLatStr && destinationLngStr)
+    ? { lat: parseFloat(destinationLatStr), lng: parseFloat(destinationLngStr) }
+    : generateRandomCoordinates();
 
   const payload = cloneDashboard();
 

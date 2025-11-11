@@ -10,6 +10,26 @@ const STATUS_OPTIONS = ["Light", "Medium", "Heavy"] as const;
 
 export type TowTypeOption = (typeof STATUS_OPTIONS)[number];
 
+const GOOGLE_MAPS_API_KEY = 'AIzaSyBa684TfLdTXSODlil08SYZNWvm5yCqApQ';
+
+// Load Google Maps script
+function loadGoogleMapsScript(): Promise<void> {
+  return new Promise((resolve, reject) => {
+    if (typeof window !== 'undefined' && (window as any).google?.maps?.places) {
+      resolve();
+      return;
+    }
+
+    const script = document.createElement('script');
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_API_KEY}&libraries=places`;
+    script.async = true;
+    script.defer = true;
+    script.onload = () => resolve();
+    script.onerror = () => reject(new Error('Failed to load Google Maps script'));
+    document.head.appendChild(script);
+  });
+}
+
 export type DriverOption = {
   id: string;
   name: string;
@@ -29,9 +49,13 @@ type TowFormValues = {
   pickupTitle: string;
   pickupAddress: string;
   pickupDistance: string;
+  pickupLat: string;
+  pickupLng: string;
   destinationTitle: string;
   destinationAddress: string;
   destinationDistance: string;
+  destinationLat: string;
+  destinationLng: string;
   poNumber: string;
   dispatcher: string;
   hasKeys: string;
@@ -61,9 +85,13 @@ const defaultValues: TowFormValues = {
   pickupTitle: "",
   pickupAddress: "",
   pickupDistance: "",
+  pickupLat: "",
+  pickupLng: "",
   destinationTitle: "",
   destinationAddress: "",
   destinationDistance: "",
+  destinationLat: "",
+  destinationLng: "",
   poNumber: "",
   dispatcher: "",
   hasKeys: "no",
@@ -111,6 +139,8 @@ export function TowForm({
   }, [driverOptions, formValues.driverId, mode]);
 
   const [isSaving, setIsSaving] = useState(false);
+  const pickupInputRef = useRef<HTMLInputElement>(null);
+  const destinationInputRef = useRef<HTMLInputElement>(null);
 
   const requiresDriver = mode === "create" && driverOptions.length > 0;
 
@@ -145,6 +175,75 @@ export function TowForm({
     }));
   };
 
+  // Initialize Google Maps Autocomplete
+  useEffect(() => {
+    let pickupAutocomplete: any;
+    let destinationAutocomplete: any;
+
+    const initAutocomplete = async () => {
+      try {
+        await loadGoogleMapsScript();
+        const google = (window as any).google;
+
+        // Pickup autocomplete
+        if (pickupInputRef.current) {
+          pickupAutocomplete = new google.maps.places.Autocomplete(pickupInputRef.current, {
+            types: ['address'],
+          });
+
+          pickupAutocomplete.addListener('place_changed', () => {
+            const place = pickupAutocomplete.getPlace();
+            if (place.geometry && place.geometry.location) {
+              const lat = place.geometry.location.lat();
+              const lng = place.geometry.location.lng();
+              setFormValues((prev) => ({
+                ...prev,
+                pickupAddress: place.formatted_address || prev.pickupAddress,
+                pickupLat: lat.toFixed(4),
+                pickupLng: lng.toFixed(4),
+              }));
+            }
+          });
+        }
+
+        // Destination autocomplete
+        if (destinationInputRef.current) {
+          destinationAutocomplete = new google.maps.places.Autocomplete(destinationInputRef.current, {
+            types: ['address'],
+          });
+
+          destinationAutocomplete.addListener('place_changed', () => {
+            const place = destinationAutocomplete.getPlace();
+            if (place.geometry && place.geometry.location) {
+              const lat = place.geometry.location.lat();
+              const lng = place.geometry.location.lng();
+              setFormValues((prev) => ({
+                ...prev,
+                destinationAddress: place.formatted_address || prev.destinationAddress,
+                destinationLat: lat.toFixed(4),
+                destinationLng: lng.toFixed(4),
+              }));
+            }
+          });
+        }
+      } catch (error) {
+        console.error('[Autocomplete] Failed to initialize:', error);
+      }
+    };
+
+    initAutocomplete();
+
+    return () => {
+      // Cleanup autocomplete listeners
+      if (pickupAutocomplete) {
+        google.maps.event.clearInstanceListeners(pickupAutocomplete);
+      }
+      if (destinationAutocomplete) {
+        google.maps.event.clearInstanceListeners(destinationAutocomplete);
+      }
+    };
+  }, []);
+
   const towTypeFieldName = mode === "edit" ? "type" : "towType";
 
   const handleAction = async (formData: FormData) => {
@@ -159,6 +258,12 @@ export function TowForm({
       if (requiresDriver) {
         formData.set("driverId", formValues.driverId);
       }
+      // Add lat/lng coordinates if available
+      if (formValues.pickupLat) formData.set("pickupLat", formValues.pickupLat);
+      if (formValues.pickupLng) formData.set("pickupLng", formValues.pickupLng);
+      if (formValues.destinationLat) formData.set("destinationLat", formValues.destinationLat);
+      if (formValues.destinationLng) formData.set("destinationLng", formValues.destinationLng);
+      
       await onSubmit(formData, formValues.towId);
     } catch (error) {
       console.error("[TowForm] Submission failed:", error);
@@ -436,18 +541,25 @@ export function TowForm({
               </div>
               <div>
                 <label htmlFor="pickupAddress" className="mb-1.5 block text-xs text-muted-foreground">
-                  Address
+                  Address {formValues.pickupLat && <span className="text-green-500">✓</span>}
                 </label>
-                <textarea
+                <input
+                  ref={pickupInputRef}
+                  type="text"
                   id="pickupAddress"
                   name="pickupAddress"
                   value={formValues.pickupAddress}
                   onChange={handleChange("pickupAddress")}
                   required
-                  rows={2}
                   className="w-full rounded-lg border border-border/60 bg-slate-900/50 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
-                  placeholder="Street, City, State"
+                  placeholder="Start typing an address..."
+                  autoComplete="off"
                 />
+                {formValues.pickupLat && formValues.pickupLng && (
+                  <p className="mt-1 text-xs text-green-500">
+                    📍 GPS coordinates set
+                  </p>
+                )}
               </div>
               <div>
                 <label htmlFor="pickupDistance" className="mb-1.5 block text-xs text-muted-foreground">
@@ -484,18 +596,25 @@ export function TowForm({
               </div>
               <div>
                 <label htmlFor="destinationAddress" className="mb-1.5 block text-xs text-muted-foreground">
-                  Address
+                  Address {formValues.destinationLat && <span className="text-green-500">✓</span>}
                 </label>
-                <textarea
+                <input
+                  ref={destinationInputRef}
+                  type="text"
                   id="destinationAddress"
                   name="destinationAddress"
                   value={formValues.destinationAddress}
                   onChange={handleChange("destinationAddress")}
                   required
-                  rows={2}
                   className="w-full rounded-lg border border-border/60 bg-slate-900/50 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
-                  placeholder="Street, City, State"
+                  placeholder="Start typing an address..."
+                  autoComplete="off"
                 />
+                {formValues.destinationLat && formValues.destinationLng && (
+                  <p className="mt-1 text-xs text-green-500">
+                    📍 GPS coordinates set
+                  </p>
+                )}
               </div>
               <div>
                 <label htmlFor="destinationDistance" className="mb-1.5 block text-xs text-muted-foreground">

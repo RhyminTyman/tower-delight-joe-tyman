@@ -2,14 +2,36 @@
 
 import { db } from "@/db";
 
+const GOOGLE_MAPS_API_KEY = 'AIzaSyBa684TfLdTXSODlil08SYZNWvm5yCqApQ';
+
+// Generate map URL from GPS coordinates using Google Maps Static API
+function generateMapUrl(pickup: any, destination: any) {
+  if (!pickup.lat || !pickup.lng || !destination.lat || !destination.lng) {
+    return undefined;
+  }
+  
+  const markers = [
+    `color:red|label:A|${pickup.lat},${pickup.lng}`,
+    `color:green|label:B|${destination.lat},${destination.lng}`
+  ].join('&markers=');
+  
+  const path = `color:0x0066ff|weight:3|${pickup.lat},${pickup.lng}|${destination.lat},${destination.lng}`;
+  
+  return `https://maps.googleapis.com/maps/api/staticmap?size=600x400&scale=2&maptype=roadmap&markers=${markers}&path=${path}&key=${GOOGLE_MAPS_API_KEY}`;
+}
+
 export async function updateTow(formData: FormData) {
   const towId = formData.get("towId") as string;
   const ticketId = formData.get("ticketId") as string;
   const vehicle = formData.get("vehicle") as string;
   const pickupTitle = formData.get("pickupTitle") as string;
   const pickupAddress = formData.get("pickupAddress") as string;
+  const pickupLatStr = (formData.get("pickupLat") as string | null)?.trim();
+  const pickupLngStr = (formData.get("pickupLng") as string | null)?.trim();
   const destinationTitle = formData.get("destinationTitle") as string;
   const destinationAddress = formData.get("destinationAddress") as string;
+  const destinationLatStr = (formData.get("destinationLat") as string | null)?.trim();
+  const destinationLngStr = (formData.get("destinationLng") as string | null)?.trim();
   const poNumber = formData.get("poNumber") as string;
   const dispatcher = formData.get("dispatcher") as string;
   const hasKeys = formData.get("hasKeys") === "on";
@@ -38,14 +60,29 @@ export async function updateTow(formData: FormData) {
       // Update route info
       data.route.pickup.title = pickupTitle;
       data.route.pickup.address = pickupAddress;
+      if (pickupLatStr && pickupLngStr) {
+        data.route.pickup.lat = parseFloat(pickupLatStr);
+        data.route.pickup.lng = parseFloat(pickupLngStr);
+      }
       data.route.destination.title = destinationTitle;
       data.route.destination.address = destinationAddress;
+      if (destinationLatStr && destinationLngStr) {
+        data.route.destination.lat = parseFloat(destinationLatStr);
+        data.route.destination.lng = parseFloat(destinationLngStr);
+      }
       data.route.poNumber = poNumber;
       data.route.dispatcher = dispatcher;
       data.route.hasKeys = hasKeys;
       data.route.type = type;
       data.route.driverCallsign = driverCallsign;
       data.route.truck = truck;
+      
+      // Regenerate map URL if coordinates are available
+      const mapUrl = generateMapUrl(data.route.pickup, data.route.destination);
+      if (mapUrl) {
+        data.route.mapUrl = mapUrl;
+        data.route.mapImage = mapUrl;
+      }
 
       await db
         .updateTable("driver_dashboard")

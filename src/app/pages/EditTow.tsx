@@ -14,11 +14,15 @@ interface TowEditData {
     title: string;
     address: string;
     distance: string;
+    lat?: number;
+    lng?: number;
   };
   destination: {
     title: string;
     address: string;
     distance: string;
+    lat?: number;
+    lng?: number;
   };
 }
 

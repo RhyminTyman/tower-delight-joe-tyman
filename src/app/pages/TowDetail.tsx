@@ -51,10 +51,11 @@ export const TowDetail = async (requestInfo: RequestInfo) => {
               </svg>
             </a>
 
-            <form action={capturePhoto}>
+            <form>
               <input type="hidden" name="towId" value={towId} />
               <button
                 type="submit"
+                formAction={capturePhoto}
                 className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-white/10 hover:text-foreground"
                 title="Take photo"
               >
@@ -99,10 +100,11 @@ export const TowDetail = async (requestInfo: RequestInfo) => {
             <div className="absolute inset-0 bg-gradient-to-br from-black/20 via-black/40 to-black/70" />
             <div className="relative flex h-full flex-col justify-between p-5 text-white">
               <div className="flex items-center justify-between">
-                <form action={updateStatus}>
+                <form>
                   <input type="hidden" name="towId" value={towId} />
                   <button
                     type="submit"
+                    formAction={updateStatus}
                     className="rounded-full bg-white/10 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-white transition-colors hover:bg-white/20"
                   >
                     {data.route.status}

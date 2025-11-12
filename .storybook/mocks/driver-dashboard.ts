@@ -1,6 +1,8 @@
 // .storybook/mocks/driver-dashboard.ts
 // Standalone mock with all types and data inlined - no imports from original file
 
+console.log('[STORYBOOK MOCK] driver-dashboard.ts mock loaded!');
+
 // Types
 export interface DriverSnapshot {
   id: string;

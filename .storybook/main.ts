@@ -23,6 +23,22 @@ const config: StorybookConfig = {
     // DON'T add redwood() plugin - it breaks Storybook by trying to process server actions
     // config.plugins.push(redwood());
     
+    // Add plugin to resolve cloudflare:workers virtual module
+    config.plugins = config.plugins ?? [];
+    config.plugins.push({
+      name: 'mock-cloudflare-workers',
+      resolveId(id) {
+        if (id === 'cloudflare:workers') {
+          return id; // Mark as resolved
+        }
+      },
+      load(id) {
+        if (id === 'cloudflare:workers') {
+          return 'export const env = {}; export default {};';
+        }
+      }
+    });
+    
     config.resolve = config.resolve ?? {};
     
     // Add exact match aliases FIRST - order matters!

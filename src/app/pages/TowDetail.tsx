@@ -233,6 +233,10 @@ export const TowDetail = async (requestInfo: RequestInfo) => {
             </Button>
           </div>
           <dl className="grid grid-cols-2 gap-4 text-sm text-foreground">
+            <div className="space-y-1 col-span-2">
+              <dt className="text-xs uppercase tracking-wide text-muted-foreground">Vehicle</dt>
+              <dd className="font-medium">{data.dispatch.vehicle}</dd>
+            </div>
             <div className="space-y-1">
               <dt className="text-xs uppercase tracking-wide text-muted-foreground">Dispatcher</dt>
               <dd className="font-medium">{data.route.dispatcher}</dd>

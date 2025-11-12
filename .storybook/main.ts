@@ -30,6 +30,7 @@ const config: StorybookConfig = {
       // Mock server-side modules for Storybook
       "@/db": path.resolve(__dirname, "./mocks/db.ts"),
       "@/app/data/driver-dashboard": path.resolve(__dirname, "./mocks/driver-dashboard.ts"),
+      [path.resolve(__dirname, "../src/app/data/driver-dashboard.ts")]: path.resolve(__dirname, "./mocks/driver-dashboard.ts"),
       // Mock all server actions - need to include .tsx extension for relative imports
       "@/app/pages/TowDetail/functions": path.resolve(__dirname, "./mocks/serverActions.ts"),
       "@/app/pages/AddTow/functions": path.resolve(__dirname, "./mocks/serverActions.ts"),

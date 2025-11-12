@@ -17,7 +17,7 @@ export async function updateTow(formData: FormData) {
   const destinationLngStr = (formData.get("destinationLng") as string | null)?.trim();
   const poNumber = formData.get("poNumber") as string;
   const dispatcher = formData.get("dispatcher") as string;
-  const hasKeys = formData.get("hasKeys") === "on";
+  const hasKeys = formData.get("hasKeys") === "yes";
   const type = formData.get("type") as string;
   const driverCallsign = formData.get("driverCallsign") as string;
   const truck = formData.get("truck") as string;

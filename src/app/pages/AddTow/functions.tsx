@@ -81,6 +81,7 @@ export async function createTow(formData: FormData) {
   const destinationTitle = (formData.get("destinationTitle") as string | null)?.trim() ?? "";
   const destinationAddress = (formData.get("destinationAddress") as string | null)?.trim() ?? "";
   const destinationDistance = (formData.get("destinationDistance") as string | null)?.trim() ?? "";
+  const hasKeys = formData.get("hasKeys") === "yes";
 
   const etaMinutes = etaMinutesRaw ? Number(etaMinutesRaw) : 0;
 
@@ -147,7 +148,7 @@ export async function createTow(formData: FormData) {
     mapUrl: mapUrl,
     mapImage: mapUrl || payload.route.mapImage,
     dispatcher: dispatcherInfo.name,
-    hasKeys: false,
+    hasKeys: hasKeys,
     type,
     poNumber: poNumber,
     driverCallsign,

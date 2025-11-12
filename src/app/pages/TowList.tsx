@@ -6,6 +6,7 @@ import { db } from "@/db";
 interface TowItem {
   id: string;
   ticketId: string;
+  driverName: string;
   status: string;
   statusTone: "waiting" | "active" | "completed";
   vehicle: string;
@@ -91,21 +92,23 @@ const TowCard = ({ tow }: { tow: TowItem }) => (
     <Card className="glass-card cursor-pointer overflow-hidden p-0 transition-all hover:border-accent/50 hover:shadow-brand">
       <div className="border-l-4 border-accent/60 p-5">
         <div className="mb-3 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Badge
-              variant={tow.statusTone === "active" ? "accent" : tow.statusTone === "completed" ? "default" : "muted"}
-              className="px-3 py-1 text-xs font-semibold uppercase tracking-wide"
-            >
-              {tow.status}
-            </Badge>
-            <span className="text-sm font-semibold text-foreground">{tow.ticketId}</span>
-          </div>
+          <h3 className="text-lg font-semibold text-foreground">{tow.driverName}</h3>
           {tow.etaMinutes !== undefined && tow.etaMinutes > 0 && (
             <span className="text-xs font-medium text-accent">ETA {tow.etaMinutes} min</span>
           )}
         </div>
 
         <p className="mb-4 text-sm text-muted-foreground">{tow.vehicle}</p>
+
+        <div className="mb-3 flex items-center gap-3">
+          <Badge
+            variant={tow.statusTone === "active" ? "accent" : tow.statusTone === "completed" ? "default" : "muted"}
+            className="px-3 py-1 text-xs font-semibold uppercase tracking-wide"
+          >
+            {tow.status}
+          </Badge>
+          <span className="text-sm font-semibold text-foreground">{tow.ticketId}</span>
+        </div>
 
         <div className="space-y-3 rounded-none bg-slate-900/40 p-4">
           <div>
@@ -174,6 +177,7 @@ async function loadTowList(): Promise<TowItem[]> {
         return {
           id: row.id,
           ticketId: data?.dispatch?.ticketId || '',
+          driverName: data?.driver?.name || 'Unknown Driver',
           status: data?.route?.status || '',
           statusTone: (data?.route?.statusTone || 'waiting') as "waiting" | "active" | "completed",
           vehicle: data?.dispatch?.vehicle || '',

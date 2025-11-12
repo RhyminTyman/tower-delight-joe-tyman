@@ -18,8 +18,14 @@ export const AddTow = async (_requestInfo: RequestInfo) => {
 
 async function loadDriverOptions(): Promise<DriverOption[]> {
   try {
-    const rows = await db.selectFrom("driver_dashboard").select(["payload"]).execute();
-    const map = new Map<string, DriverOption>();
+    // Only load records with IDs starting with "driver-" (actual driver records)
+    const rows = await db
+      .selectFrom("driver_dashboard")
+      .select(["id", "payload"])
+      .where("id", "like", "driver-%")
+      .execute();
+    
+    const driverOptions: DriverOption[] = [];
 
     for (const row of rows) {
       if (!row.payload) continue;
@@ -27,24 +33,19 @@ async function loadDriverOptions(): Promise<DriverOption[]> {
         const data = typeof row.payload === "string" ? JSON.parse(row.payload) : row.payload;
         const driver = data?.driver as DriverSnapshot | undefined;
         if (!driver?.id) continue;
-        if (map.has(driver.id)) continue;
 
-        map.set(driver.id, {
+        driverOptions.push({
           id: driver.id,
           name: driver.name,
           snapshot: driver,
-          callSign: data?.route?.driverCallsign,
+          callSign: driver.callSign || data?.route?.driverCallsign,
         });
       } catch (error) {
         console.warn("[AddTow] Failed to parse driver payload:", error);
       }
     }
 
-    if (map.size === 0) {
-      return [];
-    }
-
-    return Array.from(map.values());
+    return driverOptions;
   } catch (error) {
     console.error("[AddTow] Failed to load drivers:", error);
     return [];

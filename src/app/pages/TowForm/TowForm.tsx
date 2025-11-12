@@ -391,11 +391,8 @@ export function TowForm({
       if (formValues.destinationLng) formData.set("destinationLng", formValues.destinationLng);
       
       await onSubmit(formData, formValues.towId);
-      // If onSubmit completes without error and doesn't redirect, reset saving state
-      setIsSaving(false);
     } catch (error) {
       console.error("[TowForm] Submission failed:", error);
-      alert(error instanceof Error ? error.message : "Failed to submit form. Please try again.");
       setIsSaving(false);
     }
   };

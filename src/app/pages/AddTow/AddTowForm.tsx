@@ -9,8 +9,14 @@ interface AddTowFormProps {
 
 export function AddTowForm({ driverOptions }: AddTowFormProps) {
   const handleSubmit = async (formData: FormData, towId: string) => {
-    await createTow(formData);
-    window.location.href = `/tow/${towId}`;
+    try {
+      await createTow(formData);
+      // Use replace to ensure navigation happens
+      window.location.replace(`/tow/${towId}`);
+    } catch (error) {
+      // Error will be caught and displayed by TowForm
+      throw error;
+    }
   };
 
   return (

@@ -30,10 +30,6 @@ export function StatusBanner({ towId, currentStatus }: StatusBannerProps) {
     error: updateError,
     update: updateStatus 
   } = useOptimisticUpdate(currentStatus, {
-    onSuccess: () => {
-      // Reload page to get fresh data after successful update
-      window.location.reload();
-    },
     onError: (error) => {
       // Error is logged by the hook, status reverted automatically
       alert(`Failed to update status: ${error.message}`);

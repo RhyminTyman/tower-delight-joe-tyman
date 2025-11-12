@@ -28,6 +28,14 @@ export function generateMapUrl(
     return undefined;
   }
 
+  // Read API key at runtime from globalThis (set by worker fetch handler)
+  const apiKey = (typeof globalThis !== 'undefined' && (globalThis as any).__GOOGLE_MAPS_API_KEY) || GOOGLE_MAPS_API_KEY;
+  
+  if (!apiKey) {
+    console.error('Google Maps API key not found');
+    return undefined;
+  }
+
   const markers = [
     `color:${MAP_MARKER_COLORS.pickup}|label:A|${pickup.lat},${pickup.lng}`,
     `color:${MAP_MARKER_COLORS.destination}|label:B|${destination.lat},${destination.lng}`,
@@ -35,7 +43,7 @@ export function generateMapUrl(
 
   const path = `color:${MAP_PATH_COLOR}|weight:${MAP_PATH_WEIGHT}|${pickup.lat},${pickup.lng}|${destination.lat},${destination.lng}`;
 
-  return `https://maps.googleapis.com/maps/api/staticmap?size=${MAP_IMAGE_SIZE}&scale=${MAP_IMAGE_SCALE}&maptype=roadmap&markers=${markers}&path=${path}&key=${GOOGLE_MAPS_API_KEY}`;
+  return `https://maps.googleapis.com/maps/api/staticmap?size=${MAP_IMAGE_SIZE}&scale=${MAP_IMAGE_SCALE}&maptype=roadmap&markers=${markers}&path=${path}&key=${apiKey}`;
 }
 
 /**
@@ -64,8 +72,16 @@ export function loadGoogleMapsScript(): Promise<void> {
       return;
     }
 
+    // Read API key at runtime from globalThis (set by worker fetch handler)
+    const apiKey = (typeof globalThis !== 'undefined' && (globalThis as any).__GOOGLE_MAPS_API_KEY) || '';
+    
+    if (!apiKey) {
+      reject(new Error('Google Maps API key not found'));
+      return;
+    }
+
     const script = document.createElement('script');
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_API_KEY}&libraries=places`;
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places`;
     script.async = true;
     script.defer = true;
     script.onload = () => resolve();

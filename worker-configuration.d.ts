@@ -7,6 +7,7 @@ declare namespace Cloudflare {
 	}
 	interface Env {
 		TOWER_API_BASE_URL: "https://placeholder.api.tower-delight.local";
+		GOOGLE_MAPS_API_KEY: string;
 		DATABASE: DurableObjectNamespace<import("./src/worker").Database>;
 		ASSETS: Fetcher;
 	}
@@ -16,5 +17,5 @@ type StringifyValues<EnvType extends Record<string, unknown>> = {
 	[Binding in keyof EnvType]: EnvType[Binding] extends string ? EnvType[Binding] : string;
 };
 declare namespace NodeJS {
-	interface ProcessEnv extends StringifyValues<Pick<Cloudflare.Env, "TOWER_API_BASE_URL">> {}
+	interface ProcessEnv extends StringifyValues<Pick<Cloudflare.Env, "TOWER_API_BASE_URL" | "GOOGLE_MAPS_API_KEY">> {}
 }

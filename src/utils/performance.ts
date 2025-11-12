@@ -2,62 +2,12 @@
  * Performance utilities for debouncing and throttling
  */
 
-/**
- * Debounce a function - waits for a pause in calls before executing
- * Useful for: search input, form validation, resize handlers
- */
-export function debounce<T extends (...args: any[]) => any>(
-  func: T,
-  delay: number
-): (...args: Parameters<T>) => void {
-  let timeoutId: ReturnType<typeof setTimeout> | null = null;
-
-  return function debounced(...args: Parameters<T>) {
-    if (timeoutId) {
-      clearTimeout(timeoutId);
-    }
-
-    timeoutId = setTimeout(() => {
-      func(...args);
-      timeoutId = null;
-    }, delay);
-  };
-}
-
-/**
- * Throttle a function - ensures it's called at most once per time period
- * Useful for: scroll handlers, mousemove, API rate limiting
- */
-export function throttle<T extends (...args: any[]) => any>(
-  func: T,
-  limit: number
-): (...args: Parameters<T>) => void {
-  let inThrottle = false;
-  let lastArgs: Parameters<T> | null = null;
-
-  return function throttled(...args: Parameters<T>) {
-    if (!inThrottle) {
-      func(...args);
-      inThrottle = true;
-
-      setTimeout(() => {
-        inThrottle = false;
-        if (lastArgs) {
-          throttled(...lastArgs);
-          lastArgs = null;
-        }
-      }, limit);
-    } else {
-      lastArgs = args;
-    }
-  };
-}
-
-/**
- * React hook for debounced values
- */
 import { useEffect, useState } from 'react';
 
+/**
+ * React hook for debouncing values
+ * Useful for delaying API calls until user stops typing
+ */
 export function useDebounce<T>(value: T, delay: number): T {
   const [debouncedValue, setDebouncedValue] = useState<T>(value);
 
@@ -75,35 +25,55 @@ export function useDebounce<T>(value: T, delay: number): T {
 }
 
 /**
- * React hook for throttled callback
+ * Debounce function - delays execution until after wait time has elapsed
+ * Useful for: search inputs, resize handlers, scroll handlers
+ * 
+ * @param func Function to debounce
+ * @param wait Wait time in milliseconds
+ * @returns Debounced function
  */
-import { useCallback, useRef } from 'react';
+export function debounce<T extends (...args: any[]) => any>(
+  func: T,
+  wait: number
+): (...args: Parameters<T>) => void {
+  let timeout: ReturnType<typeof setTimeout> | null = null;
 
-export function useThrottle<T extends (...args: any[]) => any>(
-  callback: T,
-  limit: number
-): T {
-  const inThrottle = useRef(false);
-  const lastArgs = useRef<Parameters<T> | null>(null);
+  return function executedFunction(...args: Parameters<T>) {
+    const later = () => {
+      timeout = null;
+      func(...args);
+    };
 
-  return useCallback(
-    ((...args: Parameters<T>) => {
-      if (!inThrottle.current) {
-        callback(...args);
-        inThrottle.current = true;
-
-        setTimeout(() => {
-          inThrottle.current = false;
-          if (lastArgs.current) {
-            callback(...lastArgs.current);
-            lastArgs.current = null;
-          }
-        }, limit);
-      } else {
-        lastArgs.current = args;
-      }
-    }) as T,
-    [callback, limit]
-  );
+    if (timeout) {
+      clearTimeout(timeout);
+    }
+    timeout = setTimeout(later, wait);
+  };
 }
 
+/**
+ * Throttle function - ensures function is called at most once per wait period
+ * Useful for: scroll handlers, resize handlers, API calls
+ * 
+ * @param func Function to throttle
+ * @param wait Wait time in milliseconds
+ * @returns Throttled function
+ */
+export function throttle<T extends (...args: any[]) => any>(
+  func: T,
+  wait: number
+): (...args: Parameters<T>) => void {
+  let inThrottle: boolean;
+  let lastResult: ReturnType<T>;
+
+  return function executedFunction(...args: Parameters<T>) {
+    if (!inThrottle) {
+      inThrottle = true;
+      lastResult = func(...args);
+      setTimeout(() => {
+        inThrottle = false;
+      }, wait);
+    }
+    return lastResult;
+  };
+}

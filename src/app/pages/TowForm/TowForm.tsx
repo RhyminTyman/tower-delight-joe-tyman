@@ -22,7 +22,6 @@ async function calculateDistance(
     try {
       const google = window.google;
       if (!google?.maps?.DistanceMatrixService) {
-        console.warn('[Distance] Google Maps not loaded');
         resolve(null);
         return;
       }
@@ -46,7 +45,6 @@ async function calculateDistance(
               duration: element.duration.text,
             });
           } else {
-            console.warn('[Distance] Calculation failed:', status);
             resolve(null);
           }
         }
@@ -62,7 +60,6 @@ async function calculateDistance(
 async function getUserLocation(): Promise<{ lat: number; lng: number } | null> {
   return new Promise((resolve) => {
     if (!navigator.geolocation) {
-      console.warn('[Location] Geolocation not supported');
       resolve(null);
       return;
     }
@@ -75,7 +72,6 @@ async function getUserLocation(): Promise<{ lat: number; lng: number } | null> {
         });
       },
       (error) => {
-        console.warn('[Location] Failed to get user location:', error);
         resolve(null);
       },
       { 
@@ -262,13 +258,10 @@ export function TowForm({
       await new Promise(resolve => setTimeout(resolve, GOOGLE_MAPS_INIT_DELAY_MS));
 
       setIsCalculatingDistances(true);
-      console.log('[Distance] Starting calculations...');
 
       // Calculate distance from user to pickup
       if (userLocation) {
-        console.log('[Distance] Calculating user to pickup:', userLocation, { lat: pickupLat, lng: pickupLng });
         const userToPickup = await calculateDistance(userLocation, { lat: pickupLat, lng: pickupLng });
-        console.log('[Distance] User to pickup result:', userToPickup);
         if (userToPickup) {
           setFormValues((prev) => ({
             ...prev,
@@ -278,12 +271,10 @@ export function TowForm({
       }
 
       // Calculate distance from pickup to destination
-      console.log('[Distance] Calculating pickup to destination:', { lat: pickupLat, lng: pickupLng }, { lat: destLat, lng: destLng });
       const pickupToDest = await calculateDistance(
         { lat: pickupLat, lng: pickupLng },
         { lat: destLat, lng: destLng }
       );
-      console.log('[Distance] Pickup to destination result:', pickupToDest);
       if (pickupToDest) {
         setFormValues((prev) => ({
           ...prev,

@@ -29,7 +29,7 @@ async function getDispatcher() {
       };
     }
   } catch (error) {
-    console.warn("[createTow] Failed to fetch dispatcher", error);
+    console.error("[createTow] Failed to fetch dispatcher:", error);
   }
 
   // Fallback to default
@@ -61,7 +61,6 @@ async function resolveDriverSnapshot(driverId: string | null) {
       .executeTakeFirst();
 
     if (!row?.payload) {
-      console.warn("[resolveDriverSnapshot] Driver not found:", driverId);
       return getDefaultDriverSnapshot();
     }
 

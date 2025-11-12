@@ -1,6 +1,7 @@
 import type { RequestInfo } from "rwsdk/worker";
 import { render, route } from "rwsdk/router";
 import { defineApp } from "rwsdk/worker";
+import { env } from "cloudflare:workers";
 
 import { Document } from "@/app/Document";
 import { STATIC_DRIVER_DASHBOARD, loadDashboardFromDatabase } from "@/app/data/driver-dashboard";
@@ -13,9 +14,6 @@ import { TowDetail } from "@/app/pages/TowDetail";
 import { TowList } from "@/app/pages/TowList";
 import { db } from "@/db";
 import { DISPATCHER_ID } from "@/config/constants";
-import { createLogger } from "@/utils/logger";
-
-const logger = createLogger('Worker');
 
 export type AppContext = {
   apiBaseUrl?: string;
@@ -24,6 +22,8 @@ export type AppContext = {
 declare global {
   // biome-ignore lint/style/noVar: Cloudflare worker safe global
   var __TOWER_API_BASE_URL: string | undefined;
+  // biome-ignore lint/style/noVar: Cloudflare worker safe global
+  var __GOOGLE_MAPS_API_KEY: string | undefined;
 }
 
 const hydrateAppContext = (requestInfo: RequestInfo<any, AppContext>) => {
@@ -74,7 +74,6 @@ const app = defineApp([
   }),
   route("/api/tow/:id/photo", async (requestInfo: RequestInfo) => {
     const towId = requestInfo.params.id;
-    logger.info('Photo API called', { towId, action: 'capturePhoto' });
     const request = requestInfo.request;
 
     if (request.method === "DELETE") {
@@ -116,10 +115,9 @@ const app = defineApp([
           .where("id", "=", towId)
           .execute();
 
-        logger.info('Photo removed successfully', { towId });
         return Response.json({ success: true, mapImageUpdated: false });
       } catch (error) {
-        logger.error('Failed to remove photo', error, { towId });
+        console.error('Failed to remove photo:', error);
         return Response.json({ error: String(error) }, { status: 500 });
       }
     }
@@ -142,7 +140,7 @@ const app = defineApp([
         mimeType = typeof body.mimeType === "string" ? body.mimeType : null;
       }
     } catch (parseError) {
-      logger.warn('Failed to parse request body', { error: parseError, towId });
+      // Ignore parse errors, will use null values
     }
 
     try {
@@ -198,7 +196,6 @@ const app = defineApp([
           .where("id", "=", towId)
           .execute();
 
-        logger.info('Photo saved successfully', { towId, fileName });
         return Response.json({
           success: true,
           mapImageUpdated: Boolean(photoData),
@@ -207,13 +204,12 @@ const app = defineApp([
 
       return Response.json({ error: "Tow not found" }, { status: 404 });
     } catch (error) {
-      console.error("[API capturePhoto] Error:", error);
+      console.error("API capturePhoto] Error:", error);
       return Response.json({ error: String(error) }, { status: 500 });
     }
   }),
   route("/api/tow/:id/status", async (requestInfo: RequestInfo) => {
     const towId = requestInfo.params.id;
-    console.log("[API updateStatus] Starting for towId:", towId);
 
     try {
       const row = await db
@@ -251,19 +247,17 @@ const app = defineApp([
           .where("id", "=", towId)
           .execute();
 
-        console.log("[API updateStatus] Success");
         return Response.json({ success: true });
       }
 
       return Response.json({ error: "Tow not found" }, { status: 404 });
     } catch (error) {
-      console.error("[API updateStatus] Error:", error);
+      console.error("API updateStatus] Error:", error);
       return Response.json({ error: String(error) }, { status: 500 });
     }
   }),
   route("/api/seed", async () => {
     try {
-      console.log("[Seed] Starting seed process...");
 
       const SEED_TOWS = [
         {
@@ -379,9 +373,7 @@ const app = defineApp([
       ];
 
       // Clear existing tows
-      console.log("[Seed] Clearing existing tows...");
       await db.deleteFrom("driver_dashboard").execute();
-      console.log("[Seed] Cleared existing tows");
 
       // Helper function to generate map URL using Google Maps Static API
       const generateMapUrl = (pickup: any, destination: any) => {
@@ -389,7 +381,13 @@ const app = defineApp([
           return undefined;
         }
         
-        const GOOGLE_MAPS_API_KEY = 'AIzaSyBa684TfLdTXSODlil08SYZNWvm5yCqApQ';
+        // Use API key from environment variable
+        const GOOGLE_MAPS_API_KEY = env.GOOGLE_MAPS_API_KEY;
+        
+        if (!GOOGLE_MAPS_API_KEY) {
+          console.error('GOOGLE_MAPS_API_KEY not set in environment variables');
+          return undefined;
+        }
         
         // Google Maps Static API with markers and path
         const markers = [
@@ -501,7 +499,6 @@ const app = defineApp([
   }),
   route("/api/seed/drivers/reset", async () => {
     try {
-      console.log("[Reset Drivers] Deleting all driver entries...");
       
       // Delete all driver entries (they all have IDs starting with "driver-")
       const result = await db
@@ -522,7 +519,7 @@ const app = defineApp([
         }
       );
     } catch (error) {
-      console.error("[Reset Drivers] Error:", error);
+      console.error("Reset Drivers] Error:", error);
       return new Response(
         JSON.stringify({ success: false, error: String(error) }),
         { 
@@ -535,7 +532,6 @@ const app = defineApp([
 
   route("/api/seed/drivers", async () => {
     try {
-      console.log("[Seed Drivers] Starting seed operation...");
 
       const SEED_DRIVERS = [
         {
@@ -651,7 +647,7 @@ const app = defineApp([
 
       return response;
     } catch (error) {
-      console.error("[Seed Drivers] Failed:", error);
+      console.error("Seed Drivers] Failed:", error);
       return Response.json(
         {
           success: false,
@@ -665,7 +661,6 @@ const app = defineApp([
 
   route("/api/seed/dispatcher", async () => {
     try {
-      console.log("[Seed Dispatcher] Starting seed operation...");
 
       const DISPATCHER = {
         id: DISPATCHER_ID,
@@ -721,7 +716,7 @@ const app = defineApp([
         dispatcher: DISPATCHER,
       });
     } catch (error) {
-      console.error("[Seed Dispatcher] Failed:", error);
+      console.error("Seed Dispatcher] Failed:", error);
       return Response.json(
         {
           success: false,
@@ -735,7 +730,6 @@ const app = defineApp([
 
   route("/api/dispatcher", async () => {
     try {
-      console.log("[Get Dispatcher] Fetching dispatcher info...");
 
       const dispatcher = await db
         .selectFrom("driver_dashboard")
@@ -762,7 +756,7 @@ const app = defineApp([
         dispatcher: data,
       });
     } catch (error) {
-      console.error("[Get Dispatcher] Failed:", error);
+      console.error("Get Dispatcher] Failed:", error);
       return Response.json(
         {
           success: false,
@@ -775,9 +769,10 @@ const app = defineApp([
 ]);
 
 export default {
-  fetch(request: Request, env: Env & { TOWER_API_BASE_URL?: string }, cf: ExecutionContext) {
-    globalThis.__TOWER_API_BASE_URL = env.TOWER_API_BASE_URL;
-    return app.fetch(request, env, cf);
+  fetch(request: Request, workerEnv: Env & { TOWER_API_BASE_URL?: string; GOOGLE_MAPS_API_KEY?: string }, cf: ExecutionContext) {
+    globalThis.__TOWER_API_BASE_URL = workerEnv.TOWER_API_BASE_URL;
+    globalThis.__GOOGLE_MAPS_API_KEY = workerEnv.GOOGLE_MAPS_API_KEY;
+    return app.fetch(request, workerEnv, cf);
   },
 };
 

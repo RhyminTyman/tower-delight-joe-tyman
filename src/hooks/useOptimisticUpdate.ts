@@ -1,12 +1,9 @@
 /**
  * Hook for optimistic UI updates
- * Updates UI immediately, then reverts if the server request fails
+ * Updates UI immediately, then reverts if server call fails
  */
 
 import { useState, useCallback } from 'react';
-import { createLogger } from '@/utils/logger';
-
-const logger = createLogger('useOptimisticUpdate');
 
 interface UseOptimisticUpdateOptions<T> {
   onSuccess?: (value: T) => void;
@@ -15,7 +12,7 @@ interface UseOptimisticUpdateOptions<T> {
 
 export function useOptimisticUpdate<T>(
   initialValue: T,
-  options: UseOptimisticUpdateOptions<T> = {}
+  options?: UseOptimisticUpdateOptions<T>
 ) {
   const [value, setValue] = useState<T>(initialValue);
   const [isUpdating, setIsUpdating] = useState(false);
@@ -24,55 +21,43 @@ export function useOptimisticUpdate<T>(
   const update = useCallback(
     async (
       newValue: T,
-      asyncOperation: (value: T) => Promise<void>
-    ): Promise<boolean> => {
+      serverUpdate: (value: T) => Promise<void>
+    ) => {
       const previousValue = value;
       
-      // Optimistically update UI
+      // Optimistically update UI immediately
       setValue(newValue);
       setIsUpdating(true);
       setError(null);
-      
-      logger.debug('Optimistic update started', { from: previousValue, to: newValue });
 
       try {
-        // Perform the actual async operation
-        await asyncOperation(newValue);
+        // Perform server update
+        await serverUpdate(newValue);
         
-        setIsUpdating(false);
-        options.onSuccess?.(newValue);
-        logger.info('Optimistic update succeeded', { value: newValue });
-        return true;
+        // Call success callback
+        options?.onSuccess?.(newValue);
       } catch (err) {
-        // Revert to previous value on error
         const error = err instanceof Error ? err : new Error(String(err));
+        
+        console.error('Server update failed, reverting:', error);
+        
+        // Revert to previous value on error
         setValue(previousValue);
         setError(error);
-        setIsUpdating(false);
         
-        options.onError?.(error, previousValue);
-        logger.error('Optimistic update failed, reverted', error, { 
-          attempted: newValue,
-          reverted: previousValue 
-        });
-        return false;
+        // Call error callback
+        options?.onError?.(error, previousValue);
+      } finally {
+        setIsUpdating(false);
       }
     },
     [value, options]
   );
-
-  const reset = useCallback(() => {
-    setValue(initialValue);
-    setError(null);
-    setIsUpdating(false);
-  }, [initialValue]);
 
   return {
     value,
     isUpdating,
     error,
     update,
-    reset,
   };
 }
-

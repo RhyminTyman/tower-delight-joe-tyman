@@ -39,6 +39,9 @@
   },
 
   // Environment variables
+  // IMPORTANT: Set GOOGLE_MAPS_API_KEY as a secret for production:
+  // Run: wrangler secret put GOOGLE_MAPS_API_KEY
+  // For local development, you can add it here temporarily (DO NOT COMMIT)
   "vars": {
     "TOWER_API_BASE_URL": "https://placeholder.api.tower-delight.local"
   }

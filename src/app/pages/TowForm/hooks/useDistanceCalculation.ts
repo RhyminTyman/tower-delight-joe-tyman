@@ -5,10 +5,7 @@
 
 import { useEffect, useState } from 'react';
 import type { Coordinates, DistanceResult } from '@/types/maps';
-import { createLogger } from '@/utils/logger';
 import { useDebounce } from '@/utils/performance';
-
-const logger = createLogger('useDistanceCalculation');
 
 async function calculateDistance(
   origin: Coordinates,
@@ -18,7 +15,6 @@ async function calculateDistance(
     try {
       const google = window.google;
       if (!google?.maps?.DistanceMatrixService) {
-        logger.warn('Google Maps not loaded');
         resolve(null);
         return;
       }
@@ -41,16 +37,14 @@ async function calculateDistance(
               distance: element.distance.text,
               duration: element.duration.text,
             };
-            logger.debug('Distance calculated', { origin, destination, result });
             resolve(result);
           } else {
-            logger.warn('Distance calculation failed', { status });
             resolve(null);
           }
         }
       );
     } catch (error) {
-      logger.error('Distance calculation error', error);
+      console.error('Distance calculation error:', error);
       resolve(null);
     }
   });
@@ -96,7 +90,6 @@ export function useDistanceCalculation({
       }
 
       setIsCalculating(true);
-      logger.info('Starting distance calculations');
 
       // Calculate distance from user to pickup
       if (userLocation) {

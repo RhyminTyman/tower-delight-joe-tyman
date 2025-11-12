@@ -3,7 +3,10 @@
  */
 
 // Google Maps Configuration
-export const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || 'AIzaSyBa684TfLdTXSODlil08SYZNWvm5yCqApQ';
+// Loaded from Cloudflare Workers environment variable (wrangler.jsonc)
+// This is set in worker.tsx fetch handler from env.GOOGLE_MAPS_API_KEY
+export const GOOGLE_MAPS_API_KEY = 
+  (typeof globalThis !== 'undefined' && (globalThis as any).__GOOGLE_MAPS_API_KEY) || '';
 export const GOOGLE_MAPS_INIT_DELAY_MS = 500;
 
 // Geolocation Configuration

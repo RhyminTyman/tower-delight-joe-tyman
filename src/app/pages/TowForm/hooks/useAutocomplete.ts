@@ -4,9 +4,6 @@
 
 import { useEffect, useRef } from 'react';
 import type { GoogleMapsAutocomplete } from '@/types/maps';
-import { createLogger } from '@/utils/logger';
-
-const logger = createLogger('useAutocomplete');
 
 interface UseAutocompleteProps {
   isLoadingMaps: boolean;
@@ -30,7 +27,6 @@ export function useAutocomplete({ isLoadingMaps, onPlaceSelected }: UseAutocompl
       try {
         const google = window.google;
         if (!google?.maps?.places?.Autocomplete) {
-          logger.warn('Google Maps Places not available');
           return;
         }
 
@@ -46,13 +42,12 @@ export function useAutocomplete({ isLoadingMaps, onPlaceSelected }: UseAutocompl
               lat: place.geometry.location.lat().toFixed(4),
               lng: place.geometry.location.lng().toFixed(4),
             });
-            logger.debug('Place selected', { address: place.formatted_address });
           }
         });
 
         autocompleteRef.current = autocomplete;
       } catch (error) {
-        logger.error('Failed to initialize autocomplete', error);
+        console.error('Failed to initialize autocomplete:', error);
       }
     };
 
@@ -65,7 +60,7 @@ export function useAutocomplete({ isLoadingMaps, onPlaceSelected }: UseAutocompl
           google.maps.event.clearInstanceListeners(autocompleteRef.current);
         }
       } catch (error) {
-        logger.error('Failed to cleanup autocomplete', error);
+        console.error('Failed to cleanup autocomplete:', error);
       }
     };
   }, [isLoadingMaps, onPlaceSelected]);

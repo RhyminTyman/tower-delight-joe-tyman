@@ -60,10 +60,12 @@ export function StatusBanner({ towId, currentStatus }: StatusBannerProps) {
   }
 
   return (
-    <div className={`sticky top-0 z-50 ${config.color} px-4 py-3`}>
+    <div className={`sticky top-0 z-50 ${config.color} px-4 py-3`} role="banner" aria-label="Tow status">
       <div className="mx-auto flex max-w-md items-center justify-between gap-4">
         <div className="flex-1">
-          <p className="text-lg font-bold text-white uppercase tracking-wide">{displayStatus}</p>
+          <p className="text-lg font-bold text-white uppercase tracking-wide" aria-live="polite" aria-atomic="true">
+            {displayStatus}
+          </p>
         </div>
         
         <div className="relative flex items-stretch">
@@ -84,9 +86,12 @@ export function StatusBanner({ towId, currentStatus }: StatusBannerProps) {
             disabled={isUpdating}
             type="button"
             title="Change status"
+            aria-label="Open status menu"
+            aria-expanded={isDropdownOpen}
+            aria-haspopup="menu"
             className={`${nextStatus ? '' : ''} bg-white/20 p-2 text-white transition-colors hover:bg-white/30 disabled:opacity-50 aspect-square flex items-center justify-center`}
           >
-            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
             </svg>
           </button>
@@ -96,14 +101,21 @@ export function StatusBanner({ towId, currentStatus }: StatusBannerProps) {
               <div 
                 className="fixed inset-0 z-40" 
                 onClick={() => setIsDropdownOpen(false)}
+                aria-hidden="true"
               />
-              <div className="absolute right-0 top-full mt-2 z-50 w-48 bg-slate-800 shadow-xl border border-slate-700">
+              <div 
+                className="absolute right-0 top-full mt-2 z-50 w-48 bg-slate-800 shadow-xl border border-slate-700"
+                role="menu"
+                aria-label="Status options"
+              >
                 {ALL_STATUSES.map((status) => (
                   <button
                     key={status}
                     onClick={() => handleStatusChange(status)}
                     disabled={status === currentStatus}
                     type="button"
+                    role="menuitem"
+                    aria-current={status === currentStatus ? "true" : undefined}
                     className={`w-full px-4 py-3 text-left text-sm font-medium transition-colors ${
                       status === currentStatus
                         ? "bg-slate-700 text-slate-400 cursor-not-allowed"
@@ -112,7 +124,7 @@ export function StatusBanner({ towId, currentStatus }: StatusBannerProps) {
                   >
                     {status}
                     {status === currentStatus && (
-                      <span className="ml-2 text-xs text-slate-400">(current)</span>
+                      <span className="ml-2 text-xs text-slate-400" aria-label="current status">(current)</span>
                     )}
                   </button>
                 ))}

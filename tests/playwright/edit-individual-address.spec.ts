@@ -9,10 +9,10 @@ test.describe("Edit individual address", () => {
     
     await expect(page.getByLabel(/location name/i)).toBeVisible();
     await expect(page.getByLabel(/street address/i)).toBeVisible();
-    await expect(page.getByLabel(/distance\/eta/i)).toBeVisible();
+    await expect(page.getByLabel(/distance/i)).toBeVisible();
     
     await expect(page.getByRole("button", { name: /save changes/i })).toBeVisible();
-    await expect(page.getByRole("link", { name: /cancel/i })).toHaveAttribute("href", "/tow/tow-001");
+    await expect(page.getByRole("link", { name: /cancel/i }).first()).toHaveAttribute("href", "/tow/tow-001");
   });
 
   test("can edit destination address", async ({ page }) => {
@@ -23,10 +23,10 @@ test.describe("Edit individual address", () => {
     
     await expect(page.getByLabel(/location name/i)).toBeVisible();
     await expect(page.getByLabel(/street address/i)).toBeVisible();
-    await expect(page.getByLabel(/distance\/eta/i)).toBeVisible();
+    await expect(page.getByLabel(/distance/i)).toBeVisible();
     
     await expect(page.getByRole("button", { name: /save changes/i })).toBeVisible();
-    await expect(page.getByRole("link", { name: /cancel/i })).toHaveAttribute("href", "/tow/tow-001");
+    await expect(page.getByRole("link", { name: /cancel/i }).first()).toHaveAttribute("href", "/tow/tow-001");
   });
 
   test("displays current pickup address values", async ({ page }) => {

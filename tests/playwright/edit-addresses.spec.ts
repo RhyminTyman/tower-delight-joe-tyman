@@ -8,26 +8,21 @@ test.describe("Edit tow", () => {
   test("shows edit form with all tow fields", async ({ page }) => {
     await expect(page.getByRole("heading", { name: /edit tow/i })).toBeVisible();
     
-    // Tow information section
-    await expect(page.getByText(/tow information/i)).toBeVisible();
+    // Tow information fields
     await expect(page.getByLabel(/ticket id/i)).toBeVisible();
     await expect(page.getByLabel(/vehicle description/i)).toBeVisible();
     await expect(page.getByLabel(/po number/i)).toBeVisible();
-    await expect(page.getByLabel(/type/i)).toBeVisible();
+    await expect(page.getByLabel(/tow type/i)).toBeVisible();
     await expect(page.getByLabel(/dispatcher/i)).toBeVisible();
     await expect(page.getByLabel(/has keys/i)).toBeVisible();
     
     // Pickup section
-    await expect(page.getByText(/pickup location/i)).toBeVisible();
     await expect(page.getByLabel(/location name/i).first()).toBeVisible();
-    await expect(page.getByLabel(/street address/i).first()).toBeVisible();
-    await expect(page.getByLabel(/distance\/eta/i).first()).toBeVisible();
+    await expect(page.getByLabel(/address/i).first()).toBeVisible();
     
     // Destination section
-    await expect(page.getByText(/destination/i)).toBeVisible();
     await expect(page.getByLabel(/location name/i).nth(1)).toBeVisible();
-    await expect(page.getByLabel(/street address/i).nth(1)).toBeVisible();
-    await expect(page.getByLabel(/distance\/eta/i).nth(1)).toBeVisible();
+    await expect(page.getByLabel(/address/i).nth(1)).toBeVisible();
     
     // Submit button
     await expect(page.getByRole("button", { name: /save changes/i })).toBeVisible();

@@ -15,6 +15,8 @@ export default defineConfig({
     trace: "retain-on-failure",
     screenshot: "only-on-failure",
     video: "retain-on-failure",
+    // Use headed mode on macOS to avoid Chromium headless shell crashes
+    headless: process.env.CI ? true : false,
   },
   projects: [
     {

@@ -181,14 +181,20 @@ export async function createTow(formData: FormData) {
 
   const now = Math.floor(Date.now() / 1000);
 
-  await db
-    .insertInto("driver_dashboard")
-    .values({
-      id: towId,
-      payload: JSON.stringify(payload),
-      updated_at: now,
-    })
-    .execute();
+  try {
+    await db
+      .insertInto("driver_dashboard")
+      .values({
+        id: towId,
+        payload: JSON.stringify(payload),
+        updated_at: now,
+      })
+      .execute();
+  } catch (error) {
+    console.error("[createTow] Database insert failed:", error);
+    console.error("[createTow] Payload size:", JSON.stringify(payload).length);
+    throw new Error("Failed to save tow to database. Please try again.");
+  }
 }
 
 

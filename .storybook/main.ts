@@ -2,7 +2,6 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import type { StorybookConfig } from "@storybook/react-vite";
-import { redwood } from "rwsdk/vite";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -21,8 +20,9 @@ const config: StorybookConfig = {
     options: {},
   },
   viteFinal: async (config) => {
-    config.plugins = config.plugins ?? [];
-    config.plugins.push(redwood());
+    // DON'T add redwood() plugin - it breaks Storybook by trying to process server actions
+    // config.plugins.push(redwood());
+    
     config.resolve = config.resolve ?? {};
     config.resolve.alias = {
       ...(config.resolve.alias ?? {}),

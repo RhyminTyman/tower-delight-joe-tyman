@@ -72,9 +72,9 @@ export const TowDetail = async (requestInfo: RequestInfo) => {
 
       <StatusBanner towId={towId} currentStatus={data.route.status} />
       
-      <main className="mx-auto flex min-h-screen max-w-md flex-col gap-4 px-4 pb-28 pt-4 sm:max-w-lg">
+      <main className="mx-auto flex min-h-screen max-w-md flex-col px-4 pb-28 pt-4 sm:max-w-lg">
         {/* Vehicle Info Card */}
-        <div className="border border-border/60 bg-secondary/40 p-4">
+        <div className="border-x border-t border-border/60 bg-secondary/40 p-4">
           <p className="text-xs uppercase tracking-wide text-muted-foreground mb-1">Vehicle</p>
           <p className="text-base font-semibold text-foreground">{data.dispatch.vehicle}</p>
         </div>
@@ -228,7 +228,7 @@ export const TowDetail = async (requestInfo: RequestInfo) => {
         </div>
 
         {/* Route Detail Card */}
-        <div className="border border-border/60 bg-secondary/40 flex flex-col gap-3 p-4">
+        <div className="mt-4 border border-border/60 bg-secondary/40 flex flex-col gap-3 p-4">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-xs uppercase tracking-wide text-muted-foreground">PO #</p>
@@ -263,7 +263,7 @@ export const TowDetail = async (requestInfo: RequestInfo) => {
         </div>
 
         {/* Status Timeline */}
-        <div className="border border-border/60 bg-secondary/40 p-4">
+        <div className="mt-4 border border-border/60 bg-secondary/40 p-4">
           <h2 className="text-sm font-semibold text-foreground">Statuses</h2>
           <div className="mt-4 flex flex-col gap-4">
             {data.route.statuses.map((status, index) => {

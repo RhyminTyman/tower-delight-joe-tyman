@@ -58,7 +58,18 @@ const config: StorybookConfig = {
     config.build.rollupOptions.external = [
       ...(Array.isArray(config.build.rollupOptions.external) ? config.build.rollupOptions.external : []),
       "cloudflare:workers",
+      "rwsdk/db",
+      "rwsdk/worker",
       /^node:/,
+    ];
+    
+    // Also configure Vite's optimizeDeps to exclude these
+    config.optimizeDeps = config.optimizeDeps ?? {};
+    config.optimizeDeps.exclude = [
+      ...(config.optimizeDeps.exclude ?? []),
+      "cloudflare:workers",
+      "rwsdk/db",
+      "rwsdk/worker",
     ];
     
     return config;

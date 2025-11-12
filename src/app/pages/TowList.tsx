@@ -169,7 +169,11 @@ const TowCard = ({ tow }: { tow: TowItem }) => (
 
 async function loadTowList(): Promise<TowItem[]> {
   try {
-    const rows = await db.selectFrom("driver_dashboard").select(["id", "payload"]).execute();
+    const rows = await db
+      .selectFrom("driver_dashboard")
+      .select(["id", "payload"])
+      .where("id", "like", "tow-%")
+      .execute();
     
     const tows = rows.filter(row => row.payload).map((row) => {
       try {

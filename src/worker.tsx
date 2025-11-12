@@ -772,14 +772,6 @@ const app = defineApp([
       );
     }
   }),
-  route("/api/debug/env", async () => {
-    return Response.json({
-      hasGoogleMapsKey: !!env.GOOGLE_MAPS_API_KEY,
-      keyLength: env.GOOGLE_MAPS_API_KEY?.length || 0,
-      keyPrefix: env.GOOGLE_MAPS_API_KEY?.substring(0, 10) || 'not set',
-      globalHasKey: !!(globalThis as any).__GOOGLE_MAPS_API_KEY,
-    });
-  }),
 ]);
 
 export default {

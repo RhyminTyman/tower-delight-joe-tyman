@@ -2,7 +2,7 @@
 
 import { DASHBOARD_TEMPLATE, type DriverDashboardData } from "@/app/data/driver-dashboard";
 import { db } from "@/db";
-import { generateMapUrl, generateRandomCoordinates } from "@/utils/maps";
+import { generateMapUrl } from "@/utils/maps";
 import { DISPATCHER_ID } from "@/config/constants";
 
 function cloneDashboard(): DriverDashboardData {
@@ -88,7 +88,7 @@ export async function createTow(formData: FormData) {
   const { driver, driverCallsign, truck } = await resolveDriverSnapshot(driverId);
   const dispatcherInfo = await getDispatcher();
 
-  // Use provided GPS coordinates or generate random ones
+  // Use provided GPS coordinates (no fallback to random coordinates)
   const pickupLatStr = (formData.get("pickupLat") as string | null)?.trim();
   const pickupLngStr = (formData.get("pickupLng") as string | null)?.trim();
   const destinationLatStr = (formData.get("destinationLat") as string | null)?.trim();
@@ -96,10 +96,10 @@ export async function createTow(formData: FormData) {
   
   const pickupCoords = (pickupLatStr && pickupLngStr) 
     ? { lat: parseFloat(pickupLatStr), lng: parseFloat(pickupLngStr) }
-    : generateRandomCoordinates();
+    : null;
   const destinationCoords = (destinationLatStr && destinationLngStr)
     ? { lat: parseFloat(destinationLatStr), lng: parseFloat(destinationLngStr) }
-    : generateRandomCoordinates();
+    : null;
 
   const payload = cloneDashboard();
 
@@ -112,24 +112,25 @@ export async function createTow(formData: FormData) {
     location: pickupTitle || payload.dispatch.location,
   };
 
-  // Generate map URL with GPS coordinates
+  // Build pickup and destination objects with coordinates (if available)
   const pickupWithCoords = {
     title: pickupTitle || payload.route.pickup.title,
     address: pickupAddress || payload.route.pickup.address,
     distance: pickupDistance || payload.route.pickup.distance,
-    lat: pickupCoords.lat,
-    lng: pickupCoords.lng,
+    ...(pickupCoords && { lat: pickupCoords.lat, lng: pickupCoords.lng }),
   };
 
   const destinationWithCoords = {
     title: destinationTitle || payload.route.destination.title,
     address: destinationAddress || payload.route.destination.address,
     distance: destinationDistance || payload.route.destination.distance,
-    lat: destinationCoords.lat,
-    lng: destinationCoords.lng,
+    ...(destinationCoords && { lat: destinationCoords.lat, lng: destinationCoords.lng }),
   };
 
-  const mapUrl = generateMapUrl(pickupWithCoords, destinationWithCoords);
+  // Only generate map URL if both locations have coordinates
+  const mapUrl = (pickupCoords && destinationCoords) 
+    ? generateMapUrl(pickupWithCoords as any, destinationWithCoords as any)
+    : undefined;
 
   // Get current time for the timestamp
   const currentDate = new Date();

@@ -201,7 +201,7 @@ export function TowForm({
 
   const canSubmit = useMemo(() => {
     return (
-      (mode === "create" || formValues.ticketId.trim().length > 0) &&
+      formValues.ticketId.trim().length > 0 &&
       formValues.vehicle.trim().length > 0 &&
       formValues.pickupTitle.trim().length > 0 &&
       formValues.pickupAddress.trim().length > 0 &&
@@ -210,7 +210,6 @@ export function TowForm({
       (!requiresDriver || formValues.driverId.trim().length > 0)
     );
   }, [
-    mode,
     formValues.destinationAddress,
     formValues.destinationTitle,
     formValues.driverId,
@@ -472,22 +471,20 @@ export function TowForm({
               Tow Information
             </h2>
             <div className="flex flex-col gap-4">
-              {mode === "edit" && (
-                <div>
-                  <label htmlFor="ticketId" className="mb-1.5 block text-xs text-muted-foreground">
-                    Ticket ID
-                  </label>
-                  <input
-                    id="ticketId"
-                    name="ticketId"
-                    value={formValues.ticketId}
-                    onChange={handleChange("ticketId")}
-                    required
-                    className="w-full rounded-none border border-border/60 bg-slate-900/50 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
-                    placeholder="e.g. TD-4921"
-                  />
-                </div>
-              )}
+              <div>
+                <label htmlFor="ticketId" className="mb-1.5 block text-xs text-muted-foreground">
+                  Ticket ID
+                </label>
+                <input
+                  id="ticketId"
+                  name="ticketId"
+                  value={formValues.ticketId}
+                  onChange={handleChange("ticketId")}
+                  required
+                  className="w-full rounded-none border border-border/60 bg-slate-900/50 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+                  placeholder="e.g. TD-4921"
+                />
+              </div>
 
               <div>
                 <label htmlFor="vehicle" className="mb-1.5 block text-xs text-muted-foreground">

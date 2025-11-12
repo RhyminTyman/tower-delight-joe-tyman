@@ -34,20 +34,6 @@ async function getDispatcher() {
   };
 }
 
-async function generateTicketId(): Promise<string> {
-  // Get count of all tows to determine the next index
-  const result = await db
-    .selectFrom("driver_dashboard")
-    .select(db.fn.count<number>("id").as("count"))
-    .where("id", "like", "tow-%")
-    .executeTakeFirst();
-  
-  const count = result?.count ?? 0;
-  const nextIndex = count + 1;
-  
-  return `TD-1500${nextIndex}`;
-}
-
 async function resolveDriverSnapshot(driverId: string | null) {
   if (!driverId) {
     throw new Error("Driver ID is required. Please select a driver.");
@@ -83,9 +69,7 @@ export async function createTow(formData: FormData) {
     throw new Error("[createTow] Missing towId");
   }
 
-  // Auto-generate ticket ID
-  const ticketId = await generateTicketId();
-  
+  const ticketId = (formData.get("ticketId") as string | null)?.trim() ?? "";
   const vehicle = (formData.get("vehicle") as string | null)?.trim() ?? "";
   const driverId = (formData.get("driverId") as string | null)?.trim() ?? null;
   const type = (formData.get("towType") as string | null)?.trim() ?? "Light";

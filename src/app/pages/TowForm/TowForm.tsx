@@ -466,7 +466,6 @@ export function TowForm({
         </h1>
         <form action={handleAction} className="flex flex-col gap-6">
           <input type="hidden" name="towId" value={formValues.towId} />
-          {mode === "create" && <input type="hidden" name="ticketId" value="" />}
 
           <Card className="glass-card p-5">
             <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-accent">

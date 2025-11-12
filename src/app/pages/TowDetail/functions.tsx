@@ -28,6 +28,7 @@ export async function updateTowStatus(formData: FormData) {
     "En Route": "En Route",
     "On Scene": "On Scene",
     "Towing": "Towing",
+    "Completed": "Completed",
   };
 
   const now = new Date();
@@ -36,7 +37,7 @@ export async function updateTowStatus(formData: FormData) {
   if (data.route.statuses && Array.isArray(data.route.statuses)) {
     data.route.statuses.forEach((statusEntry: any) => {
       // Mark all statuses before and including the new status as completed
-      const statusOrder = ["Waiting", "Dispatched", "En Route", "On Scene", "Towing"];
+      const statusOrder = ["Waiting", "Dispatched", "En Route", "On Scene", "Towing", "Completed"];
       const currentIndex = statusOrder.indexOf(newStatus);
       const entryIndex = statusOrder.indexOf(statusEntry.label);
 

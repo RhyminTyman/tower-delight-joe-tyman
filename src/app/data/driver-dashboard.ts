@@ -144,6 +144,7 @@ export const DASHBOARD_TEMPLATE: DriverDashboardData = {
       { label: "En Route", time: "10:57 AM", status: "active" },
       { label: "On Scene", time: "--", status: "waiting" },
       { label: "Towing", time: "--", status: "waiting" },
+      { label: "Completed", time: "--", status: "waiting" },
     ],
   },
   workflow: [

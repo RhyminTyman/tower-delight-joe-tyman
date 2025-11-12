@@ -144,7 +144,14 @@ export default async () => {
                 : { ...s, status: "waiting" };
           }
           if (tow.status === "Towing") {
-            return s.label === "Towing" ? { ...s, status: "active" } : { ...s, status: "completed" };
+            return s.label === "Towing"
+              ? { ...s, status: "active" }
+              : s.label === "Waiting" || s.label === "Dispatched" || s.label === "En Route" || s.label === "On Scene"
+                ? { ...s, status: "completed" }
+                : { ...s, status: "waiting" };
+          }
+          if (tow.status === "Completed") {
+            return { ...s, status: "completed" };
           }
           return s;
         }),

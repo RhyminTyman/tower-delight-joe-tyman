@@ -14,10 +14,11 @@ const STATUS_CONFIG = {
   "Dispatched": { color: "bg-blue-600", next: "En Route" },
   "En Route": { color: "bg-green-500", next: "On Scene" },
   "On Scene": { color: "bg-amber-500", next: "Towing" },
-  "Towing": { color: "bg-purple-600", next: null },
+  "Towing": { color: "bg-purple-600", next: "Completed" },
+  "Completed": { color: "bg-emerald-600", next: null },
 } as const;
 
-const ALL_STATUSES = ["Waiting", "Dispatched", "En Route", "On Scene", "Towing"];
+const ALL_STATUSES = ["Waiting", "Dispatched", "En Route", "On Scene", "Towing", "Completed"];
 
 export function StatusBanner({ towId, currentStatus }: StatusBannerProps) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);

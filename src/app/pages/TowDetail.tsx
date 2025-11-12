@@ -212,20 +212,27 @@ export const TowDetail = async (requestInfo: RequestInfo) => {
                 </div>
               )}
             </div>
-
-            {/* Vehicle Photo - at the bottom of the collapsible section */}
-            {data.route.lastPhoto && hasPhoto(data.route.lastPhoto.dataUrl) && (
-              <div className="border-t border-border/60">
-                <div className="px-4 py-2 bg-card/50">
-                  <h3 className="text-xs font-semibold uppercase tracking-wide text-foreground">Vehicle Photo</h3>
-                </div>
-                <div className="overflow-hidden">
-                  <PhotoPreview towId={towId} imageUrl={data.route.lastPhoto.dataUrl} />
-                </div>
-              </div>
-            )}
           </details>
         </div>
+
+        {/* Vehicle Photo Card - Collapsible */}
+        {data.route.lastPhoto && hasPhoto(data.route.lastPhoto.dataUrl) && (
+          <div className="border border-border/60 bg-secondary/40">
+            <details className="group">
+              <summary className="cursor-pointer border-b border-border/60 px-4 py-2 bg-card/50 list-none">
+                <div className="flex items-center gap-3">
+                  <svg className="h-4 w-4 text-muted-foreground transition-transform group-open:rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                  <h2 className="text-sm font-semibold uppercase tracking-wide text-foreground">Vehicle Photo</h2>
+                </div>
+              </summary>
+              <div className="overflow-hidden">
+                <PhotoPreview towId={towId} imageUrl={data.route.lastPhoto.dataUrl} />
+              </div>
+            </details>
+          </div>
+        )}
 
         {/* Route Detail Card */}
         <div className="border border-border/60 bg-secondary/40 flex flex-col gap-3 p-4">

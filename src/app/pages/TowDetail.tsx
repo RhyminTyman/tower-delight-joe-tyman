@@ -73,18 +73,20 @@ export const TowDetail = async (requestInfo: RequestInfo) => {
       <StatusBanner towId={towId} currentStatus={data.route.status} />
       
       <main className="mx-auto flex min-h-screen max-w-md flex-col px-4 pb-28 pt-4 sm:max-w-lg">
-        {/* Route Map Card - Shows GPS map between pickup and destination */}
-        {(data.route.mapUrl || data.route.mapImage) && (
-          <div className="border border-border/60 bg-secondary/40">
-            <details className="group" open>
-              <summary className="cursor-pointer border-b border-border/60 px-4 py-2 bg-card/50 list-none">
-                <div className="flex items-center gap-3">
-                  <svg className="h-4 w-4 text-muted-foreground transition-transform group-open:rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                  <h2 className="text-sm font-semibold uppercase tracking-wide text-foreground">Route Map</h2>
-                </div>
-              </summary>
+        {/* Route Map Card - Shows GPS map, pickup/destination details, and vehicle photo */}
+        <div className="border border-border/60 bg-secondary/40">
+          <details className="group" open>
+            <summary className="cursor-pointer border-b border-border/60 px-4 py-2 bg-card/50 list-none">
+              <div className="flex items-center gap-3">
+                <svg className="h-4 w-4 text-muted-foreground transition-transform group-open:rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+                <h2 className="text-sm font-semibold uppercase tracking-wide text-foreground">Route Map</h2>
+              </div>
+            </summary>
+            
+            {/* Map Image */}
+            {(data.route.mapUrl || data.route.mapImage) && (
               <div className="overflow-hidden bg-slate-900">
                 <img
                   src={data.route.mapUrl || data.route.mapImage}
@@ -92,155 +94,82 @@ export const TowDetail = async (requestInfo: RequestInfo) => {
                   className="h-full w-full object-cover"
                 />
               </div>
-              {data.route.pickup.lat && data.route.pickup.lng && data.route.destination.lat && data.route.destination.lng && (
-                <div className="border-t border-border/60">
-                  <a
-                    href={`https://www.google.com/maps/dir/?api=1&origin=${data.route.pickup.lat},${data.route.pickup.lng}&destination=${data.route.destination.lat},${data.route.destination.lng}&travelmode=driving`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex w-full items-center justify-center gap-2 bg-accent px-4 py-3 text-sm font-semibold text-accent-foreground transition-colors hover:bg-accent/90 active:bg-accent/80"
-                  >
-                    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
-                    </svg>
-                    Open Route in Maps
-                  </a>
-                </div>
-              )}
-            </details>
-          </div>
-        )}
+            )}
 
-        {/* Vehicle Photo Card - Shows photo of the actual car */}
-        {data.route.lastPhoto && hasPhoto(data.route.lastPhoto.dataUrl) && (
-          <div className="border border-border/60 bg-secondary/40">
-            <details className="group">
-              <summary className="cursor-pointer border-b border-border/60 px-4 py-2 bg-card/50 list-none">
-                <div className="flex items-center gap-3">
-                  <svg className="h-4 w-4 text-muted-foreground transition-transform group-open:rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                  <h2 className="text-sm font-semibold uppercase tracking-wide text-foreground">Vehicle Photo</h2>
-                </div>
-              </summary>
-              <div className="overflow-hidden">
-                <PhotoPreview towId={towId} imageUrl={data.route.lastPhoto.dataUrl} />
-              </div>
-            </details>
-          </div>
-        )}
-
-        {/* Route Details Card */}
-        <div className="overflow-hidden border border-border/60 bg-secondary/40">
-          <div className="p-4 text-foreground">
-            <div className="bg-card/50 p-3">
-              {/* Pickup Row */}
-              <div className="flex items-start justify-between gap-3">
-                <div className="flex-1">
-                  <div className="mb-1 flex items-center gap-2">
-                    <p className="text-xs uppercase tracking-wide text-muted-foreground">Pickup</p>
-                    <a
-                      href={`/tow/${towId}/address/pickup`}
-                      className="rounded p-1 transition-colors hover:bg-muted"
-                      title="Edit pickup"
-                    >
-                      <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                      </svg>
-                    </a>
-                  </div>
-                  <p className="text-sm font-semibold leading-tight">{data.route.pickup.title}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {data.route.pickup.address}
-                  </p>
-                  {data.route.pickup.distance && (
-                    <p className="mt-1 text-xs text-muted-foreground/80">
-                      {data.route.pickup.distance}
-                    </p>
-                  )}
-                  {data.route.pickup.lat && data.route.pickup.lng && (
-                    <div className="mt-2">
+            {/* Pickup and Destination Details */}
+            <div className="border-t border-border/60 p-4 text-foreground">
+              <div className="bg-card/50 p-3">
+                {/* Pickup Row */}
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex-1">
+                    <div className="mb-1 flex items-center gap-2">
+                      <p className="text-xs uppercase tracking-wide text-muted-foreground">Pickup</p>
                       <a
-                        href={`https://maps.google.com/?q=${data.route.pickup.lat},${data.route.pickup.lng}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 bg-accent/10 px-3 py-2 text-sm font-medium text-accent transition-colors hover:bg-accent/20 active:bg-accent/30"
+                        href={`/tow/${towId}/address/pickup`}
+                        className="rounded p-1 transition-colors hover:bg-muted"
+                        title="Edit pickup"
                       >
-                        <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                         </svg>
-                        Navigate
                       </a>
                     </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Divider */}
-              <div className="my-3 h-px bg-border" />
-
-              {/* Destination Row */}
-              <div className="flex items-start justify-between gap-3">
-                <div className="flex-1">
-                  <div className="mb-1 flex items-center gap-2">
-                    <p className="text-xs uppercase tracking-wide text-muted-foreground">Destination</p>
-                    <a
-                      href={`/tow/${towId}/address/destination`}
-                      className="rounded p-1 transition-colors hover:bg-muted"
-                      title="Edit destination"
-                    >
-                      <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                      </svg>
-                    </a>
-                  </div>
-                  <p className="text-sm font-semibold leading-tight">{data.route.destination.title}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {data.route.destination.address}
-                  </p>
-                  {data.route.destination.distance && (
-                    <p className="mt-1 text-xs text-muted-foreground/80">
-                      {data.route.destination.distance}
+                    <p className="text-sm font-semibold leading-tight">{data.route.pickup.title}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {data.route.pickup.address}
                     </p>
-                  )}
-                  {data.route.destination.lat && data.route.destination.lng && (
-                    <div className="mt-2">
+                    {data.route.pickup.distance && (
+                      <p className="mt-1 text-xs text-muted-foreground/80">
+                        {data.route.pickup.distance}
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Divider */}
+                <div className="my-3 h-px bg-border" />
+
+                {/* Destination Row */}
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex-1">
+                    <div className="mb-1 flex items-center gap-2">
+                      <p className="text-xs uppercase tracking-wide text-muted-foreground">Destination</p>
                       <a
-                        href={`https://maps.google.com/?q=${data.route.destination.lat},${data.route.destination.lng}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 bg-emerald-500/10 px-3 py-2 text-sm font-medium text-emerald-400 transition-colors hover:bg-emerald-500/20 active:bg-emerald-500/30"
+                        href={`/tow/${towId}/address/destination`}
+                        className="rounded p-1 transition-colors hover:bg-muted"
+                        title="Edit destination"
                       >
-                        <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                         </svg>
-                        Navigate
                       </a>
                     </div>
-                  )}
+                    <p className="text-sm font-semibold leading-tight">{data.route.destination.title}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {data.route.destination.address}
+                    </p>
+                    {data.route.destination.distance && (
+                      <p className="mt-1 text-xs text-muted-foreground/80">
+                        {data.route.destination.distance}
+                      </p>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
-            
-            {/* Full Route Navigation */}
-            {data.route.pickup.lat && data.route.pickup.lng && data.route.destination.lat && data.route.destination.lng && (
-              <div className="mt-3">
-                <a
-                  href={`https://www.google.com/maps/dir/?api=1&origin=${data.route.pickup.lat},${data.route.pickup.lng}&destination=${data.route.destination.lat},${data.route.destination.lng}&travelmode=driving`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex w-full items-center justify-center gap-2 bg-accent px-5 py-3 text-base font-semibold text-accent-foreground transition-colors hover:bg-accent/90 active:bg-accent/80"
-                >
-                  <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
-                  </svg>
-                  Get Directions
-                </a>
+
+            {/* Vehicle Photo - at the bottom of the collapsible section */}
+            {data.route.lastPhoto && hasPhoto(data.route.lastPhoto.dataUrl) && (
+              <div className="border-t border-border/60">
+                <div className="px-4 py-2 bg-card/50">
+                  <h3 className="text-xs font-semibold uppercase tracking-wide text-foreground">Vehicle Photo</h3>
+                </div>
+                <div className="overflow-hidden">
+                  <PhotoPreview towId={towId} imageUrl={data.route.lastPhoto.dataUrl} />
+                </div>
               </div>
             )}
-          </div>
+          </details>
         </div>
 
         {/* Route Detail Card */}

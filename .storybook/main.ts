@@ -34,7 +34,20 @@ const config: StorybookConfig = {
       },
       load(id) {
         if (id === 'cloudflare:workers') {
-          return 'export const env = {}; export default {};';
+          // Export all common Cloudflare Workers APIs as mocks
+          return `
+            export const env = {};
+            export class DurableObject {}
+            export class DurableObjectStub {}
+            export class DurableObjectNamespace {}
+            export class ExecutionContext {}
+            export class Request {}
+            export class Response {}
+            export class Headers {}
+            export class URL {}
+            export class URLSearchParams {}
+            export default {};
+          `;
         }
       }
     });

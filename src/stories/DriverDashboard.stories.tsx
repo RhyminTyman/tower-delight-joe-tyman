@@ -73,6 +73,8 @@ export const OnScene: Story = {
           ? { ...status, status: "active", time: "11:15 AM" }
           : status.label === "Waiting" || status.label === "Dispatched" || status.label === "En Route"
             ? { ...status, status: "completed" }
+            : status.label === "Completed"
+            ? { ...status, status: "waiting", time: "--" }
             : { ...status, status: "waiting", time: "--" },
       ),
     },
@@ -150,10 +152,12 @@ export const TowComplete: Story = {
       ...baseData.route,
       status: "Towing",
       statusTone: "completed",
-      updateCta: "Close Ticket",
+      updateCta: "Mark Complete",
       statuses: baseData.route.statuses.map((status) =>
         status.label === "Towing"
           ? { ...status, status: "active", time: "11:32 AM" }
+          : status.label === "Completed"
+          ? { ...status, status: "waiting", time: "--" }
           : { ...status, status: "completed" },
       ),
     },
@@ -167,6 +171,41 @@ export const TowComplete: Story = {
       description: {
         story:
           "Final stage of workflow. Vehicle is loaded and being towed to impound. Driver must submit documentation to APD before completing ticket. Edit icon appears next to pickup address.",
+      },
+    },
+  },
+};
+
+export const Completed: Story = {
+  name: "Completed - Tow Finished",
+  args: {
+    ...cloneDashboard(baseData),
+    towId: "primary",
+    driver: {
+      ...baseData.driver,
+      status: "Available",
+    },
+    route: {
+      ...baseData.route,
+      status: "Completed",
+      statusTone: "completed",
+      updateCta: "View Details",
+      statuses: baseData.route.statuses.map((status) => ({
+        ...status,
+        status: "completed" as const,
+        time: status.label === "Completed" ? "11:45 AM" : status.time,
+      })),
+    },
+    nextAction: {
+      label: "Tow complete",
+      detail: "All documentation submitted and verified",
+    },
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Tow has been completed successfully. All statuses are marked as complete, and the driver is now available for the next assignment. This represents the final state of a tow workflow.",
       },
     },
   },

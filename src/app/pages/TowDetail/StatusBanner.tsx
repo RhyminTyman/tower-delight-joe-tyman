@@ -77,7 +77,7 @@ export function StatusBanner({ towId, currentStatus }: StatusBannerProps) {
               {isUpdating ? "Updating..." : `→ ${nextStatus}`}
             </button>
           )}
-          
+
           <button
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
             disabled={isUpdating}

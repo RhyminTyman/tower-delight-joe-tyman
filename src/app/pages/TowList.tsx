@@ -172,10 +172,11 @@ async function loadTowList(): Promise<TowItem[]> {
     const rows = await db
       .selectFrom("driver_dashboard")
       .select(["id", "payload"])
-      .where("id", "like", "tow-%")
       .execute();
     
-    const tows = rows.filter(row => row.payload).map((row) => {
+    const tows = rows
+      .filter(row => row.payload && row.id.startsWith("tow-"))
+      .map((row) => {
       try {
         const data = typeof row.payload === 'string' ? JSON.parse(row.payload) : row.payload;
         return {
@@ -200,6 +201,9 @@ async function loadTowList(): Promise<TowItem[]> {
         throw err;
       }
     });
+    
+    // Sort by ID descending (newest first, since IDs are tow-{timestamp})
+    tows.sort((a, b) => b.id.localeCompare(a.id));
     
     return tows;
   } catch (error) {

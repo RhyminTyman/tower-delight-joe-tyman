@@ -72,19 +72,22 @@ export const TowDetail = async (requestInfo: RequestInfo) => {
 
       <StatusBanner towId={towId} currentStatus={data.route.status} />
       
-      <main className="mx-auto flex min-h-screen max-w-md flex-col px-4 pb-28 pt-4 sm:max-w-lg">
+      <main className="mx-auto flex min-h-screen max-w-md flex-col gap-4 px-4 pb-28 pt-4 sm:max-w-lg">
+        {/* Vehicle Info Card */}
+        <div className="border border-border/60 bg-secondary/40 p-4">
+          <p className="text-xs uppercase tracking-wide text-muted-foreground mb-1">Vehicle</p>
+          <p className="text-base font-semibold text-foreground">{data.dispatch.vehicle}</p>
+        </div>
+
         {/* Route Map Card - Shows GPS map, pickup/destination details, and vehicle photo */}
         <div className="border border-border/60 bg-secondary/40">
           <details className="group" open>
             <summary className="cursor-pointer border-b border-border/60 px-4 py-2 bg-card/50 list-none">
-              <div className="flex items-center justify-between gap-3">
-                <div className="flex items-center gap-3">
-                  <svg className="h-4 w-4 text-muted-foreground transition-transform group-open:rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                  <h2 className="text-sm font-semibold uppercase tracking-wide text-foreground">Route Map</h2>
-                </div>
-                <p className="text-xs font-medium text-muted-foreground">{data.dispatch.vehicle}</p>
+              <div className="flex items-center gap-3">
+                <svg className="h-4 w-4 text-muted-foreground transition-transform group-open:rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+                <h2 className="text-sm font-semibold uppercase tracking-wide text-foreground">Route Map</h2>
               </div>
             </summary>
             

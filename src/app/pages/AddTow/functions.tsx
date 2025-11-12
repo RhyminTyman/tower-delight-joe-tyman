@@ -1,13 +1,9 @@
 "use server";
 
-import { DASHBOARD_TEMPLATE, type DriverDashboardData } from "@/app/data/driver-dashboard";
+import { type DriverDashboardData } from "@/app/data/driver-dashboard";
 import { db } from "@/db";
 import { generateMapUrl } from "@/utils/maps";
 import { DISPATCHER_ID } from "@/config/constants";
-
-function cloneDashboard(): DriverDashboardData {
-  return JSON.parse(JSON.stringify(DASHBOARD_TEMPLATE));
-}
 
 async function getDispatcher() {
   const dispatcher = await db
@@ -104,29 +100,18 @@ export async function createTow(formData: FormData) {
     ? { lat: parseFloat(destinationLatStr), lng: parseFloat(destinationLngStr) }
     : null;
 
-  const payload = cloneDashboard();
-
-  payload.driver = driver;
-  payload.dispatch = {
-    ...payload.dispatch,
-    ticketId,
-    vehicle,
-    etaMinutes: Number.isFinite(etaMinutes) ? etaMinutes : payload.dispatch.etaMinutes,
-    location: pickupTitle || payload.dispatch.location,
-  };
-
   // Build pickup and destination objects with coordinates (if available)
   const pickupWithCoords = {
-    title: pickupTitle || payload.route.pickup.title,
-    address: pickupAddress || payload.route.pickup.address,
-    distance: pickupDistance || payload.route.pickup.distance,
+    title: pickupTitle,
+    address: pickupAddress,
+    distance: pickupDistance,
     ...(pickupCoords && { lat: pickupCoords.lat, lng: pickupCoords.lng }),
   };
 
   const destinationWithCoords = {
-    title: destinationTitle || payload.route.destination.title,
-    address: destinationAddress || payload.route.destination.address,
-    distance: destinationDistance || payload.route.destination.distance,
+    title: destinationTitle,
+    address: destinationAddress,
+    distance: destinationDistance,
     ...(destinationCoords && { lat: destinationCoords.lat, lng: destinationCoords.lng }),
   };
 
@@ -143,40 +128,50 @@ export async function createTow(formData: FormData) {
     hour12: true 
   });
 
-  payload.route = {
-    ...payload.route,
-    status: "Waiting",
-    statusTone: "waiting",
-    pickup: pickupWithCoords,
-    destination: destinationWithCoords,
-    mapUrl: mapUrl,
-    mapImage: mapUrl || payload.route.mapImage,
-    dispatcher: dispatcherInfo.name,
-    hasKeys: hasKeys,
-    type,
-    poNumber: poNumber,
-    driverCallsign,
-    truck,
-    statuses: payload.route.statuses.map((status) => {
-      if (status.label === "Waiting") {
-        return {
-          ...status,
-          status: "active",
-          time: currentTime,
-        };
-      }
-      return {
-        ...status,
-        status: "waiting",
-        time: "--",
-      };
-    }),
-  };
-
-  // Update driver info with dispatcher contact
-  payload.driver = {
-    ...payload.driver,
-    contactNumber: dispatcherInfo.contactNumber,
+  // Build the payload from scratch with only real data
+  const payload: DriverDashboardData = {
+    driver: {
+      ...driver,
+      contactNumber: dispatcherInfo.contactNumber,
+    },
+    dispatch: {
+      ticketId,
+      vehicle,
+      etaMinutes: Number.isFinite(etaMinutes) ? etaMinutes : 0,
+      location: pickupTitle,
+      customer: "",
+    },
+    route: {
+      status: "Waiting",
+      statusTone: "waiting",
+      pickup: pickupWithCoords,
+      destination: destinationWithCoords,
+      mapUrl: mapUrl,
+      mapImage: mapUrl || "",
+      dispatcher: dispatcherInfo.name,
+      hasKeys: hasKeys,
+      type,
+      poNumber: poNumber,
+      driverCallsign,
+      truck,
+      updateCta: "Mark Dispatched",
+      statuses: [
+        { label: "Waiting", time: currentTime, status: "active" },
+        { label: "Dispatched", time: "--", status: "waiting" },
+        { label: "En Route", time: "--", status: "waiting" },
+        { label: "On Scene", time: "--", status: "waiting" },
+        { label: "Towing", time: "--", status: "waiting" },
+        { label: "Completed", time: "--", status: "waiting" },
+      ],
+    },
+    workflow: [],
+    actions: [],
+    checklist: [],
+    impoundPreparation: [],
+    nextAction: {
+      label: "Waiting for dispatch",
+      detail: "Tow request created, awaiting assignment",
+    },
   };
 
   const now = Math.floor(Date.now() / 1000);

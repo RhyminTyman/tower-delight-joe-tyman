@@ -6,11 +6,11 @@ import type { DriverOption } from "@/app/pages/TowForm/TowForm";
 // Mock driver options for the form
 const mockDriverOptions: DriverOption[] = [
   {
-    id: "driver-784",
+    id: "driver-001",
     name: "Jordan Alvarez",
     callSign: "HD-12",
     snapshot: {
-      id: "driver-784",
+      id: "driver-001",
       name: "Jordan Alvarez",
       role: "Heavy Duty Operator",
       shift: "Night",

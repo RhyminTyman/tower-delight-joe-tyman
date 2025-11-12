@@ -102,7 +102,7 @@ export interface DriverDashboardData {
 // Template for seeding and testing only - NOT for runtime fallback
 export const DASHBOARD_TEMPLATE: DriverDashboardData = {
   driver: {
-    id: "driver-784",
+    id: "driver-001",
     name: "Jordan Alvarez",
     role: "Heavy Duty Operator",
     shift: "Night Shift · 6:00p — 2:00a",

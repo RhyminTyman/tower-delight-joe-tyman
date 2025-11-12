@@ -29,6 +29,7 @@ const config: StorybookConfig = {
       "@": path.resolve(__dirname, "../src"),
       // Mock server-side modules for Storybook
       "@/db": path.resolve(__dirname, "./mocks/db.ts"),
+      "@/app/pages/TowDetail/functions": path.resolve(__dirname, "./mocks/towDetailFunctions.ts"),
     };
     
     // Externalize Cloudflare Workers modules for Storybook

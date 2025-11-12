@@ -28,6 +28,12 @@ export function AddressAutocompleteInput({
 }: AddressAutocompleteInputProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const autocompleteRef = useRef<any>(null);
+  const callbackRef = useRef(onPlaceSelected);
+
+  // Keep callback ref up to date
+  useEffect(() => {
+    callbackRef.current = onPlaceSelected;
+  }, [onPlaceSelected]);
 
   useEffect(() => {
     let isMounted = true;
@@ -49,8 +55,8 @@ export function AddressAutocompleteInput({
 
         autocomplete.addListener('place_changed', () => {
           const place = autocomplete.getPlace();
-          if (place.geometry?.location && onPlaceSelected) {
-            onPlaceSelected({
+          if (place.geometry?.location && callbackRef.current) {
+            callbackRef.current({
               address: place.formatted_address || '',
               lat: place.geometry.location.lat().toFixed(4),
               lng: place.geometry.location.lng().toFixed(4),
@@ -77,7 +83,7 @@ export function AddressAutocompleteInput({
         console.error('Failed to cleanup autocomplete:', error);
       }
     };
-  }, [onPlaceSelected]);
+  }, []);
 
   return (
     <div>

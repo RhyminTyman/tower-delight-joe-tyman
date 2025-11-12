@@ -514,11 +514,14 @@ const app = defineApp([
       const driverList = drivers.map(d => {
         try {
           const payload = typeof d.payload === 'string' ? JSON.parse(d.payload) : d.payload;
+          // Drivers are stored with DASHBOARD_TEMPLATE structure, so driver info is nested
+          const driverInfo = payload.driver || payload;
           return {
             id: d.id,
-            name: payload.name || 'Unknown',
-            role: payload.role || 'Unknown',
-            callSign: payload.callSign || 'Unknown'
+            name: driverInfo.name || 'Unknown',
+            role: driverInfo.role || 'Unknown',
+            callSign: driverInfo.callSign || 'Unknown',
+            truck: driverInfo.truck || 'Unknown'
           };
         } catch (parseError) {
           console.error(`[Debug Drivers] Failed to parse driver ${d.id}:`, parseError);

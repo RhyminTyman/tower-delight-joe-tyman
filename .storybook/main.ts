@@ -29,12 +29,18 @@ const config: StorybookConfig = {
       "@": path.resolve(__dirname, "../src"),
       // Mock server-side modules for Storybook
       "@/db": path.resolve(__dirname, "./mocks/db.ts"),
-      // Mock all server actions
+      // Mock all server actions - need to include .tsx extension for relative imports
       "@/app/pages/TowDetail/functions": path.resolve(__dirname, "./mocks/serverActions.ts"),
       "@/app/pages/AddTow/functions": path.resolve(__dirname, "./mocks/serverActions.ts"),
       "@/app/pages/EditTow/functions": path.resolve(__dirname, "./mocks/serverActions.ts"),
       "@/app/pages/EditAddress/functions": path.resolve(__dirname, "./mocks/serverActions.ts"),
       "@/app/pages/AddNote/functions": path.resolve(__dirname, "./mocks/serverActions.ts"),
+      // Also need to handle the actual file paths for relative imports
+      [path.resolve(__dirname, "../src/app/pages/TowDetail/functions.tsx")]: path.resolve(__dirname, "./mocks/serverActions.ts"),
+      [path.resolve(__dirname, "../src/app/pages/AddTow/functions.tsx")]: path.resolve(__dirname, "./mocks/serverActions.ts"),
+      [path.resolve(__dirname, "../src/app/pages/EditTow/functions.tsx")]: path.resolve(__dirname, "./mocks/serverActions.ts"),
+      [path.resolve(__dirname, "../src/app/pages/EditAddress/functions.tsx")]: path.resolve(__dirname, "./mocks/serverActions.ts"),
+      [path.resolve(__dirname, "../src/app/pages/AddNote/functions.tsx")]: path.resolve(__dirname, "./mocks/serverActions.ts"),
     };
     
     // Externalize Cloudflare Workers modules for Storybook

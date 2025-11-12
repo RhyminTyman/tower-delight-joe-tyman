@@ -69,7 +69,10 @@ export async function createTow(formData: FormData) {
     throw new Error("[createTow] Missing towId");
   }
 
-  const ticketId = (formData.get("ticketId") as string | null)?.trim() ?? "";
+  const ticketId = (formData.get("ticketId") as string | null)?.trim();
+  if (!ticketId) {
+    throw new Error("Ticket ID is required");
+  }
   const vehicle = (formData.get("vehicle") as string | null)?.trim() ?? "";
   const driverId = (formData.get("driverId") as string | null)?.trim() ?? null;
   const type = (formData.get("towType") as string | null)?.trim() ?? "Light";

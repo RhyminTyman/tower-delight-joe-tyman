@@ -369,28 +369,18 @@ export function TowForm({
   const towTypeFieldName = mode === "edit" ? "type" : "towType";
 
   const handleAction = async (formData: FormData) => {
-    if (!canSubmit || isSaving) {
-      return;
+    formData.set("towId", formValues.towId);
+    formData.set(towTypeFieldName, formValues.towType);
+    if (requiresDriver) {
+      formData.set("driverId", formValues.driverId);
     }
-
-    setIsSaving(true);
-    try {
-      formData.set("towId", formValues.towId);
-      formData.set(towTypeFieldName, formValues.towType);
-      if (requiresDriver) {
-        formData.set("driverId", formValues.driverId);
-      }
-      // Add lat/lng coordinates if available
-      if (formValues.pickupLat) formData.set("pickupLat", formValues.pickupLat);
-      if (formValues.pickupLng) formData.set("pickupLng", formValues.pickupLng);
-      if (formValues.destinationLat) formData.set("destinationLat", formValues.destinationLat);
-      if (formValues.destinationLng) formData.set("destinationLng", formValues.destinationLng);
-      
-      await onSubmit(formData, formValues.towId);
-    } catch (error) {
-      console.error("[TowForm] Submission failed:", error);
-      setIsSaving(false);
-    }
+    // Add lat/lng coordinates if available
+    if (formValues.pickupLat) formData.set("pickupLat", formValues.pickupLat);
+    if (formValues.pickupLng) formData.set("pickupLng", formValues.pickupLng);
+    if (formValues.destinationLat) formData.set("destinationLat", formValues.destinationLat);
+    if (formValues.destinationLng) formData.set("destinationLng", formValues.destinationLng);
+    
+    await onSubmit(formData, formValues.towId);
   };
 
   if (mode === "create" && driverOptions.length === 0) {

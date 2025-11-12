@@ -24,25 +24,32 @@ const config: StorybookConfig = {
     // config.plugins.push(redwood());
     
     config.resolve = config.resolve ?? {};
-    config.resolve.alias = {
-      ...(config.resolve.alias ?? {}),
-      "@": path.resolve(__dirname, "../src"),
-      // Mock server-side modules for Storybook
-      "@/db": path.resolve(__dirname, "./mocks/db.ts"),
-      "@/app/data/driver-dashboard": path.resolve(__dirname, "./mocks/driver-dashboard.ts"),
+    
+    // Add exact match aliases FIRST - order matters!
+    const mockAliases = {
+      // EXACT file path aliases (must come first for precedence)
       [path.resolve(__dirname, "../src/app/data/driver-dashboard.ts")]: path.resolve(__dirname, "./mocks/driver-dashboard.ts"),
-      // Mock all server actions - need to include .tsx extension for relative imports
-      "@/app/pages/TowDetail/functions": path.resolve(__dirname, "./mocks/serverActions.ts"),
-      "@/app/pages/AddTow/functions": path.resolve(__dirname, "./mocks/serverActions.ts"),
-      "@/app/pages/EditTow/functions": path.resolve(__dirname, "./mocks/serverActions.ts"),
-      "@/app/pages/EditAddress/functions": path.resolve(__dirname, "./mocks/serverActions.ts"),
-      "@/app/pages/AddNote/functions": path.resolve(__dirname, "./mocks/serverActions.ts"),
-      // Also need to handle the actual file paths for relative imports
+      [path.resolve(__dirname, "../src/db/index.ts")]: path.resolve(__dirname, "./mocks/db.ts"),
       [path.resolve(__dirname, "../src/app/pages/TowDetail/functions.tsx")]: path.resolve(__dirname, "./mocks/serverActions.ts"),
       [path.resolve(__dirname, "../src/app/pages/AddTow/functions.tsx")]: path.resolve(__dirname, "./mocks/serverActions.ts"),
       [path.resolve(__dirname, "../src/app/pages/EditTow/functions.tsx")]: path.resolve(__dirname, "./mocks/serverActions.ts"),
       [path.resolve(__dirname, "../src/app/pages/EditAddress/functions.tsx")]: path.resolve(__dirname, "./mocks/serverActions.ts"),
       [path.resolve(__dirname, "../src/app/pages/AddNote/functions.tsx")]: path.resolve(__dirname, "./mocks/serverActions.ts"),
+    };
+    
+    config.resolve.alias = {
+      ...(config.resolve.alias ?? {}),
+      "@": path.resolve(__dirname, "../src"),
+      // Path-based aliases FIRST (higher priority)
+      ...mockAliases,
+      // Then @ aliases as fallback
+      "@/db": path.resolve(__dirname, "./mocks/db.ts"),
+      "@/app/data/driver-dashboard": path.resolve(__dirname, "./mocks/driver-dashboard.ts"),
+      "@/app/pages/TowDetail/functions": path.resolve(__dirname, "./mocks/serverActions.ts"),
+      "@/app/pages/AddTow/functions": path.resolve(__dirname, "./mocks/serverActions.ts"),
+      "@/app/pages/EditTow/functions": path.resolve(__dirname, "./mocks/serverActions.ts"),
+      "@/app/pages/EditAddress/functions": path.resolve(__dirname, "./mocks/serverActions.ts"),
+      "@/app/pages/AddNote/functions": path.resolve(__dirname, "./mocks/serverActions.ts"),
     };
     
     // Externalize Cloudflare Workers modules for Storybook

@@ -369,16 +369,13 @@ export function TowForm({
 
   const towTypeFieldName = mode === "edit" ? "type" : "towType";
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    
+  const handleAction = async (formData: FormData) => {
     if (!canSubmit || isSaving) {
       return;
     }
 
     setIsSaving(true);
     try {
-      const formData = new FormData(e.currentTarget);
       formData.set("towId", formValues.towId);
       formData.set(towTypeFieldName, formValues.towType);
       if (requiresDriver) {
@@ -467,7 +464,7 @@ export function TowForm({
         <h1 className={`mb-6 text-xl font-semibold text-foreground ${mode === "create" ? "hidden" : ""}`}>
           {headerTitle}
         </h1>
-        <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+        <form action={handleAction} className="flex flex-col gap-6">
           <input type="hidden" name="towId" value={formValues.towId} />
           {mode === "create" && <input type="hidden" name="ticketId" value="" />}
 

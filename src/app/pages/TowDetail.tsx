@@ -123,6 +123,22 @@ export const TowDetail = async (requestInfo: RequestInfo) => {
                         {data.route.pickup.distance}
                       </p>
                     )}
+                    {data.route.pickup.lat && data.route.pickup.lng && (
+                      <div className="mt-2">
+                        <a
+                          href={`https://maps.google.com/?q=${data.route.pickup.lat},${data.route.pickup.lng}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-2 bg-blue-500/10 px-3 py-2 text-sm font-medium text-blue-400 transition-colors hover:bg-blue-500/20 active:bg-blue-500/30"
+                        >
+                          <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                          </svg>
+                          Navigate to Pickup
+                        </a>
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -152,6 +168,22 @@ export const TowDetail = async (requestInfo: RequestInfo) => {
                       <p className="mt-1 text-xs text-muted-foreground/80">
                         {data.route.destination.distance}
                       </p>
+                    )}
+                    {data.route.destination.lat && data.route.destination.lng && (
+                      <div className="mt-2">
+                        <a
+                          href={`https://maps.google.com/?q=${data.route.destination.lat},${data.route.destination.lng}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-2 bg-emerald-500/10 px-3 py-2 text-sm font-medium text-emerald-400 transition-colors hover:bg-emerald-500/20 active:bg-emerald-500/30"
+                        >
+                          <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                          </svg>
+                          Navigate to Destination
+                        </a>
+                      </div>
                     )}
                   </div>
                 </div>

@@ -512,13 +512,24 @@ const app = defineApp([
         .execute();
       
       const driverList = drivers.map(d => {
-        const payload = JSON.parse(d.payload);
-        return {
-          id: d.id,
-          name: payload.name,
-          role: payload.role,
-          callSign: payload.callSign
-        };
+        try {
+          const payload = typeof d.payload === 'string' ? JSON.parse(d.payload) : d.payload;
+          return {
+            id: d.id,
+            name: payload.name || 'Unknown',
+            role: payload.role || 'Unknown',
+            callSign: payload.callSign || 'Unknown'
+          };
+        } catch (parseError) {
+          console.error(`[Debug Drivers] Failed to parse driver ${d.id}:`, parseError);
+          return {
+            id: d.id,
+            name: 'Parse Error',
+            role: 'Parse Error',
+            callSign: 'Parse Error',
+            rawPayload: String(d.payload).substring(0, 100)
+          };
+        }
       });
       
       return Response.json({ 
@@ -527,7 +538,10 @@ const app = defineApp([
       });
     } catch (error) {
       console.error("[Debug Drivers] Error:", error);
-      return Response.json({ success: false, error: String(error) }, { status: 500 });
+      return Response.json({ 
+        success: false, 
+        error: error instanceof Error ? error.message : String(error)
+      }, { status: 500 });
     }
   }),
 

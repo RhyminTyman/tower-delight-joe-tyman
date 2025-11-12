@@ -228,7 +228,7 @@ export const TowDetail = async (requestInfo: RequestInfo) => {
         </div>
 
         {/* Route Detail Card */}
-        <div className="mt-4 border border-border/60 bg-secondary/40 flex flex-col gap-3 p-4">
+        <div className="border border-border/60 bg-secondary/40 flex flex-col gap-3 p-4">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-xs uppercase tracking-wide text-muted-foreground">PO #</p>
@@ -263,7 +263,7 @@ export const TowDetail = async (requestInfo: RequestInfo) => {
         </div>
 
         {/* Status Timeline */}
-        <div className="mt-4 border border-border/60 bg-secondary/40 p-4">
+        <div className="border border-border/60 bg-secondary/40 p-4">
           <h2 className="text-sm font-semibold text-foreground">Statuses</h2>
           <div className="mt-4 flex flex-col gap-4">
             {data.route.statuses.map((status, index) => {

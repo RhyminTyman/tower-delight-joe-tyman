@@ -2,11 +2,21 @@ import type { Meta, StoryObj } from "@storybook/react";
 
 import { AddTowForm } from "@/app/pages/AddTow/AddTowForm";
 
+// Mock driver options for the form
+const mockDriverOptions = [
+  { id: "driver-784", name: "Jordan Alvarez" },
+  { id: "driver-512", name: "Maria Garcia" },
+  { id: "driver-331", name: "James Wilson" },
+];
+
 const meta: Meta<typeof AddTowForm> = {
   title: "Forms/AddTowForm",
   component: AddTowForm,
   parameters: {
     layout: "fullscreen",
+  },
+  args: {
+    driverOptions: mockDriverOptions,
   },
   decorators: [
     (Story) => (

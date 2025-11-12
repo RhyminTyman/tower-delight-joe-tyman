@@ -29,7 +29,7 @@ export function useOptimisticUpdate<T>(
       setValue(newValue);
       setIsUpdating(true);
       setError(null);
-
+      
       try {
         // Perform server update
         await serverUpdate(newValue);

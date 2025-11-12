@@ -98,20 +98,9 @@ export interface DriverDashboardData {
   route: RouteOverview;
 }
 
-type RemoteDashboardResponse = {
-  driver: Partial<DriverSnapshot>;
-  dispatch: Partial<DispatchTicket>;
-  workflow?: Array<Partial<DispatchWorkflowStage>>;
-  actions?: Array<Partial<DriverDashboardData["actions"][number]>>;
-  checklist?: Array<Partial<ChecklistItem>>;
-  impoundPreparation?: Array<Partial<ImpoundPreparationItem>>;
-  nextAction?: Partial<DriverDashboardData["nextAction"]>;
-  route?: Partial<RouteOverview> & {
-    statuses?: Array<Partial<RouteTimelineEntry>>;
-  };
-};
 
-const FALLBACK_DASHBOARD: DriverDashboardData = {
+// Template for seeding and testing only - NOT for runtime fallback
+export const DASHBOARD_TEMPLATE: DriverDashboardData = {
   driver: {
     id: "driver-784",
     name: "Jordan Alvarez",
@@ -235,7 +224,7 @@ const FALLBACK_DASHBOARD: DriverDashboardData = {
 
 export async function loadDriverDashboard(
   requestInfo?: Pick<RequestInfo, "ctx">,
-): Promise<DriverDashboardData> {
+): Promise<DriverDashboardData | null> {
   const dashboardFromDb = await loadDashboardFromDatabase();
   if (dashboardFromDb) {
     return dashboardFromDb;
@@ -243,7 +232,7 @@ export async function loadDriverDashboard(
 
   const apiBaseUrl = resolveApiBaseUrl(requestInfo);
   if (!apiBaseUrl) {
-    return FALLBACK_DASHBOARD;
+    return null;
   }
 
   try {
@@ -258,21 +247,21 @@ export async function loadDriverDashboard(
     clearTimeout(timeout);
 
     if (!response.ok) {
-      console.warn(
+      console.error(
         `[driver-dashboard] Non-OK response (${response.status}) from ${apiBaseUrl}/driver-dashboard`,
       );
-      return FALLBACK_DASHBOARD;
+      return null;
     }
 
-    const payload = (await response.json()) as RemoteDashboardResponse;
-    return mergeDashboard(payload);
+    const payload = (await response.json()) as DriverDashboardData;
+    return payload;
   } catch (error) {
     if (error instanceof Error) {
-      console.warn("[driver-dashboard] Falling back to static data:", error.message);
+      console.error("[driver-dashboard] Failed to load dashboard:", error.message);
     } else {
-      console.warn("[driver-dashboard] Falling back to static data:", error);
+      console.error("[driver-dashboard] Failed to load dashboard:", error);
     }
-    return FALLBACK_DASHBOARD;
+    return null;
   }
 }
 
@@ -289,102 +278,7 @@ type GlobalTowerEnv = {
   __TOWER_API_BASE_URL?: string;
 };
 
-function mergeDashboard(remote: RemoteDashboardResponse): DriverDashboardData {
-  const driver = { ...FALLBACK_DASHBOARD.driver, ...remote.driver };
-  const dispatch = { ...FALLBACK_DASHBOARD.dispatch, ...remote.dispatch };
-  const workflow =
-    remote.workflow?.map((stage, index) => {
-      const fallback =
-        (stage.key
-          ? FALLBACK_DASHBOARD.workflow.find((item) => item.key === stage.key)
-          : FALLBACK_DASHBOARD.workflow[index]) ?? FALLBACK_DASHBOARD.workflow[index]!;
-      return {
-        key: stage.key ?? fallback.key,
-        label: stage.label ?? fallback.label,
-        detail: stage.detail ?? fallback.detail,
-        occurredAt: stage.occurredAt ?? fallback.occurredAt,
-        status: stage.status ?? fallback.status,
-      };
-    }) ?? FALLBACK_DASHBOARD.workflow;
-  const actions =
-    remote.actions?.map((action, index) => {
-      const fallback =
-        (action.id
-          ? FALLBACK_DASHBOARD.actions.find((item) => item.id === action.id)
-          : FALLBACK_DASHBOARD.actions[index]) ?? FALLBACK_DASHBOARD.actions[index]!;
-      return {
-        id: action.id ?? fallback.id,
-        label: action.label ?? fallback.label,
-        variant:
-          (action.variant as DriverDashboardData["actions"][number]["variant"]) ??
-          fallback.variant ??
-          "default",
-      };
-    }) ?? FALLBACK_DASHBOARD.actions;
-  const checklist =
-    remote.checklist?.map((item, index) => {
-      const fallback =
-        (item.id
-          ? FALLBACK_DASHBOARD.checklist.find((entry) => entry.id === item.id)
-          : FALLBACK_DASHBOARD.checklist[index]) ?? FALLBACK_DASHBOARD.checklist[index]!;
-      return {
-        id: item.id ?? fallback.id,
-        label: item.label ?? fallback.label,
-        critical: item.critical ?? fallback.critical,
-        complete: item.complete ?? fallback.complete,
-      };
-    }) ?? FALLBACK_DASHBOARD.checklist;
-  const impoundPreparation =
-    remote.impoundPreparation?.map((item, index) => {
-      const fallback =
-        (item.id
-          ? FALLBACK_DASHBOARD.impoundPreparation.find((entry) => entry.id === item.id)
-          : FALLBACK_DASHBOARD.impoundPreparation[index]) ??
-        FALLBACK_DASHBOARD.impoundPreparation[index]!;
-      return {
-        id: item.id ?? fallback.id,
-        title: item.title ?? fallback.title,
-        value: item.value ?? fallback.value,
-      };
-    }) ?? FALLBACK_DASHBOARD.impoundPreparation;
-  const nextAction = { ...FALLBACK_DASHBOARD.nextAction, ...remote.nextAction };
-  const routeStatuses =
-    remote.route?.statuses?.map((entry, index) => {
-      const fallback =
-        (entry.label
-          ? FALLBACK_DASHBOARD.route.statuses.find((status) => status.label === entry.label)
-          : FALLBACK_DASHBOARD.route.statuses[index]) ??
-        FALLBACK_DASHBOARD.route.statuses[index]!;
-      return {
-        label: entry.label ?? fallback.label,
-        time: entry.time ?? fallback.time,
-        status: entry.status ?? fallback.status,
-      };
-    }) ?? FALLBACK_DASHBOARD.route.statuses;
-  const route: RouteOverview = {
-    ...FALLBACK_DASHBOARD.route,
-    ...remote.route,
-    statuses: routeStatuses,
-  };
 
-  return {
-    driver,
-    dispatch: {
-      ...dispatch,
-      etaMinutes: Number(
-        dispatch.etaMinutes ?? FALLBACK_DASHBOARD.dispatch.etaMinutes,
-      ),
-    },
-    workflow,
-    actions,
-    checklist,
-    impoundPreparation,
-    nextAction,
-    route,
-  };
-}
-
-export const STATIC_DRIVER_DASHBOARD = FALLBACK_DASHBOARD;
 
 export async function loadDashboardFromDatabase(): Promise<DriverDashboardData | null> {
   try {

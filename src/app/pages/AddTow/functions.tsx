@@ -1,80 +1,66 @@
 "use server";
 
-import { STATIC_DRIVER_DASHBOARD } from "@/app/data/driver-dashboard";
+import { DASHBOARD_TEMPLATE, type DriverDashboardData } from "@/app/data/driver-dashboard";
 import { db } from "@/db";
 import { generateMapUrl, generateRandomCoordinates } from "@/utils/maps";
 import { DISPATCHER_ID } from "@/config/constants";
 
-type DashboardPayload = typeof STATIC_DRIVER_DASHBOARD;
-
-function cloneDashboard(): DashboardPayload {
-  return JSON.parse(JSON.stringify(STATIC_DRIVER_DASHBOARD));
+function cloneDashboard(): DriverDashboardData {
+  return JSON.parse(JSON.stringify(DASHBOARD_TEMPLATE));
 }
 
 async function getDispatcher() {
-  try {
-    const dispatcher = await db
-      .selectFrom("driver_dashboard")
-      .select("payload")
-      .where("id", "=", DISPATCHER_ID)
-      .executeTakeFirst();
+  const dispatcher = await db
+    .selectFrom("driver_dashboard")
+    .select("payload")
+    .where("id", "=", DISPATCHER_ID)
+    .executeTakeFirst();
 
-    if (dispatcher?.payload) {
-      const data = typeof dispatcher.payload === "string" 
-        ? JSON.parse(dispatcher.payload) 
-        : dispatcher.payload;
-      return {
-        name: data.name || "Dispatch",
-        contactNumber: data.contactNumber || "+1 (512) 555-9999",
-      };
-    }
-  } catch (error) {
-    console.error("[createTow] Failed to fetch dispatcher:", error);
+  if (!dispatcher?.payload) {
+    throw new Error("Dispatcher not found. Please seed the dispatcher first by visiting /api/seed/dispatcher");
   }
 
-  // Fallback to default
-  return {
-    name: "Dispatch",
-    contactNumber: "+1 (512) 555-9999",
-  };
-}
+  const data = typeof dispatcher.payload === "string" 
+    ? JSON.parse(dispatcher.payload) 
+    : dispatcher.payload;
+  
+  if (!data.name || !data.contactNumber) {
+    throw new Error("Dispatcher data is incomplete");
+  }
 
-function getDefaultDriverSnapshot() {
   return {
-    driver: STATIC_DRIVER_DASHBOARD.driver,
-    driverCallsign: STATIC_DRIVER_DASHBOARD.route.driverCallsign,
-    truck: STATIC_DRIVER_DASHBOARD.route.truck,
+    name: data.name,
+    contactNumber: data.contactNumber,
   };
 }
 
 async function resolveDriverSnapshot(driverId: string | null) {
   if (!driverId) {
-    return getDefaultDriverSnapshot();
+    throw new Error("Driver ID is required. Please select a driver.");
   }
 
-  try {
-    // Query specific driver directly instead of fetching all rows
-    const row = await db
-      .selectFrom("driver_dashboard")
-      .select("payload")
-      .where("id", "=", driverId)
-      .executeTakeFirst();
+  // Query specific driver directly instead of fetching all rows
+  const row = await db
+    .selectFrom("driver_dashboard")
+    .select("payload")
+    .where("id", "=", driverId)
+    .executeTakeFirst();
 
-    if (!row?.payload) {
-      return getDefaultDriverSnapshot();
-    }
-
-    const data = typeof row.payload === "string" ? JSON.parse(row.payload) : row.payload;
-    
-    return {
-      driver: data.driver ?? STATIC_DRIVER_DASHBOARD.driver,
-      driverCallsign: data.route?.driverCallsign ?? STATIC_DRIVER_DASHBOARD.route.driverCallsign,
-      truck: data.route?.truck ?? STATIC_DRIVER_DASHBOARD.route.truck,
-    };
-  } catch (error) {
-    console.error("[resolveDriverSnapshot] Failed to resolve driver:", error);
-    return getDefaultDriverSnapshot();
+  if (!row?.payload) {
+    throw new Error(`Driver ${driverId} not found. Please seed drivers first by visiting /api/seed/drivers`);
   }
+
+  const data = typeof row.payload === "string" ? JSON.parse(row.payload) : row.payload;
+  
+  if (!data.driver || !data.route?.driverCallsign || !data.route?.truck) {
+    throw new Error(`Driver ${driverId} data is incomplete`);
+  }
+
+  return {
+    driver: data.driver,
+    driverCallsign: data.route.driverCallsign,
+    truck: data.route.truck,
+  };
 }
 
 export async function createTow(formData: FormData) {
@@ -96,7 +82,7 @@ export async function createTow(formData: FormData) {
   const destinationAddress = (formData.get("destinationAddress") as string | null)?.trim() ?? "";
   const destinationDistance = (formData.get("destinationDistance") as string | null)?.trim() ?? "";
 
-  const etaMinutes = etaMinutesRaw ? Number(etaMinutesRaw) : STATIC_DRIVER_DASHBOARD.dispatch.etaMinutes;
+  const etaMinutes = etaMinutesRaw ? Number(etaMinutesRaw) : 0;
 
   const { driver, driverCallsign, truck } = await resolveDriverSnapshot(driverId);
   const dispatcherInfo = await getDispatcher();

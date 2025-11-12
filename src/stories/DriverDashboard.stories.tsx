@@ -3,11 +3,11 @@ import type { Meta } from "@storybook/react";
 
 import {
   type DriverDashboardData,
-  STATIC_DRIVER_DASHBOARD,
+  DASHBOARD_TEMPLATE,
 } from "@/app/data/driver-dashboard";
 import { DriverDashboard } from "@/app/components/DriverDashboard";
 
-const baseData: DriverDashboardData = STATIC_DRIVER_DASHBOARD;
+const baseData: DriverDashboardData = DASHBOARD_TEMPLATE;
 
 const cloneDashboard = (data: DriverDashboardData): DriverDashboardData => ({
   driver: { ...data.driver },

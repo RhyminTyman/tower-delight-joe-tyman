@@ -4,7 +4,7 @@ import { defineApp } from "rwsdk/worker";
 import { env } from "cloudflare:workers";
 
 import { Document } from "@/app/Document";
-import { STATIC_DRIVER_DASHBOARD, loadDashboardFromDatabase } from "@/app/data/driver-dashboard";
+import { DASHBOARD_TEMPLATE, loadDashboardFromDatabase } from "@/app/data/driver-dashboard";
 import { setCommonHeaders } from "@/app/headers";
 import { AddNote } from "@/app/pages/AddNote";
 import { AddTow } from "@/app/pages/AddTow";
@@ -46,7 +46,13 @@ const app = defineApp([
   ]),
   route("/api/driver-dashboard", async () => {
     const payload = await loadDashboardFromDatabase();
-    return Response.json(payload ?? STATIC_DRIVER_DASHBOARD);
+    if (!payload) {
+      return Response.json(
+        { error: "No dashboard data found. Please seed the database first." },
+        { status: 404 }
+      );
+    }
+    return Response.json(payload);
   }),
   route("/api/debug/tows", async () => {
     try {
@@ -407,22 +413,22 @@ const app = defineApp([
         const mapUrl = generateMapUrl(tow.pickup, tow.destination);
         
         const dashboardData = {
-          ...STATIC_DRIVER_DASHBOARD,
+          ...DASHBOARD_TEMPLATE,
           dispatch: {
-            ...STATIC_DRIVER_DASHBOARD.dispatch,
+            ...DASHBOARD_TEMPLATE.dispatch,
             ticketId: tow.ticketId,
             vehicle: tow.vehicle,
             etaMinutes: tow.etaMinutes,
           },
           route: {
-            ...STATIC_DRIVER_DASHBOARD.route,
+            ...DASHBOARD_TEMPLATE.route,
             status: tow.status,
             statusTone: tow.statusTone,
             pickup: tow.pickup,
             destination: tow.destination,
             mapUrl: mapUrl,
-            mapImage: mapUrl || STATIC_DRIVER_DASHBOARD.route.mapImage,
-            statuses: STATIC_DRIVER_DASHBOARD.route.statuses.map((s) => {
+            mapImage: mapUrl || DASHBOARD_TEMPLATE.route.mapImage,
+            statuses: DASHBOARD_TEMPLATE.route.statuses.map((s) => {
               if (tow.status === "Waiting") {
                 return s.label === "Waiting" ? { ...s, status: "active" } : { ...s, status: "waiting" };
               }
@@ -602,7 +608,7 @@ const app = defineApp([
         }
 
         const driverData = {
-          ...STATIC_DRIVER_DASHBOARD,
+          ...DASHBOARD_TEMPLATE,
           driver: {
             id: driver.id,
             name: driver.name,
@@ -613,12 +619,12 @@ const app = defineApp([
             contactNumber: driver.contactNumber,
           },
           route: {
-            ...STATIC_DRIVER_DASHBOARD.route,
+            ...DASHBOARD_TEMPLATE.route,
             driverCallsign: driver.callSign,
             truck: driver.truck,
           },
           dispatch: {
-            ...STATIC_DRIVER_DASHBOARD.dispatch,
+            ...DASHBOARD_TEMPLATE.dispatch,
             ticketId: `DRIVER-${driver.id}`,
           },
         };

@@ -1,5 +1,5 @@
 import { db } from "@/db";
-import { STATIC_DRIVER_DASHBOARD } from "@/app/data/driver-dashboard";
+import { DASHBOARD_TEMPLATE } from "@/app/data/driver-dashboard";
 
 const DRIVER_DASHBOARD_TABLE = "driver_dashboard" as const;
 
@@ -105,20 +105,20 @@ export default async () => {
   // Insert all seed tows
   for (const tow of SEED_TOWS) {
     const dashboardData = {
-      ...STATIC_DRIVER_DASHBOARD,
+      ...DASHBOARD_TEMPLATE,
       dispatch: {
-        ...STATIC_DRIVER_DASHBOARD.dispatch,
+        ...DASHBOARD_TEMPLATE.dispatch,
         ticketId: tow.ticketId,
         vehicle: tow.vehicle,
         etaMinutes: tow.etaMinutes,
       },
       route: {
-        ...STATIC_DRIVER_DASHBOARD.route,
+        ...DASHBOARD_TEMPLATE.route,
         status: tow.status,
         statusTone: tow.statusTone,
         pickup: tow.pickup,
         destination: tow.destination,
-        statuses: STATIC_DRIVER_DASHBOARD.route.statuses.map((s) => {
+        statuses: DASHBOARD_TEMPLATE.route.statuses.map((s) => {
           if (tow.status === "Waiting") {
             return s.label === "Waiting" ? { ...s, status: "active" } : { ...s, status: "waiting" };
           }

@@ -503,6 +503,54 @@ const app = defineApp([
       );
     }
   }),
+  route("/api/debug/drivers", async () => {
+    try {
+      const drivers = await db
+        .selectFrom("driver_dashboard")
+        .selectAll()
+        .where("id", "like", "driver-%")
+        .execute();
+      
+      const driverList = drivers.map(d => {
+        const payload = JSON.parse(d.payload);
+        return {
+          id: d.id,
+          name: payload.name,
+          role: payload.role,
+          callSign: payload.callSign
+        };
+      });
+      
+      return Response.json({ 
+        count: driverList.length,
+        drivers: driverList
+      });
+    } catch (error) {
+      console.error("[Debug Drivers] Error:", error);
+      return Response.json({ success: false, error: String(error) }, { status: 500 });
+    }
+  }),
+
+  route("/api/fix-drivers", async () => {
+    try {
+      // Delete driver-784 (duplicate Jordan Alvarez)
+      await db
+        .deleteFrom("driver_dashboard")
+        .where("id", "=", "driver-784")
+        .execute();
+      
+      console.log(`[Fix Drivers] Removed driver-784`);
+      
+      return Response.json({ 
+        success: true, 
+        message: "Removed duplicate Jordan Alvarez (driver-784)"
+      });
+    } catch (error) {
+      console.error("[Fix Drivers] Error:", error);
+      return Response.json({ success: false, error: String(error) }, { status: 500 });
+    }
+  }),
+
   route("/api/seed/drivers/reset", async () => {
     try {
       

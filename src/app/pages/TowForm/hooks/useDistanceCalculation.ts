@@ -85,7 +85,8 @@ export function useDistanceCalculation({
       const dLng = parseFloat(debouncedDestLng);
 
       // Need all coordinates and Google Maps to be loaded
-      if (!pLat || !pLng || !dLat || !dLng || isLoadingMaps) {
+      // Check for valid numbers (not NaN, not 0, not null/undefined)
+      if (!Number.isFinite(pLat) || !Number.isFinite(pLng) || !Number.isFinite(dLat) || !Number.isFinite(dLng) || isLoadingMaps) {
         return;
       }
 

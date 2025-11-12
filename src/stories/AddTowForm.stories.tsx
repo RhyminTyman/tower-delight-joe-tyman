@@ -1,12 +1,52 @@
 import type { Meta, StoryObj } from "@storybook/react";
 
 import { AddTowForm } from "@/app/pages/AddTow/AddTowForm";
+import type { DriverOption } from "@/app/pages/TowForm/TowForm";
 
 // Mock driver options for the form
-const mockDriverOptions = [
-  { id: "driver-784", name: "Jordan Alvarez" },
-  { id: "driver-512", name: "Maria Garcia" },
-  { id: "driver-331", name: "James Wilson" },
+const mockDriverOptions: DriverOption[] = [
+  {
+    id: "driver-784",
+    name: "Jordan Alvarez",
+    callSign: "HD-12",
+    snapshot: {
+      id: "driver-784",
+      name: "Jordan Alvarez",
+      role: "Heavy Duty Operator",
+      shift: "Night",
+      truck: "Unit HD-12",
+      status: "Available",
+      contactNumber: "555-0123",
+    },
+  },
+  {
+    id: "driver-512",
+    name: "Maria Garcia",
+    callSign: "HD-08",
+    snapshot: {
+      id: "driver-512",
+      name: "Maria Garcia",
+      role: "Light Duty Operator",
+      shift: "Day",
+      truck: "Unit LD-08",
+      status: "Available",
+      contactNumber: "555-0124",
+    },
+  },
+  {
+    id: "driver-331",
+    name: "James Wilson",
+    callSign: "HD-15",
+    snapshot: {
+      id: "driver-331",
+      name: "James Wilson",
+      role: "Heavy Duty Operator",
+      shift: "Day",
+      truck: "Unit HD-15",
+      status: "Available",
+      contactNumber: "555-0125",
+    },
+  },
 ];
 
 const meta: Meta<typeof AddTowForm> = {

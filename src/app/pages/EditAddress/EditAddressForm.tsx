@@ -1,6 +1,8 @@
 "use client";
 
+import { useState } from "react";
 import { Card } from "@/components/ui/card";
+import { AddressAutocompleteInput } from "@/components/AddressAutocompleteInput";
 import { updateAddress } from "./functions";
 
 interface EditAddressFormProps {
@@ -13,9 +15,22 @@ interface EditAddressFormProps {
 }
 
 export function EditAddressForm({ towId, addressType, ticketId, title, address, distance }: EditAddressFormProps) {
+  const [selectedAddress, setSelectedAddress] = useState(address);
+  const [coordinates, setCoordinates] = useState<{ lat: string; lng: string } | null>(null);
+
   async function handleSubmit(formData: FormData) {
+    // Add coordinates if available
+    if (coordinates) {
+      formData.set('lat', coordinates.lat);
+      formData.set('lng', coordinates.lng);
+    }
     await updateAddress(formData);
     window.location.href = `/tow/${towId}`;
+  }
+
+  function handlePlaceSelected(place: { address: string; lat: string; lng: string }) {
+    setSelectedAddress(place.address);
+    setCoordinates({ lat: place.lat, lng: place.lng });
   }
 
   return (
@@ -62,19 +77,14 @@ export function EditAddressForm({ towId, addressType, ticketId, title, address, 
                 />
               </div>
 
-              <div>
-                <label htmlFor="address" className="mb-1.5 block text-xs text-muted-foreground">
-                  Street Address
-                </label>
-                <textarea
-                  id="address"
-                  name="address"
-                  defaultValue={address}
-                  rows={2}
-                  className="w-full rounded-none border border-border/60 bg-slate-900/50 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
-                  placeholder="e.g. 830 South 17th Street, Columbus OH 43206"
-                />
-              </div>
+              <AddressAutocompleteInput
+                id="address"
+                name="address"
+                label="Street Address (Start typing to autocomplete)"
+                defaultValue={selectedAddress}
+                placeholder="e.g. 830 South 17th Street, Columbus OH 43206"
+                onPlaceSelected={handlePlaceSelected}
+              />
 
               <div>
                 <label htmlFor="distance" className="mb-1.5 block text-xs text-muted-foreground">

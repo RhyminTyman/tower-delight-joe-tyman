@@ -38,7 +38,7 @@ async function loadDriverOptions(): Promise<DriverOption[]> {
           id: driver.id,
           name: driver.name,
           snapshot: driver,
-          callSign: driver.callSign || data?.route?.driverCallsign,
+          callSign: data?.route?.driverCallsign,
         });
       } catch (error) {
         console.warn("[AddTow] Failed to parse driver payload:", error);

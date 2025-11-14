@@ -7,3 +7,4 @@ CREATE TABLE driver_dashboard (
   updated_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now'))
 );
 
+

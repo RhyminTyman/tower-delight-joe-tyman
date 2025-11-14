@@ -4,7 +4,7 @@
  */
 
 import { Card } from "@/components/ui/card";
-import { useAutocomplete } from "../hooks/useAutocomplete";
+import { useAutocomplete } from "@/hooks";
 
 interface LocationSectionProps {
   title: string;

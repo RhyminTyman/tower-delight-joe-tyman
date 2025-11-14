@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { updateTowStatus } from "./functions";
-import { useOptimisticUpdate } from "@/hooks/useOptimisticUpdate";
+import { updateTowStatus } from "@/actions/towDetail";
+import { useOptimisticUpdate } from "@/hooks";
 
 interface StatusBannerProps {
   towId: string;
@@ -84,7 +84,7 @@ export function StatusBanner({ towId, currentStatus }: StatusBannerProps) {
             type="button"
             title="Change status"
             aria-label="Open status menu"
-            aria-expanded={isDropdownOpen}
+            aria-expanded={isDropdownOpen ? "true" : "false"}
             aria-haspopup="menu"
             className={`${nextStatus ? '' : ''} bg-white/20 p-2 text-white transition-colors hover:bg-white/30 disabled:opacity-50 aspect-square flex items-center justify-center`}
           >

@@ -1,6 +1,6 @@
 import type { StoryObj } from "@storybook/react";
 import type { Meta } from "@storybook/react";
-import { TowCard } from "@/app/pages/TowList/TowCard";
+import { TowCard } from "@/components";
 import type { TowItem } from "@/types/tow";
 
 // Wrapper to provide consistent max-width for card display

@@ -1,9 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Card } from "@/components/ui/card";
-import { AddressAutocompleteInput } from "@/components/AddressAutocompleteInput";
-import { updateAddress } from "./functions";
+import { Card, AddressAutocompleteInput } from "@/components";
+import { updateAddress } from "@/actions";
 
 interface EditAddressFormProps {
   towId: string;

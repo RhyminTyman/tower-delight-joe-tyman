@@ -1,6 +1,6 @@
 import type { StoryObj } from "@storybook/react";
 import type { Meta } from "@storybook/react";
-import { TowListScreen } from "@/app/pages/TowList/TowListScreen";
+import { TowListScreen } from "@/components";
 import type { TowItem } from "@/types/tow";
 
 // Mock tow data factory

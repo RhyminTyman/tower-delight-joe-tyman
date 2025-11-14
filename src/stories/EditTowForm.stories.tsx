@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react";
 
-import { EditTowForm } from "@/app/pages/EditTow/EditTowForm";
+import { EditTowForm } from "@/components";
 
 // Mock tow data for editing
 const mockTowData = {

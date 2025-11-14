@@ -1,7 +1,6 @@
 import type { RequestInfo } from "rwsdk/worker";
-import { Button } from "@/components/ui/button";
+import { Button, EditAddressForm } from "@/components";
 import { db } from "@/db";
-import { EditAddressForm } from "./EditAddress/EditAddressForm";
 
 interface AddressEditData {
   ticketId: string;

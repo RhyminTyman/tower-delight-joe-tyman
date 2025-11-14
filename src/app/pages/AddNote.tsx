@@ -1,6 +1,6 @@
 import type { RequestInfo } from "rwsdk/worker";
 import { db } from "@/db";
-import { AddNoteForm } from "./AddNote/AddNoteForm";
+import { AddNoteForm } from "@/components";
 
 export const AddNote = async (requestInfo: RequestInfo) => {
   const towId = requestInfo.params.id;

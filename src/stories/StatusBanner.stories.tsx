@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react";
 
-import { StatusBanner } from "@/app/pages/TowDetail/StatusBanner";
+import { StatusBanner } from "@/components";
 
 const meta: Meta<typeof StatusBanner> = {
   title: "Components/StatusBanner",

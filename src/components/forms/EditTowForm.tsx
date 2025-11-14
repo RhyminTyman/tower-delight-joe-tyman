@@ -1,7 +1,7 @@
 "use client";
 
-import { TowForm, type TowTypeOption } from "../TowForm/TowForm";
-import { updateTow } from "./functions";
+import { TowForm, type TowTypeOption } from "./TowForm";
+import { updateTow } from "@/actions";
 
 interface TowEditData {
   ticketId: string;

@@ -5,7 +5,7 @@
 
 import { useEffect, useState } from 'react';
 import type { Coordinates, DistanceResult } from '@/types/maps';
-import { useDebounce } from '@/utils/performance';
+import { useDebounce } from './useDebounce';
 
 async function calculateDistance(
   origin: Coordinates,

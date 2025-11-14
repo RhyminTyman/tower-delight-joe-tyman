@@ -1,7 +1,7 @@
 import type { RequestInfo } from "rwsdk/worker";
 
 import { loadDriverDashboard } from "@/app/data/driver-dashboard";
-import { DriverDashboard } from "@/app/components/DriverDashboard";
+import { DriverDashboard } from "@/components";
 
 export const Home = async (requestInfo: RequestInfo) => {
   const data = await loadDriverDashboard(requestInfo);

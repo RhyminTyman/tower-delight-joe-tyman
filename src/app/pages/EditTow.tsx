@@ -1,6 +1,6 @@
 import type { RequestInfo } from "rwsdk/worker";
 import { db } from "@/db";
-import { EditTowForm } from "./EditTow/EditTowForm";
+import { EditTowForm } from "@/components";
 
 interface TowEditData {
   ticketId: string;

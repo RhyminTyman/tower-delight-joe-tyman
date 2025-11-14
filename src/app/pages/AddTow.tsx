@@ -2,7 +2,7 @@ import type { RequestInfo } from "rwsdk/worker";
 
 import { db } from "@/db";
 import type { DriverSnapshot } from "@/app/data/driver-dashboard";
-import { AddTowForm } from "./AddTow/AddTowForm";
+import { AddTowForm } from "@/components";
 
 type DriverOption = {
   id: string;

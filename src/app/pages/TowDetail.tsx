@@ -1,12 +1,7 @@
 import type { RequestInfo } from "rwsdk/worker";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+import { Badge, Button, Card, TowActions, StatusBanner, PhotoPreview } from "@/components";
 import { db } from "@/db";
 import { parseDashboardRow } from "@/app/data/driver-dashboard";
-import { TowActions } from "./TowDetail/TowActions";
-import { StatusBanner } from "./TowDetail/StatusBanner";
-import { PhotoPreview } from "./TowDetail/PhotoPreview";
 
 export const TowDetail = async (requestInfo: RequestInfo) => {
   const towId = requestInfo.params.id;

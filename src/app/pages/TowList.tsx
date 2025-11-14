@@ -1,6 +1,6 @@
 import type { RequestInfo } from "rwsdk/worker";
 import { db } from "@/db";
-import { TowListScreen } from "./TowList/TowListScreen";
+import { TowListScreen } from "@/components";
 import type { TowItem } from "@/types/tow";
 
 export const TowList = async (requestInfo: RequestInfo) => {

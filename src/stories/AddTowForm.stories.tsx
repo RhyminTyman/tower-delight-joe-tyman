@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
 
-import { AddTowForm } from "@/app/pages/AddTow/AddTowForm";
-import type { DriverOption } from "@/app/pages/TowForm/TowForm";
+import { AddTowForm } from "@/components";
+import type { DriverOption } from "@/components/forms/TowForm";
 
 // Mock driver options for the form
 const mockDriverOptions: DriverOption[] = [

@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react";
 
-import { PhotoPreview } from "@/app/pages/TowDetail/PhotoPreview";
+import { PhotoPreview } from "@/components";
 
 // Sample base64 encoded 1x1 pixel images for demonstration
 const SAMPLE_IMAGES = {

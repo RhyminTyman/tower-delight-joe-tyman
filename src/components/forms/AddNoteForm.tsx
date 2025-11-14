@@ -1,6 +1,6 @@
 "use client";
 
-import { addNote } from "./functions";
+import { addNote } from "@/actions";
 import { useCallback, useMemo, useState, type MouseEvent } from "react";
 
 interface AddNoteFormProps {

@@ -4,7 +4,7 @@
  */
 
 import { Card } from "@/components/ui/card";
-import type { TowTypeOption, DriverOption } from "../types";
+import type { TowTypeOption, DriverOption } from "./TowForm";
 
 interface TowDetailsSectionProps {
   mode: "create" | "edit";

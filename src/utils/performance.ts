@@ -1,28 +1,7 @@
 /**
  * Performance utilities for debouncing and throttling
+ * Note: For the React hook version of debounce, use useDebounce from @/hooks
  */
-
-import { useEffect, useState } from 'react';
-
-/**
- * React hook for debouncing values
- * Useful for delaying API calls until user stops typing
- */
-export function useDebounce<T>(value: T, delay: number): T {
-  const [debouncedValue, setDebouncedValue] = useState<T>(value);
-
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedValue(value);
-    }, delay);
-
-    return () => {
-      clearTimeout(handler);
-    };
-  }, [value, delay]);
-
-  return debouncedValue;
-}
 
 /**
  * Debounce function - delays execution until after wait time has elapsed
